@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset = "UTF-8"/>
+        <meta name = "Author" content = ""/>
+        <title>ChunkPianoSystem</title>
+        <!-- socket.io を利用する際の定石の記述．一番最初に読み込むべし．Brackets のライブプビュー時にはここをコメントアウトした方が良い -->
+        <script src="/socket.io/socket.io.js"></script> 
+        <!-- まず head 要素で css を読込 -->
+        <link rel = "stylesheet" type = "text/css" href="css/sweetalert.css"/> 
+        <link rel = "stylesheet" type = "text/css" href="css/ChunkPianoSystem_client.css"/> 
+        <!-- css の後に javascript を読込 -->
+        <!-- html を javascript で簡単に書き換えるためのライブラリ -->
+        <script type = "text/javascript" src = "js/libraries/sweetalert.min.js"></script>
+        <script type = "text/javascript" src = "js/libraries/jquery.js"></script>
+        <!-- 自分の javascript を読み込む -->
+        <script type = "text/javascript" src = "js/ChunkPianoSystem_client.js"></script>
+    </head>
+    
+    <body>
+        
+        <div class="testFrame" id="upperFrame">
+            <h1 class="testFrameInnnerText" id="textArea"></h1>
+            <img src="scoreImage/TurcoScore.png" id="scoreImage" alt="譜面画像データがありません．"/>
+            <div id="chunkDrawingArea">
+                <!--div class="chunk pattern" id="patternChunk_Zero">
+                    <div class="chunkDeleteButton" id="patternChunk_Zero_DeleteButton">
+                        <p class="chunkDeleteButtonFont">×</p>
+                    </div>
+                </div-->
+            </div>
+        </div>
+        <div class="testFrame" id="lowerFrame">
+            <div class="button" id="fileLoadButton">ファイル読込</div>
+            <div class="button" id="leftChunkButton">←</div>
+            <div class="button" id="rightChunkButton">→</div>
+            <!--input type="input/text" class="textInput" id="alertText" placeholder="テキストを入力してください..." /-->
+            <div class="button" id="saveChunkButton">チャンクを保存</div>
+        </div>
+        
+        <!--div class="helloHtml" id="mainFlame">
+            <div id="scoreArea">
+                <input type="text" id="textInput" size="2" maxlength="2"/>
+                <div class="button" id="textInputButton">input!</div>
+            </div>
+        </div-->
+        
+    </body>
+</html>

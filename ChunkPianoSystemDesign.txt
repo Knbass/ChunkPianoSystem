@@ -1,0 +1,101 @@
+次回
+	機能はチャンクによる頭出し
+	上田			
+		pianoData を tsv から json に変換するプログラムを作成
+	
+	勉強のこり
+		サーバなしの場合
+			上田プログラム読み
+			チャンクを生成，保存，(更新，削除)　(CURD)，再生 のアルゴリズムを考える
+				上田がアノテーション機能の実装ですでに心得てます
+				
+		サーバありの場合
+			サーバなしの場合に加えて
+				HTTPサーバ
+				socket 通信
+			
+	ゴールライン
+		サーバも使う?
+			チャンクや演奏データの保存が少し面倒 
+				ただし現状の上田 pianoSystem はサーバレス					
+				サーバに関しては上田全面サポート
+		サーバレスの場合
+			比較的簡単に実装できるけど，セキュリティの制約で予期せぬバグが起きやすい
+				結果サーバありとそんなに時間は変わらない
+		
+!!!!! io, httpServer 宣言忘れ全修正. グローバル変数になっている!!!
+CommandExecuter のパス修正
+
+onHttpRequest を initHttpAndSocketIo の内部関数にする
+
+上田が加担
+	サーバが必要が必要な処理は上田が全面サポート
+石垣さん中心の実装
+
+
+い. チャンクを書くために必要な手順
+	0. 譜面を表示している要素上でのマウスの位置を取得
+	1. 楽譜上でマウスドラッグを開始した x，y 座標を取得
+		e.offsetX
+	2. マウスをドラッグした x 軸方向の距離を計算
+		マウスドラッグを終了した時の x 座標 - 楽譜上でマウスドラッグを開始した x
+		 y座標についても同じ
+		 jQuery mousedown, mouseleave, mouseup
+	
+	★★★★★ まずは ドラッグ開始，終了，x, y のドラッグ距離を console.log する!
+	
+	 3. javascript から <a> あるいは <div> のタグを生成．css の width，height を 手順 2の x, y に書換
+	     css の top，left を ドラッグ開始位置の x, y に書換
+		jquery dom 生成，jquery css 変更，
+
+ろ. 各々のチャンク に × (削除ボタンを作る時)
+	1. い の 3 の手順と際に生成したチャンクの要素に × ボタンの要素を挿入
+	     この際，×ボタンを click された時の動作を jQuery で記述
+	     		x ボタンの対象となるチャンクを指定しなければなにも起きない !
+
+は.  保存のための処理を記述
+	1. chunkDom 描画時に オブジェクト型 ( {キー:バリュー, ...} ) でデータ構造を作る
+		保存名のテンプレート
+			ChunkPianoData_Syasu_2016-2-11_18-23-05-0457_practiceDay-1.json
+		JSONデータ構造のテンプレート
+			{
+				chunkData:{
+					chunkDomId :{
+						left: ---,
+						top:---,
+						width:---,
+						height:---,
+						chunkType: pattern,
+						parentChunk: null
+					},					
+					chunkDomId :{
+						left: ---,
+						top:---,
+						width:---,
+						height:---,
+						chunkType: pattern,
+						parentChunk: null
+					},					
+					chunkDomId :{
+						left: ---,
+						top:---,
+						width:---,
+						height:---,
+						chunkType: pattern,
+						parentChunk: null
+					}
+				}
+			}
+        2. chunkDelBtn クリック時に dom を削除するだけでなく，データ構造からも該当ずるチャンクの
+            データを id でアクセスし削除する． 
+        3. データ構造からチャンクを再描画できるようにする
+        	この際，チャンクの id カウンタも復元する
+	        	チャンク id の最大値を求め，新たにチャンクを追加するときは必ずその値よりも
+	        	大きな値でチャンク id を付与する
+	        現段階の createChunkDom メソッドは id を復元するための引数を取らないので，
+	        String 型引数 mode を追加し，mode = 'restore' の時は id を オブジェクトの chunkDomId
+	        を id として dom を生成するようにする．
+
+⚫︎ ChunkData を一覧するリストのUI
+ 	SweetAlert を利用．
+ 	An HTML message で自作 data list を追加するする．
