@@ -109,6 +109,7 @@ var ChunkPianoSystem_server = function(){
             });
             
             socket.on('chunkFileNameReq', function(data){
+                
                 getChunkDataJsonList('./ChunkData/', function(fileNameList, err){
                     if(err){
                         
@@ -125,6 +126,24 @@ var ChunkPianoSystem_server = function(){
                 });
             });
             
+            socket.on('chunkDataReq', function(data){
+                var reqestedChunkData;
+                
+                try{
+                    reqestedChunkData = fs.readFileSync('./ChunkData/' + data.requestChunkDataFileName, 'utf-8');
+                    socket.emit('reqestedChunkData',{
+                        status: 'success', // status は success, error, sameFileExist
+                        message: 'チャンクデータの読み込みを\n完了しました!!',
+                        reqestedChunkData:reqestedChunkData
+                    });
+                }catch(e){
+                    console.log(e);
+                    socket.emit('reqestedChunkData',{
+                        status: 'error', // status は success, error, sameFileExist
+                        message: 'チャンクデータの読み込みに\n失敗しました...'
+                    });
+                }
+            });
             // io.sockets.emit では自分以外の全員に emit してしまう... 
             // 参考: http://www.tettori.net/post/852/ , http://blog.choilabo.com/20120320/31
             // io.sockets.emit  　→ 自分を含む全員にデータを送信する.

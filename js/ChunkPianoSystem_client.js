@@ -16,6 +16,8 @@ var ChunkPianoSystem_client = function(){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // todo: チャンクを複数に分けて描画した際の link を指定する引数 parentChunk を追加
+    // このメソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
+    // for in 文で回し1つずつ描画する．
     createChunkDom = function(chunkPropCCD){ 
         // Chunk のサイズが 0 の時には Chunk を描画しない．
         if((chunkPropCCD.width  != 0 && chunkPropCCD.width  != null && chunkPropCCD.width  != undefined ) ||
@@ -80,6 +82,8 @@ var ChunkPianoSystem_client = function(){
             if(chunkPropCCD.chunkType == 'pattern'){
                 patternChunkCount++; // todo: phraseChunk, hardChunk 描画時のカウンティング処理を追加
             }
+        }else{
+            console.log('something wrong!!!');
         }
     };
     ///////////////////////////////////////////////
@@ -106,6 +110,8 @@ var ChunkPianoSystem_client = function(){
             
             var pullDownMenuTemplate = '<select class="pullDownMenu" id="chunkDataSelectMenu">'
             
+            
+            // todo: プルダウンメニューに ChunkPianoData や .json を描画する必要は無いので，split して消去
             for(var i in data.fileNameList){ //  i をインデックスとして data.fileNameList の長さ分 for 文を実行
                 pullDownMenuTemplate += '<option value ="' + data.fileNameList[i] + '">' + data.fileNameList[i] + '</option>';
             }
@@ -122,16 +128,40 @@ var ChunkPianoSystem_client = function(){
                 showLoaderOnConfirm: true,
             }, function(){
                 setTimeout(function () {
-                    
                     // 上記で生成したプルダウンメニューでユーザが選択したファイル名を取得
                     var chunkDataSelectMenuVal = $('#chunkDataSelectMenu').val();
                     console.log('chunkDataSelectMenuVal: ' + chunkDataSelectMenuVal);
-                    swal( 'データの読み込みを完了しました!');
-                    // swal.close();
                     
-                }, 1500);
+                    socketIo.emit('chunkDataReq',{requestChunkDataFileName:chunkDataSelectMenuVal});
+                    // swal.close();
+                }, 1000); // chunkDataSelectMenu DOM の描画を待つ必要があるため，1.5 秒待つ．
             }); 
             
+        });
+        
+        socketIo.on('reqestedChunkData', function(data){
+            
+            // data.reqestedChunkData にユーザが指定した ChunkData が格納されている．
+            // これは stringfy (文字列化) されているので JSON.parse() で JavaScript のオブジェクトに変換する．
+            
+            data.reqestedChunkData = JSON.parse(data.reqestedChunkData);
+            
+            // createChunkDom メソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
+            // for in 文で回し1つずつ描画する．
+            for(var chunkId in data.reqestedChunkData.chunkData){
+                createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
+            }
+            
+            // todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
+            //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
+            // !!!! ロードしたチャンクは createChunkDom で描画した際に chunkDataObj に格納される．
+            
+            // todo: 既に Chunk が描画されている時に ChunkData をロードした際の処理を記述
+            //       isChunkRenderd == true の時は ロード前に保存するのを確認し，
+            //       一旦 チャンクを全て消去 ( jQuery の empty() を利用)
+            //       (重要) chunkDataObj.chunkData も空にする．
+            //       isChunkRenderd == false の時は 何もしなくて ok 
+            swal(data.message, '', data.status);
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
@@ -150,12 +180,26 @@ var ChunkPianoSystem_client = function(){
             beforeColor = '',
             isChunkDrawing = false,
             chunkDrawingAreaMouseDowmPosX = 0,
-            chunkDrawingAreaMouseDowmPosY = 0
+            chunkDrawingAreaMouseDowmPosY = 0,
+            swalPromptOptionForUserNameProp,
+            userNameSetter
         ;
+                
+        userNameSetter = function(userNameUNS){
+            chunkDataObj.userName = userNameUNS;
+            swal.close();
+        };
         
-        // todo: 標準 prompt は利用せず，SweetAlert を利用: http://t4t5.github.io/sweetalert/
-        // chunkDataObj.userName = window.prompt('ChunkPianoSystem へようこそ!\n ユーザー名を入力してください...', '');  
-        // console.log(chunkDataObj);
+        swalPromptOptionForUserNameProp = {
+            title: 'ユーザ名を入力してください!',
+            type: 'input',
+            showCancelButton: false,
+            closeOnConfirm: false, // これを true にすると practiceDayChecker が呼び出されなくなる!!!
+            animation: 'slide-from-top',
+            inputPlaceholder: 'ここにユーザ名を入力'                    
+        };
+
+        swal(swalPromptOptionForUserNameProp, userNameSetter);   
         
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
@@ -199,7 +243,7 @@ var ChunkPianoSystem_client = function(){
             if(Object.keys(chunkDataObj.chunkData).length == 0){ // chunk が一つも描画されていない時は保存処理を行わない
                 swal('保存するにはチャンクを\n1つ以上記入してください!', '', 'warning');
             }else{
-                var practiceDayChecker, swalPromptOption; 
+                var practiceDayChecker, swalPromptOptionForPracDayProp; 
                 
                 practiceDayChecker = function(practiceDay){
 
@@ -212,7 +256,8 @@ var ChunkPianoSystem_client = function(){
                         practiceDay = parseInt(practiceDay, 10);
                         practiceDay += String();
                         
-                        if (practiceDay.match(/^[0-9]+$/)){ // 入力値が半角数字の時
+                        if(practiceDay.match(/^[0-9]+$/)){ // 入力値が半角数字の時
+                            // todo: 既に存在しているファイル名の際に，上書きするか確認. 
                             chunkDataObj.practiceDay = practiceDay;
                             socketIo.emit('chunkSaveReq', {chunkDataObj:chunkDataObj});
                         }else{
@@ -221,15 +266,16 @@ var ChunkPianoSystem_client = function(){
                     }
                 };
                 
-                swalPromptOption = {
+                swalPromptOptionForPracDayProp = {
                     title: '今日は何日目の練習日ですか?',
                     type: 'input',
                     showCancelButton: true,
+                    closeOnConfirm: false, // これを true にすると practiceDayChecker が呼び出されなくなる!!!
                     animation: 'slide-from-top',
                     inputPlaceholder: '半角数字で練習日を入力してください．'                    
                 };
-                    
-                swal(swalPromptOption, practiceDayChecker);                
+                
+                swal(swalPromptOptionForPracDayProp, practiceDayChecker);                
             }
         });
         
@@ -242,6 +288,7 @@ var ChunkPianoSystem_client = function(){
             // todo: data で userName をサーバに渡し，その userName のファイルだけを req するようにする．
             // ここではサーバに保存されている ChunkPianoData 名のリストをリクエストしているだけ．
             // リストがレスポンスされた際の処理は socketIo.on の 'chunkFileNameList' 
+            // !!!! 保存データの描画処理は socketIo.on の reqestedChunkData に記述されている !!!!
             socketIo.emit('chunkFileNameReq',{});
         });
         
