@@ -16,7 +16,6 @@ var ChunkPianoSystem_client = function(){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // todo: チャンクを複数に分けて描画した際の link を指定する引数 parentChunk を追加
-    // createChunkDom = function(left, top, width, height, chunkType){
     createChunkDom = function(chunkPropCCD){ 
         // Chunk のサイズが 0 の時には Chunk を描画しない．
         if((chunkPropCCD.width  != 0 && chunkPropCCD.width  != null && chunkPropCCD.width  != undefined ) ||
@@ -102,11 +101,20 @@ var ChunkPianoSystem_client = function(){
         });
         
         socketIo.on('chunkFileNameList', function(data){
-            console.info(data.fileNameList);
+
+            // console.log(data.fileNameList);
+            
+            var pullDownMenuTemplate = '<select class="pullDownMenu" id="chunkDataSelectMenu">'
+            
+            for(var i in data.fileNameList){ //  i をインデックスとして data.fileNameList の長さ分 for 文を実行
+                pullDownMenuTemplate += '<option value ="' + data.fileNameList[i] + '">' + data.fileNameList[i] + '</option>';
+            }
+            
+            pullDownMenuTemplate += '</select>';
             
             swal({
                 title: '読み込むチャンクデータを<br>指定してください!',
-                text: '<select class="pullDownMenu" id="chunkDataSelectMenu"><option value = "ueda">uedaData</option></select>',
+                text: pullDownMenuTemplate,
                 type: 'info',
                 html: true,
                 showCancelButton: false,
@@ -114,9 +122,14 @@ var ChunkPianoSystem_client = function(){
                 showLoaderOnConfirm: true,
             }, function(){
                 setTimeout(function () {
-                    swal('データの読み込みを完了しました!');
+                    
+                    // 上記で生成したプルダウンメニューでユーザが選択したファイル名を取得
+                    var chunkDataSelectMenuVal = $('#chunkDataSelectMenu').val();
+                    console.log('chunkDataSelectMenuVal: ' + chunkDataSelectMenuVal);
+                    swal( 'データの読み込みを完了しました!');
                     // swal.close();
-                }, 1000);
+                    
+                }, 1500);
             }); 
             
         });
@@ -211,8 +224,7 @@ var ChunkPianoSystem_client = function(){
                 swalPromptOption = {
                     title: '今日は何日目の練習日ですか?',
                     type: 'input',
-                    showCancelButton: false,
-                    closeOnConfirm: false,
+                    showCancelButton: true,
                     animation: 'slide-from-top',
                     inputPlaceholder: '半角数字で練習日を入力してください．'                    
                 };
@@ -222,29 +234,15 @@ var ChunkPianoSystem_client = function(){
         });
         
         loadChunkButton.click(function(){
+<<<<<<< HEAD
             // console.log('fileLoadButton');
             
+=======
+>>>>>>> 0d770b32e3b9748e7f38a019c4a8ad818346bc02
             // todo: data で userName をサーバに渡し，その userName のファイルだけを req するようにする．
+            // ここではサーバに保存されている ChunkPianoData 名のリストをリクエストしているだけ．
+            // リストがレスポンスされた際の処理は socketIo.on の 'chunkFileNameList' 
             socketIo.emit('chunkFileNameReq',{});
-            
-            // var chunkDataSelectMenu = $('');
-            
-            /*
-            swal({
-                title: '読み込むチャンクデータを<br>指定してください!',
-                text: '<select class="pullDownMenu" id="chunkDataSelectMenu"><option value = "ueda">uedaData</option></select>',
-                type: 'info',
-                html: true,
-                showCancelButton: false,
-                closeOnConfirm: false,
-                showLoaderOnConfirm: true,
-            }, function(){
-                setTimeout(function () {
-                    swal('データの読み込みを完了しました!');
-                    // swal.close();
-                }, 1000);
-            });
-            */
         });
         
         if(callback) callback();
