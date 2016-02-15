@@ -130,7 +130,7 @@ var ChunkPianoSystem_client = function(){
     initDomAction = function(callback){
         var upperFrame = $('#upperFrame'),        
             saveChunkButton = $('#saveChunkButton'),
-            fileLoadButton = $('#fileLoadButton'),
+            loadChunkButton = $('#loadChunkButton'),
             displayTexitButton = $('#displayTexitButton'),
             alertText = $('.textInput#alertText'),
             textArea = $('#textArea'),
@@ -221,7 +221,7 @@ var ChunkPianoSystem_client = function(){
             }
         });
         
-        fileLoadButton.click(function(){
+        loadChunkButton.click(function(){
             // console.log('fileLoadButton');
             
             // todo: data で userName をサーバに渡し，その userName のファイルだけを req するようにする．
