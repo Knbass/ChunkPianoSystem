@@ -19,8 +19,8 @@ var ChunkPianoSystem_client = function(){
     // createChunkDom = function(left, top, width, height, chunkType){
     createChunkDom = function(chunkPropCCD){ 
         // Chunk のサイズが 0 の時には Chunk を描画しない．
-        if((chunkPropCCD.width  != 0 && chunkPropCCD.width  != '0' && chunkPropCCD.width  != null && chunkPropCCD.width  != undefined ) ||
-           (chunkPropCCD.height != 0 && chunkPropCCD.height != '0' && chunkPropCCD.height != null && chunkPropCCD.height != undefined )
+        if((chunkPropCCD.width  != 0 && chunkPropCCD.width  != null && chunkPropCCD.width  != undefined ) ||
+           (chunkPropCCD.height != 0 && chunkPropCCD.height != null && chunkPropCCD.height != undefined )
           ){
     
             var chunkDom, chunkDomId, chunkDomDelBtn; 
@@ -120,7 +120,8 @@ var ChunkPianoSystem_client = function(){
             }); 
             
         });
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         $(window).unload(function(){
         });        
     };
