@@ -87,7 +87,7 @@ var ChunkPianoSystem_client = function(){
         }
     };
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
+    ///////////////////////////////////////////////
     initSocketIo = function(){
         
         // socketIo = io.connect('http://127.0.0.1:3001');
@@ -130,7 +130,6 @@ var ChunkPianoSystem_client = function(){
                 setTimeout(function () {
                     // 上記で生成したプルダウンメニューでユーザが選択したファイル名を取得
                     var chunkDataSelectMenuVal = $('#chunkDataSelectMenu').val();
-                    console.log('chunkDataSelectMenuVal: ' + chunkDataSelectMenuVal);
                     
                     socketIo.emit('chunkDataReq',{requestChunkDataFileName:chunkDataSelectMenuVal});
                     // swal.close();
