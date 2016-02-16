@@ -66,7 +66,8 @@ var ChunkPianoSystem_server = function(){
         };
         ///////////////////////////////////////////////
         /////////////////////////////////////////////// 
-        httpServer = http.createServer(onHttpRequest).listen(3003, '127.0.0.1');
+        httpServer = http.createServer(onHttpRequest).listen(process.env.VMC_APP_PORT || 3003); // for heroku deployment
+        // httpServer = http.createServer(onHttpRequest).listen(3003, '127.0.0.1');
         
         // socket.io の初期化
         io = socketIo.listen(httpServer);
