@@ -197,3 +197,7 @@ html {
     top:-23px;
     left:0px;
 }
+
+#chunkDataSelectMenu{
+    width: 350px;
+}
