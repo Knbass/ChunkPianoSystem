@@ -2,8 +2,12 @@ var ChunkPianoSystem_client = function(){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     var constructor, initDomAction, createChunkDom, initSocketIo,
-        chunkDrawingArea = $('#chunkDrawingArea'), socketIo, 
-        patternChunkCount = 0, 
+        resetChunkDrawingAreaAndChunkData, turnNotEditedMode,
+        chunkDrawingArea = $('#chunkDrawingArea'), // 複数メソッドで利用するので，クラス内グローバルで宣言
+        socketIo, 
+        patternChunkCount = 0,
+        phraseChunkCount = 0,
+        hardChunkCount = 0,
         isFromLoadChunkButton = false,
         isEditedByChunkMovingOrDelete = false, 
         isEditedByNewChunk = false,
@@ -16,6 +20,23 @@ var ChunkPianoSystem_client = function(){
             practiceDay:null
         }
     ;
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
+    // このメソッドは chunkDataObj の chunkData のみを初期化する
+    // チャンクのカウントもリセットするので注意... 
+    resetChunkDrawingAreaAndChunkData = function(){
+        chunkDataObj.chunkData = {};
+        patternChunkCount = 0;
+        phraseChunkCount = 0;
+        hardChunkCount = 0;
+        chunkDrawingArea.empty();
+    };
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
+    turnNotEditedMode = function(){                        
+        isEditedByChunkMovingOrDelete = false;
+        isEditedByNewChunk = false;
+    };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // todo: チャンクを複数に分けて描画した際の link を指定する引数 parentChunk を追加
@@ -126,8 +147,7 @@ var ChunkPianoSystem_client = function(){
             };
             
             // セーブが完了したら，編集モードを未編集にする． 
-            isEditedByChunkMovingOrDelete = false;
-            isEditedByNewChunk = false;
+            turnNotEditedMode();
             
             setTimeout(isFromLoadChunkButtonProcessing, (WAIT_TIME + 500));
 
@@ -180,6 +200,7 @@ var ChunkPianoSystem_client = function(){
             // data.reqestedChunkData にユーザが指定した ChunkData が格納されている．
             // これは stringfy (文字列化) されているので JSON.parse() で JavaScript のオブジェクトに変換する．
             
+            resetChunkDrawingAreaAndChunkData();
             data.reqestedChunkData = JSON.parse(data.reqestedChunkData);
             
             // createChunkDom メソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
@@ -188,9 +209,7 @@ var ChunkPianoSystem_client = function(){
                 createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
             }
             
-            // データロード後は編集状態を 未編集 に戻す．
-            isEditedByChunkMovingOrDelete = false;
-            isEditedByNewChunk = false;
+            turnNotEditedMode();
             
             // 解決済todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
             //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
@@ -322,6 +341,7 @@ var ChunkPianoSystem_client = function(){
                         // todo: 半角英数字 + 大文字でも処理を通過するバグを修正
                         if(practiceDay.match(/^[0-9]+$/)){ // 練習日数の入力が正しい，つまり入力値が半角数字の時
                             // todo: 既に存在しているファイル名の際に，上書きするか確認. 
+                            // todo: ファイルネームにメタデータをパース可能な状態で付与しているので，この処理は意味がないかもしれない．
                             chunkDataObj.practiceDay = practiceDay;
 
                             // todo: chunkDataObj と chunkDrawingArea をリセット
@@ -376,11 +396,9 @@ var ChunkPianoSystem_client = function(){
                         // todo: chunkDataObj と chunkDrawingArea をリセット
                         // 上記処理のメソッド refreshChunkDataObjAndChunkDrawingArea を作成
             
+                        turnNotEditedMode();
                         // 保存しない をユーザが選択した場合は，意図的に編集モードを未編集に変更し，
                         // loadChunkButton click イベントを再度呼び出す．
-                        isEditedByChunkMovingOrDelete = false;
-                        isEditedByNewChunk = false;
-                        
                         loadChunkButton.click();
                     }
                 });
