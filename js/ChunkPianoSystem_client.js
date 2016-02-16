@@ -4,6 +4,9 @@ var ChunkPianoSystem_client = function(){
     var constructor, initDomAction, createChunkDom, initSocketIo,
         chunkDrawingArea = $('#chunkDrawingArea'), socketIo, 
         patternChunkCount = 0, 
+        isFromLoadChunkButton = false,
+        isEditedByChunkMovingOrDelete = false, 
+        isEditedByNewChunk = false,
         // todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
         //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
         domUtil = ChunkPianoSystem_client.utility(),
@@ -62,7 +65,12 @@ var ChunkPianoSystem_client = function(){
                 parentChunkDom.remove();
                 // html の chunkDom の削除と同時に オブジェクトのデータ構造にも chunkDom を削除．
                 delete chunkDataObj.chunkData[parentChunkDomId];
+                isEditedByChunkMovingOrDelete = true;
                 console.log(chunkDataObj);
+            });
+            
+            chunkDom.mousedown(function(){
+                isEditedByChunkMovingOrDelete = true; // chunkDom がクリック，または移動された際は編集された，と定義する
             });
             
             chunkDom.append(chunkDomDelBtn);
@@ -101,7 +109,35 @@ var ChunkPianoSystem_client = function(){
 	    });
         
         socketIo.on('chunkDataSaveRes', function(data){
-            swal(data.message, '', data.status);
+            
+            var isFromLoadChunkButtonProcessing,
+                WAIT_TIME = 2000
+            ;
+            
+            isFromLoadChunkButtonProcessing = function(){
+                // loadChunkButton を押し，保存するを選択．正しい練習日数を記入し，保存をクリックした際に呼ばれる処理
+                if(isFromLoadChunkButton){ 
+                    // todo: 通信エラー時に isFromLoadChunkButton を false にできない可能性がある．
+                    //       ユーザがブラウザをリロードすれば解決するが...
+                    isFromLoadChunkButton = false; // これを行わないと，保存処理を行うたびにロード処理のモーダルウィンドウも表示される
+                    console.error('シャブババア');
+                    socketIo.emit('chunkFileNameReq',{});
+                }
+            };
+            
+            // セーブが完了したら，編集モードを未編集にする． 
+            isEditedByChunkMovingOrDelete = false;
+            isEditedByNewChunk = false;
+            
+            setTimeout(isFromLoadChunkButtonProcessing, (WAIT_TIME + 500));
+
+            swal({   
+                title: data.message, 
+                type: data.status, timer: WAIT_TIME, 
+                showConfirmButton: false }
+                )
+            ;
+
         });
         
         socketIo.on('chunkFileNameList', function(data){
@@ -139,7 +175,7 @@ var ChunkPianoSystem_client = function(){
             
         });
         
-        socketIo.on('reqestedChunkData', function(data){
+        socketIo.on('reqestedChunkData', function(data){ // ロードリクエストをした chunkData がレスポンスされた時
             
             // data.reqestedChunkData にユーザが指定した ChunkData が格納されている．
             // これは stringfy (文字列化) されているので JSON.parse() で JavaScript のオブジェクトに変換する．
@@ -151,6 +187,10 @@ var ChunkPianoSystem_client = function(){
             for(var chunkId in data.reqestedChunkData.chunkData){
                 createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
             }
+            
+            // データロード後は編集状態を 未編集 に戻す．
+            isEditedByChunkMovingOrDelete = false;
+            isEditedByNewChunk = false;
             
             // 解決済todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
             //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
@@ -203,8 +243,13 @@ var ChunkPianoSystem_client = function(){
         ;
                 
         userNameSetter = function(userNameUNS){
-            chunkDataObj.userName = userNameUNS;
-            swal.close();
+            
+            if(userNameUNS == '' || userNameUNS == null || userNameUNS == undefined){
+                swal.showInputError('ユーザ名は必須です!');
+            }else{
+                chunkDataObj.userName = userNameUNS;
+                swal.close();
+            }
         };
         
         swalPromptOptionForUserNameProp = {
@@ -250,12 +295,13 @@ var ChunkPianoSystem_client = function(){
                 
                 createChunkDom(chunkProperties);
                 
+                isEditedByNewChunk = true;
                 isChunkDrawing = false;
             }
         });    
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
-        saveChunkButton.click(function(){
+        saveChunkButton.click(function(mode){
             
             if(Object.keys(chunkDataObj.chunkData).length == 0){ // chunk が一つも描画されていない時は保存処理を行わない
                 swal('保存するにはチャンクを\n1つ以上記入してください!', '', 'warning');
@@ -263,7 +309,7 @@ var ChunkPianoSystem_client = function(){
                 var practiceDayChecker, swalPromptOptionForPracDayProp; 
                 
                 practiceDayChecker = function(practiceDay){
-
+                    
                     if(practiceDay == 0 || practiceDay == undefined || practiceDay == null){                        
                         swal.showInputError('半角数字で練習日を入力してください．');
                     }else{
@@ -273,10 +319,14 @@ var ChunkPianoSystem_client = function(){
                         practiceDay = parseInt(practiceDay, 10);
                         practiceDay += String();
                         
-                        if(practiceDay.match(/^[0-9]+$/)){ // 入力値が半角数字の時
+                        // todo: 半角英数字 + 大文字でも処理を通過するバグを修正
+                        if(practiceDay.match(/^[0-9]+$/)){ // 練習日数の入力が正しい，つまり入力値が半角数字の時
                             // todo: 既に存在しているファイル名の際に，上書きするか確認. 
                             chunkDataObj.practiceDay = practiceDay;
-                            socketIo.emit('chunkSaveReq', {chunkDataObj:chunkDataObj});
+
+                            // todo: chunkDataObj と chunkDrawingArea をリセット
+                            // 上記処理のメソッド refreshChunkDataObjAndChunkDrawingArea を作成                            
+                            socketIo.emit('chunkSaveReq', {chunkDataObj:chunkDataObj});                            
                         }else{
                             swal.showInputError('半角数字で練習日を入力してください．');
                         }
@@ -301,7 +351,44 @@ var ChunkPianoSystem_client = function(){
             // ここではサーバに保存されている ChunkPianoData 名のリストをリクエストしているだけ．
             // リストがレスポンスされた際の処理は socketIo.on の 'chunkFileNameList' 
             // !!!! 保存データの描画処理は socketIo.on の reqestedChunkData に記述されている !!!!
-            socketIo.emit('chunkFileNameReq',{});
+                        
+            // chank が編集された際の処理
+            // 編集の定義... chank が動かされた，削除された，記入された とき．
+            if(isEditedByChunkMovingOrDelete || isEditedByNewChunk){ 
+            
+                swal({
+                    title: '変更を保存しますか?',
+                    type: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#26642d',
+                    confirmButtonText: '保存する',
+                    cancelButtonColor: '#7c0c0c',
+                    cancelButtonText: '保存しない',
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                }, function (isConfirm){ // 保存する をクリックした場合
+                    if(isConfirm){
+                        // saveChunkButton をクリックすれば．保存モードに移行できる．
+                        //
+                        isFromLoadChunkButton = true;
+                        saveChunkButton.click(); 
+                    }else{
+                        // todo: chunkDataObj と chunkDrawingArea をリセット
+                        // 上記処理のメソッド refreshChunkDataObjAndChunkDrawingArea を作成
+            
+                        // 保存しない をユーザが選択した場合は，意図的に編集モードを未編集に変更し，
+                        // loadChunkButton click イベントを再度呼び出す．
+                        isEditedByChunkMovingOrDelete = false;
+                        isEditedByNewChunk = false;
+                        
+                        loadChunkButton.click();
+                    }
+                });
+                
+                //saveChunkButton.click();
+            }else{
+                socketIo.emit('chunkFileNameReq',{});
+            }
         });
         
         if(callback) callback();
