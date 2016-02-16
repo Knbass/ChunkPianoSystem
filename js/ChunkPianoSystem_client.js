@@ -152,15 +152,32 @@ var ChunkPianoSystem_client = function(){
                 createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
             }
             
-            // todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
+            // 解決済todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
             //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
             // !!!! ロードしたチャンクは createChunkDom で描画した際に chunkDataObj に格納される．
+            // ChunkData のロード時に createChunkDom によって，chunkData に格納されている順番で id が再度付与されている
+            // そのため，上記 todo の作業は必要なし
+            // データロード後，チャンクの位置を変えずデータを上書きした場合は，チャンクの情報は変わらずに，id のみが再度付与される．
+            // 
+            // 動作例... 
+            //1. 新規チャンクを描画            
+            //	patternChunk_0: Object
+            //	patternChunk_1: Object
+            //	patternChunk_2: Object
+            //	patternChunk_3: Object
+            //2.  patternChunk_1 を削除し，データを保存
+            //3.  2 のデータをロード
+            //	patternChunk_0: Object
+            //	patternChunk_1: Object
+            //	patternChunk_2: Object
+            //	# ロード時に createChunkDom メソッドによってデータの登場順に id が再度付与される
             
             // todo: 既に Chunk が描画されている時に ChunkData をロードした際の処理を記述
             //       isChunkRenderd == true の時は ロード前に保存するのを確認し，
             //       一旦 チャンクを全て消去 ( jQuery の empty() を利用)
             //       (重要) chunkDataObj.chunkData も空にする．
             //       isChunkRenderd == false の時は 何もしなくて ok 
+            
             swal(data.message, '', data.status);
         });
         ///////////////////////////////////////////////
