@@ -20,3 +20,5 @@ doc/
 
 npm-debug.log
 ChunkPianoSystemDesign.txt
+
+node_modules
