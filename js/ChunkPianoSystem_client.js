@@ -87,7 +87,7 @@ var ChunkPianoSystem_client = function(){
         }
     };
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
+    ///////////////////////////////////////////////
     initSocketIo = function(){
         
         // socketIo = io.connect('http://127.0.0.1:3001');
@@ -123,7 +123,7 @@ var ChunkPianoSystem_client = function(){
                 text: pullDownMenuTemplate,
                 type: 'info',
                 html: true,
-                showCancelButton: false,
+                showCancelButton: true,
                 closeOnConfirm: false,
                 showLoaderOnConfirm: true,
             }, function(){
