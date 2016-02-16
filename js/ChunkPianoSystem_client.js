@@ -280,11 +280,8 @@ var ChunkPianoSystem_client = function(){
         });
         
         loadChunkButton.click(function(){
-<<<<<<< HEAD
             // console.log('fileLoadButton');
             
-=======
->>>>>>> 0d770b32e3b9748e7f38a019c4a8ad818346bc02
             // todo: data で userName をサーバに渡し，その userName のファイルだけを req するようにする．
             // ここではサーバに保存されている ChunkPianoData 名のリストをリクエストしているだけ．
             // リストがレスポンスされた際の処理は socketIo.on の 'chunkFileNameList' 
