@@ -112,7 +112,7 @@ var ChunkPianoSystem_client = function(){
                 patternChunkCount++; // todo: phraseChunk, hardChunk 描画時のカウンティング処理を追加
             }
         }else{
-            console.log('something wrong!!!');
+            console.log('createChunkDom; size 0');
         }
     };
     ///////////////////////////////////////////////
