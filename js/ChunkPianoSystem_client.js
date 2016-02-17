@@ -5,7 +5,8 @@ var ChunkPianoSystem_client = function(){
         resetChunkDrawingAreaAndChunkData, turnNotEditedMode,
         // 複数のクラスで利用するメンバはこの globalMem オブジェクトに定義し，インスタンス生成時に引数として渡す.
         // しかしこれはベストプラクティスではないような... 
-        globalMem = {
+        // Java のように this でメンバを渡せるようにできないか? 
+        globalMem = { // 複数のクラスで利用するメンバ/メソッドはここで定義すること
             chunkDrawingArea:$('#chunkDrawingArea'),
             patternChunkCount:0,
             phraseChunkCount:0,
@@ -15,7 +16,7 @@ var ChunkPianoSystem_client = function(){
                 chunkData:{},
                 practiceDay:null
             },
-            turnNotEditedMode:null
+            turnNotEditedMode:null 
         },
         createChunkDom =  ChunkPianoSystem_client.domRenderer(globalMem).createChunkDom,
         socketIo,
@@ -36,6 +37,7 @@ var ChunkPianoSystem_client = function(){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+    // turnNotEditedMode はクラスにして編集状態の変更をメソッドで実行するようにする
     globalMem.turnNotEditedMode = function(){                        
         isEditedByChunkMovingOrDelete = false;
         isEditedByNewChunk = false;
