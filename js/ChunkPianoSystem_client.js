@@ -141,7 +141,6 @@ var ChunkPianoSystem_client = function(){
                     // todo: 通信エラー時に isFromLoadChunkButton を false にできない可能性がある．
                     //       ユーザがブラウザをリロードすれば解決するが...
                     isFromLoadChunkButton = false; // これを行わないと，保存処理を行うたびにロード処理のモーダルウィンドウも表示される
-                    console.error('シャブババア');
                     socketIo.emit('chunkFileNameReq',{});
                 }
             };
@@ -175,7 +174,7 @@ var ChunkPianoSystem_client = function(){
             pullDownMenuTemplate += '</select>';
             
             swal({
-                title: '読み込むチャンクデータを<br>指定してください!',
+                title: '読み込むチャンクデータを<br>指定してください...',
                 text: pullDownMenuTemplate,
                 type: 'info',
                 html: true,
@@ -272,7 +271,7 @@ var ChunkPianoSystem_client = function(){
         };
         
         swalPromptOptionForUserNameProp = {
-            title: 'ユーザ名を入力してください!',
+            title: 'ユーザ名を入力してください...',
             type: 'input',
             showCancelButton: false,
             closeOnConfirm: false, // これを true にすると practiceDayChecker が呼び出されなくなる!!!
