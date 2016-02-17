@@ -1,6 +1,8 @@
 ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){ 
     
-    var domUtil = ChunkPianoSystem_client.utility();
+    var domUtil = ChunkPianoSystem_client.utility(),
+        createChunkDom
+    ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // todo: チャンクを複数に分けて描画した際の link を指定する引数 parentChunk を追加
@@ -50,12 +52,12 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                 parentChunkDom.remove();
                 // html の chunkDom の削除と同時に オブジェクトのデータ構造にも chunkDom を削除．
                 delete globalMemCPSDDR.chunkDataObj.chunkData[parentChunkDomId];
-                isEditedByChunkMovingOrDelete = true;
+                globalMemCPSDDR.isEditedByChunkMovingOrDelete = true;
                 console.log(globalMemCPSDDR.chunkDataObj);
             });
 
             chunkDom.mousedown(function(){
-                isEditedByChunkMovingOrDelete = true; // chunkDom がクリック，または移動された際は編集された，と定義する
+                globalMemCPSDDR.isEditedByChunkMovingOrDelete = true; // chunkDom がクリック，または移動された際は編集された，と定義する
             });
 
             chunkDom.append(chunkDomDelBtn);
