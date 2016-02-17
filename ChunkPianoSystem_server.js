@@ -19,45 +19,39 @@ var ChunkPianoSystem_server = function(){
         ///////////////////////////////////////////////
         /////////////////////////////////////////////// 
         onHttpRequest = function(req, res){
+                        
+            var extension;
             
             // console.log(req.url);
             // res.writeHead(200, {'Content-type':'text/plain'});
             // res.end('hello http server!\n');
             
-            switch(req.url){
-                case '/js/libraries/jquery.js':
+            // req.url から拡張子を抽出
+            extension = String() + req.url;
+            extension = extension.split('.');
+            extension = extension[extension.length-1];
+            // console.log(extension);
+            
+            switch(extension){
+                case 'js':
                     res.writeHead(200, {'Content-Type':'text/javascript'});
-                    data = fs.readFileSync('./js/libraries/jquery.js', 'utf-8');
+                    data = fs.readFileSync('./' + req.url, 'utf-8');
                     res.end(data);
                     break;
-                case '/js/ChunkPianoSystem_client.js':
-                    res.writeHead(200, {'Content-Type':'text/javascript'});
-                    data = fs.readFileSync('./js/ChunkPianoSystem_client.js', 'utf-8');
-                    res.end(data);
-                    break;
-                case '/js/libraries/sweetalert.min.js':
-                    res.writeHead(200, {'Content-Type':'text/javascript'});
-                    data = fs.readFileSync('./js/libraries/sweetalert.min.js', 'utf-8');
-                    res.end(data);
-                    break;
-                case '/css/ChunkPianoSystem_client.css':
+                case 'css':
                     res.writeHead(200, {'Content-Type':'text/css'});
-                    data = fs.readFileSync('./css/ChunkPianoSystem_client.css', 'utf-8');
+                    data = fs.readFileSync('./' + req.url, 'utf-8');
                     res.end(data);
                     break;
-                case '/css/sweetalert.css':
-                    res.writeHead(200, {'Content-Type':'text/css'});
-                    data = fs.readFileSync('./css/sweetalert.css', 'utf-8');
-                    res.end(data);
-                    break;
-                case '/scoreImage/TurcoScore.png':
+                case 'png':
                     // How to serve an image using nodejs
                     // http://stackoverflow.com/questions/5823722/how-to-serve-an-image-using-nodejs
                     res.writeHead(200, {'Content-Type':'image/png'});
-                    data = fs.readFileSync('./scoreImage/TurcoScore.png'); // png なので utf-8 で読み込んではいけない．
+                    data = fs.readFileSync('./' + req.url); // png なので utf-8 で読み込んではいけない．
                     res.end(data, 'binary');
                     break;
-                default:
+                //default:
+                case '/':
                     res.writeHead(200, {'Content-Type':'text/html'});
                     data = fs.readFileSync('./ChunkPianoSystem.html', 'utf-8');
                     res.end(data);
@@ -178,7 +172,7 @@ var ChunkPianoSystem_server = function(){
 
                     // 指定位置の要素を削除... https://syncer.jp/javascript-reverse-reference/array-remove
                     if(substrString != 'json'){
-                        chunkDataJsonList.splice( i , 1 ) ;
+                        chunkDataJsonList.splice( i , 1 ) ; // i 番目の要素のみを配列から削除
                     }
                 }
                 
