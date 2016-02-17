@@ -3,117 +3,42 @@ var ChunkPianoSystem_client = function(){
     ///////////////////////////////////////////////
     var constructor, initDomAction, createChunkDom, initSocketIo,
         resetChunkDrawingAreaAndChunkData, turnNotEditedMode,
-        chunkDrawingArea = $('#chunkDrawingArea'), // 複数メソッドで利用するので，クラス内グローバルで宣言
-        socketIo, 
-        patternChunkCount = 0,
-        phraseChunkCount = 0,
-        hardChunkCount = 0,
+        // 複数のクラスで利用するメンバはこの globalMem オブジェクトに定義し，インスタンス生成時に引数として渡す.
+        // しかしこれはベストプラクティスではないような... 
+        globalMem = {
+            chunkDrawingArea:$('#chunkDrawingArea'),
+            patternChunkCount:0,
+            phraseChunkCount:0,
+            hardChunkCount:0,
+            chunkDataObj:{
+                userName:null,
+                chunkData:{},
+                practiceDay:null
+            },
+            turnNotEditedMode:null
+        },
+        createChunkDom =  ChunkPianoSystem_client.domRenderer(globalMem).createChunkDom,
+        socketIo,
         isFromLoadChunkButton = false,
         isEditedByChunkMovingOrDelete = false, 
-        isEditedByNewChunk = false,
-        // todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
-        //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
-        domUtil = ChunkPianoSystem_client.utility(),
-        chunkDataObj = {
-            userName:null,
-            chunkData:{},
-            practiceDay:null
-        }
+        isEditedByNewChunk = false
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // このメソッドは chunkDataObj の chunkData のみを初期化する
     // チャンクのカウントもリセットするので注意...
     resetChunkDrawingAreaAndChunkData = function(){
-        chunkDataObj.chunkData = {};
+        globalMem.chunkDataObj.chunkData = {};
         patternChunkCount = 0;
         phraseChunkCount = 0;
         hardChunkCount = 0;
-        chunkDrawingArea.empty();
+        globalMem.chunkDrawingArea.empty();
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    turnNotEditedMode = function(){                        
+    globalMem.turnNotEditedMode = function(){                        
         isEditedByChunkMovingOrDelete = false;
         isEditedByNewChunk = false;
-    };
-    ///////////////////////////////////////////////
-    ///////////////////////////////////////////////
-    // todo: チャンクを複数に分けて描画した際の link を指定する引数 parentChunk を追加
-    // このメソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
-    // for in 文で回し1つずつ描画する．
-    createChunkDom = function(chunkPropCCD){ 
-        // Chunk のサイズが 0 の時には Chunk を描画しない．
-        if((chunkPropCCD.width  != 0 && chunkPropCCD.width  != null && chunkPropCCD.width  != undefined ) ||
-           (chunkPropCCD.height != 0 && chunkPropCCD.height != null && chunkPropCCD.height != undefined )
-          ){
-    
-            var chunkDom, chunkDomId, chunkDomDelBtn; 
-            
-            // マウスドラッグの x 方向がマイナス方向だった時に正しく描画するための処理．
-            if(chunkPropCCD.width < 0){ 
-                chunkPropCCD.left += chunkPropCCD.width;
-                chunkPropCCD.width = Math.abs(chunkPropCCD.width); // Math.abs() は絶対値を返す．
-            }
-            // マウスドラッグの y 方向がマイナス方向だった時
-            if(chunkPropCCD.height < 0){ 
-                chunkPropCCD.top += chunkPropCCD.height;
-                chunkPropCCD.height = Math.abs(chunkPropCCD.height);
-            }
-
-            chunkDomId = String() + chunkPropCCD.chunkType + 'Chunk_' + patternChunkCount;
-            chunkDom = $('<div class="chunk pattern" id="' + chunkDomId + '"></div>');
-
-            chunkDom.css({ // jQuery で dom の css を変更するときの書法
-                'top'   : chunkPropCCD.top    + 'px',
-                'left'  : chunkPropCCD.left   + 'px',
-                'width' : chunkPropCCD.width  + 'px',
-                'height': chunkPropCCD.height + 'px'
-            });
-
-            domUtil.appendDruggAndDropEvent(chunkDom, chunkDrawingArea);
-            
-            chunkDomDelBtn = $('<div class="chunkDeleteButton" id="' + chunkDomId +'_DeleteButton">' + 
-                                    '<p class="chunkDeleteButtonFont">×</p>' + 
-                               '</div>'
-                              )
-            ;
-            
-            chunkDomDelBtn.click(function(){
-                var parentChunkDom = $(this).parent(),
-                    parentChunkDomId = parentChunkDom[0].id
-                ;
-                parentChunkDom.remove();
-                // html の chunkDom の削除と同時に オブジェクトのデータ構造にも chunkDom を削除．
-                delete chunkDataObj.chunkData[parentChunkDomId];
-                isEditedByChunkMovingOrDelete = true;
-                console.log(chunkDataObj);
-            });
-            
-            chunkDom.mousedown(function(){
-                isEditedByChunkMovingOrDelete = true; // chunkDom がクリック，または移動された際は編集された，と定義する
-            });
-            
-            chunkDom.append(chunkDomDelBtn);
-            // html への chunkDom の追加と同時に オブジェクトのデータ構造にも chunkDom を追加．
-            chunkDataObj.chunkData[chunkDomId] = {
-                left       : chunkPropCCD.left,
-                top        : chunkPropCCD.top,
-                width      : chunkPropCCD.width,
-                height     : chunkPropCCD.height,
-                chunkType  : chunkPropCCD.chunkType,
-				parentChunk: null
-            };
-            console.log(chunkDataObj);
-            
-            chunkDrawingArea.append(chunkDom);
-
-            if(chunkPropCCD.chunkType == 'pattern'){
-                patternChunkCount++; // todo: phraseChunk, hardChunk 描画時のカウンティング処理を追加
-            }
-        }else{
-            console.log('createChunkDom; size 0');
-        }
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -146,7 +71,7 @@ var ChunkPianoSystem_client = function(){
             };
             
             // セーブが完了したら，編集モードを未編集にする． 
-            turnNotEditedMode();
+            globalMem.turnNotEditedMode();
             
             setTimeout(isFromLoadChunkButtonProcessing, (WAIT_TIME + 500));
 
@@ -208,7 +133,7 @@ var ChunkPianoSystem_client = function(){
                 createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
             }
             
-            turnNotEditedMode();
+            globalMem.turnNotEditedMode();
             
             // 解決済todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
             //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
@@ -244,7 +169,7 @@ var ChunkPianoSystem_client = function(){
         });        
     };
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
+    ///////////////////////////////////////////////
     initDomAction = function(callback){
         var upperFrame = $('#upperFrame'),        
             saveChunkButton = $('#saveChunkButton'),
@@ -265,7 +190,7 @@ var ChunkPianoSystem_client = function(){
             if(userNameUNS == '' || userNameUNS == null || userNameUNS == undefined){
                 swal.showInputError('ユーザ名は必須です!');
             }else{
-                chunkDataObj.userName = userNameUNS;
+                globalMem.chunkDataObj.userName = userNameUNS;
                 swal.close();
             }
         };
@@ -284,14 +209,14 @@ var ChunkPianoSystem_client = function(){
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // Chunk 描画処理．mousedown 時に描画開始位置を取得し，mouseup 時に描画終了位置を取得する．
-        chunkDrawingArea.mousedown(function(e){
+        globalMem.chunkDrawingArea.mousedown(function(e){
             chunkDrawingAreaMouseDowmPosX = parseInt(e.offsetX, 10);
             chunkDrawingAreaMouseDowmPosY = parseInt(e.offsetY, 10);
             isChunkDrawing = true;
         });
         ///////////////////////////////////////////////
         /////////////////////////////////////////////// 
-        chunkDrawingArea.mouseup(function(e){
+        globalMem.chunkDrawingArea.mouseup(function(e){
             
             if(isChunkDrawing){
                 var chunkSizeX = 0,
@@ -321,7 +246,7 @@ var ChunkPianoSystem_client = function(){
         ///////////////////////////////////////////////
         saveChunkButton.click(function(mode){
             
-            if(Object.keys(chunkDataObj.chunkData).length == 0){ // chunk が一つも描画されていない時は保存処理を行わない
+            if(Object.keys(globalMem.chunkDataObj.chunkData).length == 0){ // chunk が一つも描画されていない時は保存処理を行わない
                 swal('保存するにはチャンクを\n1つ以上記入してください!', '', 'warning');
             }else{
                 var practiceDayChecker, swalPromptOptionForPracDayProp; 
@@ -341,11 +266,8 @@ var ChunkPianoSystem_client = function(){
                         if(practiceDay.match(/^[0-9]+$/)){ // 練習日数の入力が正しい，つまり入力値が半角数字の時
                             // todo: 既に存在しているファイル名の際に，上書きするか確認. 
                             // todo: ファイルネームにメタデータをパース可能な状態で付与しているので，この処理は意味がないかもしれない．
-                            chunkDataObj.practiceDay = practiceDay;
-
-                            // todo: chunkDataObj と chunkDrawingArea をリセット
-                            // 上記処理のメソッド refreshChunkDataObjAndChunkDrawingArea を作成                            
-                            socketIo.emit('chunkSaveReq', {chunkDataObj:chunkDataObj});                            
+                            globalMem.chunkDataObj.practiceDay = practiceDay;
+                            socketIo.emit('chunkSaveReq', {chunkDataObj:globalMem.chunkDataObj});                            
                         }else{
                             swal.showInputError('半角数字で練習日を入力してください．');
                         }
@@ -391,11 +313,8 @@ var ChunkPianoSystem_client = function(){
                         //
                         isFromLoadChunkButton = true;
                         saveChunkButton.click(); 
-                    }else{
-                        // todo: chunkDataObj と chunkDrawingArea をリセット
-                        // 上記処理のメソッド refreshChunkDataObjAndChunkDrawingArea を作成
-            
-                        turnNotEditedMode();
+                    }else{            
+                        globalMem.turnNotEditedMode();
                         // 保存しない をユーザが選択した場合は，意図的に編集モードを未編集に変更し，
                         // loadChunkButton click イベントを再度呼び出す．
                         loadChunkButton.click();
