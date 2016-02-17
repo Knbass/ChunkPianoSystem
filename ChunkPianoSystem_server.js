@@ -185,7 +185,7 @@ var ChunkPianoSystem_server = function(){
         });
     };
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
+    ///////////////////////////////////////////////
     // todo: ioi などの打鍵データを処理するモジュールを分離．
     readIoiFile = function(fileName){        
         var ioi;
@@ -199,12 +199,10 @@ var ChunkPianoSystem_server = function(){
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
     getIoiMaxMin = function(callback){
-        
         try{
             var ioiMax = 0,
                 ioiMin = 0
             ;
-
             // 比較する初期値として splitedIoi の先頭要素を代入
             ioiMax = splitedIoi[0]; 
             ioiMin = splitedIoi[0];

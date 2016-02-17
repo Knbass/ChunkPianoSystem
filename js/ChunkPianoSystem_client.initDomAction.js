@@ -15,9 +15,11 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             chunkDrawingAreaMouseDowmPosX = 0,
             chunkDrawingAreaMouseDowmPosY = 0,
             swalPromptOptionForUserNameProp,
-            userNameSetter
+            userNameSetter,
+            saveConfirmModalWindow
         ;
-
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         userNameSetter = function(userNameUNS){
 
             if(userNameUNS == '' || userNameUNS == null || userNameUNS == undefined){
@@ -27,7 +29,6 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 swal.close();
             }
         };
-
         swalPromptOptionForUserNameProp = {
             title: 'ユーザ名を入力してください...',
             type: 'input',
@@ -36,9 +37,34 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             animation: 'slide-from-top',
             inputPlaceholder: 'ここにユーザ名を入力'                    
         };
-
         swal(swalPromptOptionForUserNameProp, userNameSetter);   
-
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        saveConfirmModalWindow = function(callback){
+            swal({
+                title: '変更を保存しますか?',
+                type: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#26642d',
+                confirmButtonText: '保存する',
+                cancelButtonColor: '#7c0c0c',
+                cancelButtonText: '保存しない',
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }, function (isConfirm){ // 保存する をクリックした場合
+                if(isConfirm){
+                    // saveChunkButton をクリックすれば．保存モードに移行できる．
+                    //
+                    globalMemCPSCIDA.isFromLoadChunkButton = true;
+                    saveChunkButton.click(); 
+                }else{            
+                    globalMemCPSCIDA.turnNotEditedMode();
+                    // 保存しない をユーザが選択した場合は，意図的に編集モードを未編集に変更し，
+                    // loadChunkButton click イベントを再度呼び出す．
+                    if(callback) callback();
+                }
+            });
+        };
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // Chunk 描画処理．mousedown 時に描画開始位置を取得し，mouseup 時に描画終了位置を取得する．
@@ -71,8 +97,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
 
                 globalMemCPSCIDA.createChunkDom(chunkProperties);
 
-                isEditedByNewChunk = true;
-                isChunkDrawing = false;
+                globalMemCPSCIDA.isEditedByNewChunk = true;
+                globalMemCPSCIDA.isChunkDrawing = false;
             }
         });    
         ///////////////////////////////////////////////
@@ -129,32 +155,9 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             // chank が編集された際の処理
             // 編集の定義... chank が動かされた，削除された，記入された とき．
             if(globalMemCPSCIDA.isEditedByChunkMovingOrDelete || globalMemCPSCIDA.isEditedByNewChunk){ 
-
-                swal({
-                    title: '変更を保存しますか?',
-                    type: 'info',
-                    showCancelButton: true,
-                    confirmButtonColor: '#26642d',
-                    confirmButtonText: '保存する',
-                    cancelButtonColor: '#7c0c0c',
-                    cancelButtonText: '保存しない',
-                    closeOnConfirm: false,
-                    closeOnCancel: false
-                }, function (isConfirm){ // 保存する をクリックした場合
-                    if(isConfirm){
-                        // saveChunkButton をクリックすれば．保存モードに移行できる．
-                        //
-                        globalMemCPSCIDA.isFromLoadChunkButton = true;
-                        saveChunkButton.click(); 
-                    }else{            
-                        globalMemCPSCIDA.turnNotEditedMode();
-                        // 保存しない をユーザが選択した場合は，意図的に編集モードを未編集に変更し，
-                        // loadChunkButton click イベントを再度呼び出す．
-                        loadChunkButton.click();
-                    }
+                saveConfirmModalWindow(function(){
+                    loadChunkButton.click();
                 });
-
-                //saveChunkButton.click();
             }else{
                 globalMemCPSCIDA.socketIo.emit('chunkFileNameReq',{});
             }
