@@ -53,21 +53,25 @@ var ScoreDataCreator = function(){
                     inputState = 'upper';
                     isUpperCol = true;
                     console.log(scoreDataObj);
+                    showHelp();
                     break;
                 case 110: // n
                     inputState = 'notesInput';
                     console.log(scoreDataObj);
+                    showHelp();
                     break;
                 case 108: // l
                     inputState = 'lower';
                     isUpperCol = false;
                     console.log(scoreDataObj);
+                    showHelp();
                     break;
                 case 100: // d        
                     inputState = 'delete';
                     console.log(scoreDataObj);
                     if(notesColCounter > 0) notesColCounter--;
                     console.log('notesColCounter: ' + notesColCounter);
+                    showHelp();
                     break;
                 case 115: // s
                     var blob, url, blobURL, fileName, a;
@@ -85,6 +89,7 @@ var ScoreDataCreator = function(){
                     a.download = fileName + '.json';
                     a.href = blobURL;
                     a.click();
+                    showHelp();
                     break;
             }                   
         });

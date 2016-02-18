@@ -111,9 +111,7 @@ var ChunkPianoSystem_server = function(){
                     if(err){
                         
                     }else{
-                        
                         // todo: 保存しているファイルがない場合の処理を追加
-                        
                         socket.emit('chunkFileNameList',{
                             status: 'success', // status は success, error, sameFileExist
                             message: 'チャンクデータの保存を\n完了しました!',
@@ -152,8 +150,8 @@ var ChunkPianoSystem_server = function(){
     // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
     // readdir は非同期実行なので次処理は callback で渡す．
     getChunkDataJsonList = function(directryPathGCDJL, callback){
-        fs.readdir(directryPathGCDJL, function(err, files){
-            
+        
+        fs.readdir(directryPathGCDJL, function(err, files){    
             try{
             
                 if (err) throw err;
