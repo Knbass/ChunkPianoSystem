@@ -1,62 +1,65 @@
 var ChunkPianoSystem_client = function(){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    var constructor, initDomAction, createChunkDom, initSocketIo,
+    var constructor, createChunkDom, initSocketIo,
         resetChunkDrawingAreaAndChunkData, turnNotEditedMode,
         // 複数のクラスで利用するメンバはこの globalMem オブジェクトに定義し，インスタンス生成時に引数として渡す.
         // しかしこれはベストプラクティスではないような... 
         // Java のように this でメンバを渡せるようにできないか? 
         globalMem = { // 複数のクラスで利用するメンバ/メソッドはここで定義すること
             chunkDrawingArea:$('#chunkDrawingArea'),
-            patternChunkCount:0,
-            phraseChunkCount:0,
-            hardChunkCount:0,
+            socketIo:null,
+            turnNotEditedMode:null, // 後方参照できないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
+            createChunkDom:null,
+            isFromLoadChunkButton:false,
+            isEditedByChunkMovingOrDelete:false, 
+            isEditedByNewChunk:false,
             chunkDataObj:{
                 userName:null,
                 chunkData:{},
                 practiceDay:null
             },
-            turnNotEditedMode:null 
-        },
+            patternChunkCount:0,
+            phraseChunkCount:0,
+            hardChunkCount:0
+        }, // !!! グローバルメンバを宣言してからサブクラスのインスタンス化を行う
         createChunkDom =  ChunkPianoSystem_client.domRenderer(globalMem).createChunkDom,
-        socketIo,
-        isFromLoadChunkButton = false,
-        isEditedByChunkMovingOrDelete = false, 
-        isEditedByNewChunk = false
+        initDomAction =  ChunkPianoSystem_client.initDomAction(globalMem).initDomAction
     ;
+    globalMem.createChunkDom = createChunkDom;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // このメソッドは chunkDataObj の chunkData のみを初期化する
     // チャンクのカウントもリセットするので注意...
     resetChunkDrawingAreaAndChunkData = function(){
         globalMem.chunkDataObj.chunkData = {};
-        patternChunkCount = 0;
-        phraseChunkCount = 0;
-        hardChunkCount = 0;
+        globalMem.patternChunkCount = 0;
+        globalMem.phraseChunkCount = 0;
+        globalMem.hardChunkCount = 0;
         globalMem.chunkDrawingArea.empty();
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // turnNotEditedMode はクラスにして編集状態の変更をメソッドで実行するようにする
     globalMem.turnNotEditedMode = function(){                        
-        isEditedByChunkMovingOrDelete = false;
-        isEditedByNewChunk = false;
+        globalMem.isEditedByChunkMovingOrDelete = false;
+        globalMem.isEditedByNewChunk = false;
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     initSocketIo = function(){
         
-        // socketIo = io.connect('http://127.0.0.1:3001');
-        socketIo = io.connect();
+        // globalMem.socketIo = io.connect('http://127.0.0.1:3001');
+        globalMem.socketIo = io.connect();
         
-        socketIo.on('connect', function () { 
-            socketIo.emit('conected', {data:0});
+        globalMem.socketIo.on('connect', function () { 
+            globalMem.socketIo.emit('conected', {data:0});
         });
         
-        socketIo.on('disconnect', function(client){            
+        globalMem.socketIo.on('disconnect', function(client){            
 	    });
         
-        socketIo.on('chunkDataSaveRes', function(data){
+        globalMem.socketIo.on('chunkDataSaveRes', function(data){
             
             var isFromLoadChunkButtonProcessing,
                 WAIT_TIME = 2000
@@ -64,11 +67,11 @@ var ChunkPianoSystem_client = function(){
             
             isFromLoadChunkButtonProcessing = function(){
                 // loadChunkButton を押し，保存するを選択．正しい練習日数を記入し，保存をクリックした際に呼ばれる処理
-                if(isFromLoadChunkButton){ 
-                    // todo: 通信エラー時に isFromLoadChunkButton を false にできない可能性がある．
+                if(globalMem.isFromLoadChunkButton){ 
+                    // todo: 通信エラー時に globalMem.isFromLoadChunkButton を false にできない可能性がある．
                     //       ユーザがブラウザをリロードすれば解決するが...
-                    isFromLoadChunkButton = false; // これを行わないと，保存処理を行うたびにロード処理のモーダルウィンドウも表示される
-                    socketIo.emit('chunkFileNameReq',{});
+                    globalMem.isFromLoadChunkButton = false; // これを行わないと，保存処理を行うたびにロード処理のモーダルウィンドウも表示される
+                    globalMem.socketIo.emit('chunkFileNameReq',{});
                 }
             };
             
@@ -85,8 +88,9 @@ var ChunkPianoSystem_client = function(){
             ;
 
         });
-        
-        socketIo.on('chunkFileNameList', function(data){
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        globalMem.socketIo.on('chunkFileNameList', function(data){
 
             // console.log(data.fileNameList);
             
@@ -114,14 +118,14 @@ var ChunkPianoSystem_client = function(){
                     var chunkDataSelectMenuVal = $('#chunkDataSelectMenu').val();
                     console.log('chunkDataSelectMenuVal: ' + chunkDataSelectMenuVal);
                     
-                    socketIo.emit('chunkDataReq',{requestChunkDataFileName:chunkDataSelectMenuVal});
+                    globalMem.socketIo.emit('chunkDataReq',{requestChunkDataFileName:chunkDataSelectMenuVal});
                     // swal.close();
                 }, 1000); // chunkDataSelectMenu DOM の描画を待つ必要があるため，1.5 秒待つ．
             }); 
-            
         });
-        
-        socketIo.on('reqestedChunkData', function(data){ // ロードリクエストをした chunkData がレスポンスされた時
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        globalMem.socketIo.on('reqestedChunkData', function(data){ // ロードリクエストをした chunkData がレスポンスされた時
             
             // data.reqestedChunkData にユーザが指定した ChunkData が格納されている．
             // これは stringfy (文字列化) されているので JSON.parse() で JavaScript のオブジェクトに変換する．
@@ -136,33 +140,7 @@ var ChunkPianoSystem_client = function(){
             }
             
             globalMem.turnNotEditedMode();
-            
-            // 解決済todo: 保存データから chunk を再描画するには 保存時に patternChunkCount も保存し，再描画時に復元しなければいけない．
-            //       復元時は patternChunkCount の最大値を計算し，新しい Chunk の id を最大値よりも大きい値にする．
-            // !!!! ロードしたチャンクは createChunkDom で描画した際に chunkDataObj に格納される．
-            // ChunkData のロード時に createChunkDom によって，chunkData に格納されている順番で id が再度付与されている
-            // そのため，上記 todo の作業は必要なし
-            // データロード後，チャンクの位置を変えずデータを上書きした場合は，チャンクの情報は変わらずに，id のみが再度付与される．
-            // 
-            // 動作例... 
-            //1. 新規チャンクを描画            
-            //	patternChunk_0: Object
-            //	patternChunk_1: Object
-            //	patternChunk_2: Object
-            //	patternChunk_3: Object
-            //2.  patternChunk_1 を削除し，データを保存
-            //3.  2 のデータをロード
-            //	patternChunk_0: Object
-            //	patternChunk_1: Object
-            //	patternChunk_2: Object
-            //	# ロード時に createChunkDom メソッドによってデータの登場順に id が再度付与される
-            
-            // todo: 既に Chunk が描画されている時に ChunkData をロードした際の処理を記述
-            //       isChunkRenderd == true の時は ロード前に保存するのを確認し，
-            //       一旦 チャンクを全て消去 ( jQuery の empty() を利用)
-            //       (重要) chunkDataObj.chunkData も空にする．
-            //       isChunkRenderd == false の時は 何もしなくて ok 
-            
+                        
             swal(data.message, '', data.status);
         });
         ///////////////////////////////////////////////
@@ -172,6 +150,7 @@ var ChunkPianoSystem_client = function(){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+<<<<<<< HEAD
     initDomAction = function(callback){
         var upperFrame = $('#upperFrame'),        
             saveChunkButton = $('#saveChunkButton'),
@@ -335,6 +314,8 @@ var ChunkPianoSystem_client = function(){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+=======
+>>>>>>> 1de99e41112aa45f2fcc4d4c69caeb3e49b6b903
     constructor = function(){
         initDomAction(initSocketIo);
     };
@@ -346,9 +327,7 @@ var ChunkPianoSystem_client = function(){
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
 $(function main(){
-    var hh = ChunkPianoSystem_client();
-    hh.constructor();
+    var cpsc = ChunkPianoSystem_client();
+    cpsc.constructor();
 });

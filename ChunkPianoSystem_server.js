@@ -2,7 +2,9 @@
 var ChunkPianoSystem_server = function(){
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
-    var constructor, readIoiFile, getIoiMaxMin, getStringTimeOrYear, getChunkDataJsonList,
+    var constructor, readIoiFile, getIoiMaxMin, 
+        getStrTimeOrYear = require('./GetStrTimeOrYear'), 
+        getChunkDataJsonList,
         initHttpAndSocketIo,
         splitedIoi = [],
         fs = require('fs'),
@@ -78,7 +80,7 @@ var ChunkPianoSystem_server = function(){
                 var fileName = '';
                 
                 fileName = String() + './ChunkData/ChunkPianoData_' + data.chunkDataObj.userName + '_' + 
-                           getStringTimeOrYear('date') + '_' + getStringTimeOrYear('time') + 
+                           getStrTimeOrYear('date') + '_' + getStrTimeOrYear('time') + 
                            '_practiceDay-' + data.chunkDataObj.practiceDay + '.json'
                 ;
                 
@@ -109,9 +111,7 @@ var ChunkPianoSystem_server = function(){
                     if(err){
                         
                     }else{
-                        
                         // todo: 保存しているファイルがない場合の処理を追加
-                        
                         socket.emit('chunkFileNameList',{
                             status: 'success', // status は success, error, sameFileExist
                             message: 'チャンクデータの保存を\n完了しました!',
@@ -150,8 +150,8 @@ var ChunkPianoSystem_server = function(){
     // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
     // readdir は非同期実行なので次処理は callback で渡す．
     getChunkDataJsonList = function(directryPathGCDJL, callback){
-        fs.readdir(directryPathGCDJL, function(err, files){
-            
+        
+        fs.readdir(directryPathGCDJL, function(err, files){    
             try{
             
                 if (err) throw err;
@@ -183,51 +183,13 @@ var ChunkPianoSystem_server = function(){
         });
     };
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
-    getStringTimeOrYear = function(mode){ // 'date' または 'time'
-        
-        var date = new Date();
-        
-        if(mode == undefined){
-            console.error('getStringTime needs argument');
-        }else if(mode == 'time'){
-
-            var hour = date.getHours(),
-                minutes = date.getMinutes(),
-                seconds = date.getSeconds(),
-                milliseconds = date.getMilliseconds()
-            ;
-                    
-            if(hour < 10) hour = '0' + hour;
-            if(minutes < 10) minutes = '0' + minutes; 
-            if(seconds < 10) seconds = '0' + seconds;
-            if(milliseconds < 10){
-                milliseconds = '000' + milliseconds;
-            }else if (milliseconds < 100){
-                milliseconds = '00' + milliseconds;
-            }else if (milliseconds < 1000){
-                milliseconds = '0' + milliseconds;
-            }
-
-            return String() + hour + '-' + minutes + '-' + seconds + '-' + milliseconds;
-        }else if(mode == 'date'){
-            var month = date.getMonth()+1,
-                day = date.getDate(),
-                year = date.getFullYear()
-            ;
-            return String() + year + '-' + month + '-' + day;
-        }
-    };
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
-    readIoiFile = function(fileName){
-        
+    // todo: ioi などの打鍵データを処理するモジュールを分離．
+    readIoiFile = function(fileName){        
         var ioi;
-        
+
         ioi = fs.readFileSync('./files/' + fileName, 'utf-8');
-
         splitedIoi = ioi.split('\n');
-
         for(var i in splitedIoi){
            splitedIoi[i] = parseInt(splitedIoi[i], 10);
         }
@@ -235,12 +197,10 @@ var ChunkPianoSystem_server = function(){
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
     getIoiMaxMin = function(callback){
-        
         try{
             var ioiMax = 0,
                 ioiMin = 0
             ;
-
             // 比較する初期値として splitedIoi の先頭要素を代入
             ioiMax = splitedIoi[0]; 
             ioiMin = splitedIoi[0];
