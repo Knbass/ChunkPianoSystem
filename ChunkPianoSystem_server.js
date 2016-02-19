@@ -1,4 +1,3 @@
-
 var ChunkPianoSystem_server = function(){
     'use strict'
     ///////////////////////////////////////////////
@@ -8,25 +7,23 @@ var ChunkPianoSystem_server = function(){
         getChunkDataJsonList,
         initHttpAndSocketIo,
         splitedIoi = [],
+        sdp = require('./node_modules/ScoreDataParser.js')('TurcoScore.json'),
+        noteLinePosition = sdp.getNoteLinePosition(),
         fs = require('fs'),
         http = require('http'),
         socketIo = require('socket.io'), 
         io
     ;
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
+    ///////////////////////////////////////////////
     initHttpAndSocketIo = function(){
-        
         var httpServer, onHttpRequest;
-
         ///////////////////////////////////////////////
         /////////////////////////////////////////////// 
-        onHttpRequest = function(req, res){
-                        
+        onHttpRequest = function(req, res){           
             var data = null, 
                 extension
             ;
-            
             // console.log(req.url);
             // res.writeHead(200, {'Content-type':'text/plain'});
             // res.end('hello http server!\n');
@@ -74,8 +71,8 @@ var ChunkPianoSystem_server = function(){
         io.sockets.on('connection', function(socket){
 
             socket.on('conected', function(data){
-                console.log('server connected.');
-                // console.log(data);
+                // クライアントとの接続確立時に譜面データを送信
+                socket.emit('noteLinePosition', {noteLinePosition:noteLinePosition});
             });
             
             socket.on('chunkSaveReq', function(data){ // data は chunkDataObj
@@ -152,8 +149,7 @@ var ChunkPianoSystem_server = function(){
     
     // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
     // readdir は非同期実行なので次処理は callback で渡す．
-    getChunkDataJsonList = function(directryPathGCDJL, callback){
-        
+    getChunkDataJsonList = function(directryPathGCDJL, callback){        
         fs.readdir(directryPathGCDJL, function(err, files){    
             try{
             

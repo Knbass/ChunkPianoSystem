@@ -53,8 +53,12 @@ var ChunkPianoSystem_client = function(){
         // globalMem.socketIo = io.connect('http://127.0.0.1:3001');
         globalMem.socketIo = io.connect();
         
-        globalMem.socketIo.on('connect', function () { 
+        globalMem.socketIo.on('connect', function(){ 
             globalMem.socketIo.emit('conected', {data:0});
+        });
+        
+        globalMem.socketIo.on('noteLinePosition', function(data){ 
+            console.log(data.noteLinePosition);
         });
         
         globalMem.socketIo.on('disconnect', function(client){            
