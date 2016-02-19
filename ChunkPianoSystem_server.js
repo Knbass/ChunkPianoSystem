@@ -3,11 +3,11 @@ var ChunkPianoSystem_server = function(){
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
     var constructor,
-        getStrTimeOrYear = require('./node_modules/GetStrTimeOrYear'), // node_modules を指定せずに require する方法はないのか? 
+        getStrTimeOrYear = require('./myNodeModules/GetStrTimeOrYear'), // node_modules を指定せずに require する方法はないのか? 
         getChunkDataJsonList,
         initHttpAndSocketIo,
         splitedIoi = [],
-        sdp = require('./node_modules/ScoreDataParser.js')('TurcoScore.json'),
+        sdp = require('./myNodeModules/ScoreDataParser.js')('TurcoScore.json'),
         noteLinePosition = sdp.getNoteLinePosition(),
         fs = require('fs'),
         http = require('http'),
