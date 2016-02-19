@@ -1,10 +1,11 @@
 var ChunkPianoSystem_client = function(){
+    'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     var constructor, createChunkDom, initSocketIo,
         resetChunkDrawingAreaAndChunkData, turnNotEditedMode,
         // 複数のクラスで利用するメンバはこの globalMem オブジェクトに定義し，インスタンス生成時に引数として渡す.
-        // しかしこれはベストプラクティスではないような... 
+        // しかしこれはベストプラクティスではないような...
         // Java のように this でメンバを渡せるようにできないか?
         globalMem = { // 複数のクラスで利用するメンバ/メソッドはここで定義すること
             chunkDrawingArea:$('#chunkDrawingArea'),

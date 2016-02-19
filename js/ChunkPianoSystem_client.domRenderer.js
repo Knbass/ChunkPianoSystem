@@ -1,5 +1,7 @@
 ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){ 
-    
+    'use strict'
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     var domUtil = ChunkPianoSystem_client.utility(),
         createChunkDom
     ;

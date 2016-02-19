@@ -1,5 +1,7 @@
 ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){    
-    
+    'use strict'
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     var initDomAction;
     
     initDomAction = function(callback){

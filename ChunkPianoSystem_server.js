@@ -1,9 +1,10 @@
 
 var ChunkPianoSystem_server = function(){
+    'use strict'
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
-    var constructor, readIoiFile, getIoiMaxMin, 
-        getStrTimeOrYear = require('./GetStrTimeOrYear'), 
+    var constructor,
+        getStrTimeOrYear = require('./node_modules/GetStrTimeOrYear'), // node_modules を指定せずに require する方法はないのか? 
         getChunkDataJsonList,
         initHttpAndSocketIo,
         splitedIoi = [],
@@ -22,7 +23,9 @@ var ChunkPianoSystem_server = function(){
         /////////////////////////////////////////////// 
         onHttpRequest = function(req, res){
                         
-            var extension;
+            var data = null, 
+                extension
+            ;
             
             // console.log(req.url);
             // res.writeHead(200, {'Content-type':'text/plain'});
@@ -107,9 +110,9 @@ var ChunkPianoSystem_server = function(){
             
             socket.on('chunkFileNameReq', function(data){
                 
-                getChunkDataJsonList('./ChunkData/', function(fileNameList, err){
-                    if(err){
-                        
+                getChunkDataJsonList('./ChunkData/', function(fileNameList, e){
+                    if(e){
+                        console.log(e);
                     }else{
                         // todo: 保存しているファイルがない場合の処理を追加
                         socket.emit('chunkFileNameList',{
@@ -175,7 +178,6 @@ var ChunkPianoSystem_server = function(){
                         chunkDataJsonList.splice( i , 1 ) ; // i 番目の要素のみを配列から削除
                     }
                 }
-                
                 callback(chunkDataJsonList);
             }catch(e){
                 callback(chunkDataJsonList, e);
@@ -184,57 +186,13 @@ var ChunkPianoSystem_server = function(){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    // todo: ioi などの打鍵データを処理するモジュールを分離．
-    readIoiFile = function(fileName){        
-        var ioi;
-
-        ioi = fs.readFileSync('./files/' + fileName, 'utf-8');
-        splitedIoi = ioi.split('\n');
-        for(var i in splitedIoi){
-           splitedIoi[i] = parseInt(splitedIoi[i], 10);
-        }
-    };
-    ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
-    getIoiMaxMin = function(callback){
-        try{
-            var ioiMax = 0,
-                ioiMin = 0
-            ;
-            // 比較する初期値として splitedIoi の先頭要素を代入
-            ioiMax = splitedIoi[0]; 
-            ioiMin = splitedIoi[0];
-
-            for(var i in splitedIoi){
-
-                // 最大値を抽出
-                if(ioiMax < splitedIoi[i]){
-                    ioiMax = splitedIoi[i];
-                }
-                // 最小値を抽出
-                if(ioiMin > splitedIoi[i]){
-                    ioiMin = splitedIoi[i];
-                }            
-            }
-            
-            if(ioiMax == undefined || ioiMin == undefined){
-                throw new Error('readIoiFile を先に実行すべし');
-            }
-
-            callback({ioiMax: ioiMax, ioiMin: ioiMin}); // callback の実体は main 関数の getIoiMaxMin 引数に与えた無名関数
-            
-        }catch(e){ // もしエラーを検出したら: e はただの変数名
-            console.log(e);
-        }
-    };
-    ///////////////////////////////////////////////
-    ///////////////////////////////////////////////
     constructor = function(){
+        'use strict'
         initHttpAndSocketIo();
     };
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
-    return {constructor:constructor, readIoiFile:readIoiFile, getIoiMaxMin:getIoiMaxMin};
+    return {constructor:constructor};
 };
 ///////////////////////////////////////////////
 /////////////////////////////////////////////// 
@@ -242,15 +200,7 @@ var ChunkPianoSystem_server = function(){
 /////////////////////////////////////////////// 
 ///////////////////////////////////////////////
 (function main(){
-    
-    var hhs = ChunkPianoSystem_server(), 
-        ioiMaxMin
-    ;
-    
-    hhs.constructor();
-    // hhs.readIoiFile('ioi.txt');
-    // hhs.getIoiMaxMin(function(ioiMaxMinObj){ // ioiMaxMinObj には getIoiMaxMin 関数から与えられた引数が格納されている
-       // console.log(ioiMaxMinObj);
-    // });
+    var cpss = ChunkPianoSystem_server();
+    cpss.constructor();
 })();
 
