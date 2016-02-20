@@ -10,11 +10,13 @@ var ChunkPianoSystem_client = function(){
         globalMem = { // 複数のクラスで利用するメンバ/メソッドはここで定義すること
             chunkDrawingArea:$('#chunkDrawingArea'),
             socketIo:null,
+            reqNoteLinePosition:null,
             turnNotEditedMode:null, // 後方参照ができないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
             createChunkDom:null,
             isFromLoadChunkButton:false,
             isEditedByChunkMovingOrDelete:false, 
             isEditedByNewChunk:false,
+            noteLinePosition:null,
             chunkDataObj:{
                 userName:null,
                 chunkData:{},
@@ -50,15 +52,32 @@ var ChunkPianoSystem_client = function(){
     ///////////////////////////////////////////////
     initSocketIo = function(){
         
+        var reqNoteLinePositionCallback = null;
         // globalMem.socketIo = io.connect('http://127.0.0.1:3001');
         globalMem.socketIo = io.connect();
         
         globalMem.socketIo.on('connect', function(){ 
-            globalMem.socketIo.emit('conected', {data:0});
+            
+            
+            // noteLinePosition が正しく受信されていない場合に domRenderer クラスは 再受信のために reqNoteLinePosition を呼び出す．
+            // そのため, reqNoteLinePosition を globalMem に追加した．
+            // このメソッドは必ず即時実行すること (忘れてもバックアップがあるけども)．
+            (globalMem.reqNoteLinePosition = function(callback){
+                globalMem.socketIo.emit('reqNoteLinePosition', {data:0});
+                //  noteLinePosition 再受信の再，domRenderer クラスは noteLinePosition の受信が完了してから
+                //  dom rendering を行う必要がある．
+                //  そのため，callback で処理を受け取り，initSocketIo スコープ変数 reqNoteLinePositionCallback を経由し
+                //  noteLinePosition の socket on 時にこれを実行．
+                if(callback){reqNoteLinePositionCallback = callback;}
+            })();
         });
         
         globalMem.socketIo.on('noteLinePosition', function(data){ 
-            console.log(data.noteLinePosition);
+            globalMem.noteLinePosition = data.noteLinePosition;
+            if(reqNoteLinePositionCallback != null){
+                reqNoteLinePositionCallback();
+                reqNoteLinePositionCallback = null; // これを行わなければ reqNoteLinePositionCallback が null でも実行されバグる．
+            }
         });
         
         globalMem.socketIo.on('disconnect', function(client){            
@@ -88,10 +107,8 @@ var ChunkPianoSystem_client = function(){
             swal({   
                 title: data.message, 
                 type: data.status, timer: WAIT_TIME, 
-                showConfirmButton: false }
-                )
-            ;
-
+                showConfirmButton: false 
+            });
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////

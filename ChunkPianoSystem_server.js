@@ -34,6 +34,9 @@ var ChunkPianoSystem_server = function(){
             extension = extension[extension.length-1];
             // console.log(extension);
             
+            // 多数の同時リロードに耐えるよう，非同期にファイル読込のテストを行ったが同期読込でないとダメらしい．
+            // ファイルロードは sync で行わないと，先に res.end(data); が実行されてしまう!
+            //      res.end(data); を callback として与えてもダメだった
             switch(extension){
                 case 'js':
                     res.writeHead(200, {'Content-Type':'text/javascript'});
@@ -67,11 +70,15 @@ var ChunkPianoSystem_server = function(){
         
         // socket.io の初期化
         io = socketIo.listen(httpServer);
-        
+        ///////////////////////////////////////////////
+        /////////////////////////////////////////////// 
+        ///////////////////////////////////////////////
+        /////////////////////////////////////////////// 
+        ///////////////////////////////////////////////
+        /////////////////////////////////////////////// 
         io.sockets.on('connection', function(socket){
 
-            socket.on('conected', function(data){
-                // クライアントとの接続確立時に譜面データを送信
+            socket.on('reqNoteLinePosition', function(data){
                 socket.emit('noteLinePosition', {noteLinePosition:noteLinePosition});
             });
             
@@ -144,6 +151,12 @@ var ChunkPianoSystem_server = function(){
             // io.sockets.emit  　→ 自分を含む全員にデータを送信する.
             // socket.broadcast.emit　→ 自分以外の全員にデータを送信する.
             // socket.emit　      → 自分のみにデータを送信する. socket.emit であることに注意!
+        ///////////////////////////////////////////////
+        /////////////////////////////////////////////// 
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        /////////////////////////////////////////////// 
         });
     };
     
