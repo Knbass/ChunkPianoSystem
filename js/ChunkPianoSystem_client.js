@@ -55,10 +55,9 @@ var ChunkPianoSystem_client = function(){
         var reqNoteLinePositionCallback = null;
         // globalMem.socketIo = io.connect('http://127.0.0.1:3001');
         globalMem.socketIo = io.connect();
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         globalMem.socketIo.on('connect', function(){ 
-            
-            
             // noteLinePosition が正しく受信されていない場合に domRenderer クラスは 再受信のために reqNoteLinePosition を呼び出す．
             // そのため, reqNoteLinePosition を globalMem に追加した．
             // このメソッドは必ず即時実行すること (忘れてもバックアップがあるけども)．
@@ -71,7 +70,8 @@ var ChunkPianoSystem_client = function(){
                 if(callback){reqNoteLinePositionCallback = callback;}
             })();
         });
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         globalMem.socketIo.on('noteLinePosition', function(data){ 
             globalMem.noteLinePosition = data.noteLinePosition;
             if(reqNoteLinePositionCallback != null){
@@ -79,10 +79,12 @@ var ChunkPianoSystem_client = function(){
                 reqNoteLinePositionCallback = null; // これを行わなければ reqNoteLinePositionCallback が null でも実行されバグる．
             }
         });
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         globalMem.socketIo.on('disconnect', function(client){            
 	    });
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         globalMem.socketIo.on('chunkDataSaveRes', function(data){
             
             var isFromLoadChunkButtonProcessing,

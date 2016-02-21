@@ -17,28 +17,52 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             chunkDrawingAreaMouseDowmPosX = 0,
             chunkDrawingAreaMouseDowmPosY = 0,
             swalPromptOptionForUserNameProp,
+            defaultUserName = null,
             userNameSetter,
             saveConfirmModalWindow
         ;
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
+        // user name 入力処理
+        
+        // 一度ユーザネームを入力している場合，次回以降は localStorage に保存されている unerName をデフォルトで入力する．
+        // localStrage はブラウザのバージョンによっては実装されていないので念のため try - catch する. 
+        try{
+            defaultUserName = localStorage.getItem('chunkPianoSystem_userName');
+            if(defaultUserName == null || defaultUserName == undefined){
+                defaultUserName = '';
+            }
+        }catch(e){
+            console.log(e);
+        }
+        
+        swalPromptOptionForUserNameProp = {
+            title: 'ユーザ名を入力してください...',
+            type: 'input',
+            inputValue: defaultUserName,
+            showCancelButton: false,
+            closeOnConfirm: false, // これを true にすると practiceDayChecker が呼び出されなくなる!!!
+            animation: 'slide-from-top',
+            inputPlaceholder: 'ここにユーザ名を入力'                    
+        };
+        
         userNameSetter = function(userNameUNS){
 
             if(userNameUNS == '' || userNameUNS == null || userNameUNS == undefined){
                 swal.showInputError('ユーザ名は必須です!');
             }else{
                 globalMemCPSCIDA.chunkDataObj.userName = userNameUNS;
+                // 何度もユーザ名を入力しなくても済むよう，localStorage にユーザネームを登録．
+                // localStrage はブラウザのバージョンによっては実装されていないので念のため try - catch する. 
+                try{
+                    localStorage.setItem('chunkPianoSystem_userName', userNameUNS);
+                }catch(e){
+                    console.log(e);
+                }
                 swal.close();
             }
         };
-        swalPromptOptionForUserNameProp = {
-            title: 'ユーザ名を入力してください...',
-            type: 'input',
-            showCancelButton: false,
-            closeOnConfirm: false, // これを true にすると practiceDayChecker が呼び出されなくなる!!!
-            animation: 'slide-from-top',
-            inputPlaceholder: 'ここにユーザ名を入力'                    
-        };
+        
         swal(swalPromptOptionForUserNameProp, userNameSetter);   
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
@@ -147,7 +171,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 swal(swalPromptOptionForPracDayProp, practiceDayChecker);                
             }
         });
-
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         loadChunkButton.click(function(){
             // todo: data で userName をサーバに渡し，その userName のファイルだけを req するようにする．
             // ここではサーバに保存されている ChunkPianoData 名のリストをリクエストしているだけ．
@@ -164,7 +189,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 globalMemCPSCIDA.socketIo.emit('chunkFileNameReq',{});
             }
         });
-
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         if(callback) callback();
     };
     

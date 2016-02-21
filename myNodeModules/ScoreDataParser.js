@@ -18,7 +18,7 @@ module.exports = function(fileName){
         
         // 譜面の上段，下段の中間の y 座標を取得．チャンクで頭出しする際，上段，下段の判定に利用．
         noteLinePositionObj.middleAxisY = Math.floor(noteLinePositionObj.upperY + 
-                                                     ((noteLinePositionObj.lowerY - noteLinePositionObj.upperY)/2)
+                                                     ((noteLinePositionObj.lowerY - noteLinePositionObj.upperY) / 2)
                                                      )
         ;
         

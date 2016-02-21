@@ -1,7 +1,7 @@
 var ChunkPianoSystem_server = function(){
     'use strict'
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
+    ///////////////////////////////////////////////
     var constructor,
         getStrTimeOrYear = require('./myNodeModules/GetStrTimeOrYear'), // node_modules を指定せずに require する方法はないのか? 
         getChunkDataJsonList,

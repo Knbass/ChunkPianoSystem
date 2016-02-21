@@ -85,16 +85,16 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
             };
             
             // noteLinePosition が正しく受信されていない場合，チャンクの頭出し位置を計算できない．
-            // その場合は main class の reqNoteLinePosition を呼び出し再受信する，
+            // その場合は main class の reqNoteLinePosition を呼び出し再受信する．
             if(globalMemCPSDDR.noteLinePosition == null || globalMemCPSDDR.noteLinePosition == undefined){
                 globalMemCPSDDR.reqNoteLinePosition(function(){
-                    console.log('----- reqNoteLinePositionCallback -----');
+                    // console.log('----- reqNoteLinePositionCallback -----');
                     // console.log(globalMemCPSDDR.noteLinePosition);
                     render();
                 });
                 return 0; // return しないと render が2度実行されてしまう．
             }
-            
+            // console.log(globalMemCPSDDR.noteLinePosition);
             render(); // 上記if文より下で実行すること．実行順序を入れ替えると，noteLinePosition を再受信した際に render が2度実行される．
         }else{
             console.log('createChunkDom; size 0');

@@ -1,5 +1,8 @@
  // このライブラリは引数に jQuery の DOM をとることに注意!
 var ScoreDataCreator = function(){
+    'use strict'
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     var constructor, initScoreAreaAction, showHelp, 
         scoreArea, addElementToScoreDataObj, createNotesTemplate,
         scoreDataObj = {
@@ -10,10 +13,10 @@ var ScoreDataCreator = function(){
             }
         },
         notesColCounter = 0,
-        inputState = 'upper', // キー入力の状態
+        inputState = 'upper', // キー入力の状態. デフォルトは上段中央のy座標を入力する upper モード．
+        isUpperCol = true, // 上段を入力中か否か
         notePosX = 0, 
-        notePosY = 0,
-        isUpperCol = true // 上段を入力中か否か
+        notePosY = 0
     ;
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
@@ -144,7 +147,6 @@ var ScoreDataCreator = function(){
         console.info('  n キーを押下し，下段の音列を左からクリック');
         console.info('  d キーを押下すると音符番号が戻り，再入力可能');
         console.info('  s でデータを保存．');
-        console.info('fin...');
     };
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
@@ -160,7 +162,7 @@ var ScoreDataCreator = function(){
 ///////////////////////////////////////////////
 /////////////////////////////////////////////// 
 ///////////////////////////////////////////////
-/////////////////////////////////////////////// 
+///////////////////////////////////////////////
 ///////////////////////////////////////////////
 $(function(){
      var sdc = ScoreDataCreator();
