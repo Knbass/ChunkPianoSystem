@@ -68,12 +68,12 @@ var ChunkPianoSystem_server = function(){
         httpServer = http.createServer(onHttpRequest).listen(process.env.PORT || 3003); // for heroku deployment
         // httpServer = http.createServer(onHttpRequest).listen(3003, '127.0.0.1');
         
-        // socket.io の初期化
+        // socket.io を httpServer と関連づける (初期化)．
         io = socketIo.listen(httpServer);
         ///////////////////////////////////////////////
         /////////////////////////////////////////////// 
         ///////////////////////////////////////////////
-        /////////////////////////////////////////////// 
+        ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         /////////////////////////////////////////////// 
         io.sockets.on('connection', function(socket){
@@ -106,7 +106,7 @@ var ChunkPianoSystem_server = function(){
                        
                        socket.emit('chunkDataSaveRes',{
                            status: 'success', // status は success, error, sameFileExist
-                           message: 'チャンクデータの保存を\n完了しました!'
+                           message: 'チャンクデータの保存を\n完了しました'
                        });
                    }
                 });
@@ -121,7 +121,7 @@ var ChunkPianoSystem_server = function(){
                         // todo: 保存しているファイルがない場合の処理を追加
                         socket.emit('chunkFileNameList',{
                             status: 'success', // status は success, error, sameFileExist
-                            message: 'チャンクデータの保存を\n完了しました!',
+                            message: 'チャンクデータの保存を\n完了しました',
                             fileNameList:fileNameList
                         });
                     }
@@ -135,7 +135,7 @@ var ChunkPianoSystem_server = function(){
                     reqestedChunkData = fs.readFileSync('./ChunkData/' + data.requestChunkDataFileName, 'utf-8');
                     socket.emit('reqestedChunkData',{
                         status: 'success', // status は success, error, sameFileExist
-                        message: 'チャンクデータの読み込みを\n完了しました!!',
+                        message: 'チャンクデータの読み込みを\n完了しました',
                         reqestedChunkData:reqestedChunkData
                     });
                 }catch(e){
