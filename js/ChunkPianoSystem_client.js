@@ -8,15 +8,19 @@ var ChunkPianoSystem_client = function(){
         // しかしこれはベストプラクティスではないような...
         // Java のように this でメンバを渡せるようにできないか?
         globalMem = { // 複数のクラスで利用するメンバ/メソッドはここで定義すること
+            setPlayPosition:ChunkPianoSystem_client.initDomAction(globalMem).setPlayPosition,
             chunkDrawingArea:$('#chunkDrawingArea'),
             socketIo:null,
             reqNoteLinePosition:null,
             turnNotEditedMode:null, // 後方参照ができないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
             createChunkDom:null,
             isFromLoadChunkButton:false,
+            practicePointMode:null,
             isEditedByChunkMovingOrDelete:false, 
             isEditedByNewChunk:false,
             noteLinePosition:null,
+            chunkHeadLinePositions:[], // チャンクによる頭出し位置を昇順ソートして格納．チャンクの移動が生じる度にソートしなおす．
+            nowNoteRowCount:0,
             chunkDataObj:{
                 userName:null,
                 chunkData:{},
@@ -25,7 +29,8 @@ var ChunkPianoSystem_client = function(){
             patternChunkCount:0,
             phraseChunkCount:0,
             hardChunkCount:0
-        }, // !!! グローバルメンバを宣言してからサブクラスのインスタンス化を行う
+        }, 
+        // !!! グローバルメンバを宣言してからサブクラスのインスタンス化を行う
         createChunkDom =  ChunkPianoSystem_client.domRenderer(globalMem).createChunkDom,
         initDomAction =  ChunkPianoSystem_client.initDomAction(globalMem).initDomAction
     ;
@@ -50,26 +55,24 @@ var ChunkPianoSystem_client = function(){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    initSocketIo = function(){
+    initSocketIo = function(callback){
         
         var reqNoteLinePositionCallback = null;
         // globalMem.socketIo = io.connect('http://127.0.0.1:3001');
         globalMem.socketIo = io.connect();
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
-        globalMem.socketIo.on('connect', function(){ 
-            // noteLinePosition が正しく受信されていない場合に domRenderer クラスは 再受信のために reqNoteLinePosition を呼び出す．
-            // そのため, reqNoteLinePosition を globalMem に追加した．
-            // このメソッドは必ず即時実行すること (忘れてもバックアップがあるけども)．
-            (globalMem.reqNoteLinePosition = function(callback){
-                globalMem.socketIo.emit('reqNoteLinePosition', {data:0});
-                //  noteLinePosition 再受信の再，domRenderer クラスは noteLinePosition の受信が完了してから
-                //  dom rendering を行う必要がある．
-                //  そのため，callback で処理を受け取り，initSocketIo スコープ変数 reqNoteLinePositionCallback を経由し
-                //  noteLinePosition の socket on 時にこれを実行．
-                if(callback){reqNoteLinePositionCallback = callback;}
-            })();
-        });
+        // noteLinePosition が正しく受信されていない場合に domRenderer クラスは 再受信のために reqNoteLinePosition を呼び出す．
+        // そのため, reqNoteLinePosition を globalMem に追加した．
+        // このメソッドは必ず即時実行すること (忘れてもバックアップがあるけども)．
+        (globalMem.reqNoteLinePosition = function(callback){
+            globalMem.socketIo.emit('reqNoteLinePosition', {data:0});
+            //  noteLinePosition 再受信の再，domRenderer クラスは noteLinePosition の受信が完了してから
+            //  dom rendering を行う必要がある．
+            //  そのため，callback で処理を受け取り，initSocketIo スコープ変数 reqNoteLinePositionCallback を経由し
+            //  noteLinePosition の socket on 時にこれを実行．
+            if(callback){reqNoteLinePositionCallback = callback;}
+        })();
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         globalMem.socketIo.on('noteLinePosition', function(data){ 
@@ -170,12 +173,15 @@ var ChunkPianoSystem_client = function(){
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         $(window).unload(function(){
-        });        
+        });     
+        
+        if(callback){callback();}
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     constructor = function(){
-        initDomAction(initSocketIo);
+        // 逆の方が安全かもしれぬ... 
+        initSocketIo(initDomAction);
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////

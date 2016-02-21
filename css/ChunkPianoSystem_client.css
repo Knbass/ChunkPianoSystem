@@ -152,6 +152,27 @@ html {
     margin: 0 auto;
 }
 
+
+#playPositionArea{
+    display: block;
+    position: absolute;
+    top:13px;
+    left: 33px;
+    height: 679px;
+    width: 1294px;
+    background-color: transparent;
+    margin: 0 auto;
+}
+
+#playPosition{
+    display: block;
+    position: absolute;
+    height: 150px;
+    width: 6px;
+    background-color: rgba(0, 0, 0, 0.62);
+    margin: 0 auto;
+}
+
 .chunk{
     position: absolute;
     border: solid 3px;
@@ -199,4 +220,10 @@ html {
 
 #chunkDataSelectMenu{
     width: 350px;
+}
+
+#practicePointModeSelector{
+    position: relative;
+    top:4px;
+    margin-left: 20px;
 }

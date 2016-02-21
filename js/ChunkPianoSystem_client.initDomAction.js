@@ -2,7 +2,9 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
     'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    var initDomAction;
+    var initDomAction, setPlayPosition, 
+        playPosition = $('#playPosition')
+    ;
     
     initDomAction = function(callback){
         
@@ -12,6 +14,9 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             displayTexitButton = $('#displayTexitButton'),
             alertText = $('.textInput#alertText'),
             textArea = $('#textArea'),
+            practicePointModeSelector = $('#practicePointModeSelector'),
+            leftPositionButton = $('#leftPositionButton'),
+            rightPositionButton = $('#rightPositionButton'),
             beforeColor = '',
             isChunkDrawing = false,
             chunkDrawingAreaMouseDowmPosX = 0,
@@ -19,8 +24,10 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             swalPromptOptionForUserNameProp,
             defaultUserName = null,
             userNameSetter,
-            saveConfirmModalWindow
+            saveConfirmModalWindow,
+            rejectChunkPracticeMode
         ;
+        globalMemCPSCIDA.practicePointMode = $('#practicePointModeSelector option:selected').val();
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // user name 入力処理
@@ -64,6 +71,19 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         };
         
         swal(swalPromptOptionForUserNameProp, userNameSetter);   
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        // 演奏位置初期化処理
+        // noteLinePosition を受け取ってから処理をしなければならないため，
+        // callback を利用し サーバから noteLinePosition を受け取ってから下記の処理を行う．
+        // todo: 実行順序の管理が大変になってきた... スマートな解決策はないか? 
+        globalMemCPSCIDA.reqNoteLinePosition(function(){      
+            globalMemCPSCIDA.nowNoteRowCount = 0;
+            setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[0].axisX, 
+                            globalMemCPSCIDA.noteLinePosition.noteLine[0].axisY
+                           )
+            ;    
+        });        
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         saveConfirmModalWindow = function(callback){
@@ -112,6 +132,10 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 chunkSizeX = parseInt(e.offsetX, 10) - chunkDrawingAreaMouseDowmPosX;
                 chunkSizeY = parseInt(e.offsetY, 10) - chunkDrawingAreaMouseDowmPosY;
 
+                // todo: globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId] (domrenderer), chunkPropaties (initDomAction) など，
+                //       同じ情報もしくはその拡張を複数箇所で定義しており，バグを生みやすい状況にある．
+                //       object の ファクトリ関数を定義し，最初から全てのプロパティを定義し，サブクラスでプロパティを拡張しないようにする．
+                //       現状ではオブジェクトプロパティを確認するにはプログラムを実行する必要があり，メンテナンス性が低い!!!
                 chunkProperties = {
                     left       : chunkDrawingAreaMouseDowmPosX,
                     top        : chunkDrawingAreaMouseDowmPosY,
@@ -173,6 +197,114 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
+        rejectChunkPracticeMode = function(){
+            swal('チャンクで頭出しするには\nチャンクを1つ以上記入する\n必要があります!', '', 'warning');
+            globalMemCPSCIDA.practicePointMode = 'notePosition';
+            practicePointModeSelector.val('notePosition');
+            globalMemCPSCIDA.nowNoteRowCount = 0;
+            setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisX, 
+                            globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisY
+                           )
+            ;  
+        };        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        practicePointModeSelector.change(function(){
+            
+            globalMemCPSCIDA.practicePointMode = $('#practicePointModeSelector option:selected').val();
+            
+            if(globalMemCPSCIDA.practicePointMode == 'chunk'){
+                if(globalMemCPSCIDA.chunkHeadLinePositions.length == 0){
+                    rejectChunkPracticeMode();
+                }else{                    
+                    globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[0];
+                    setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.chunkHeadLinePositions[0]].axisX, 
+                                    globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.chunkHeadLinePositions[0]].axisY
+                                   )
+                    ;  
+                    
+                }
+            }else if(globalMemCPSCIDA.practicePointMode == 'notePosition'){
+                globalMemCPSCIDA.nowNoteRowCount = 0;
+                setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[0].axisX, 
+                                globalMemCPSCIDA.noteLinePosition.noteLine[0].axisY
+                               )
+                ;  
+            }
+        });
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        leftPositionButton.click(function(){
+            
+            var isRejectChunkPractice = false;
+            
+            if(globalMemCPSCIDA.practicePointMode == 'notePosition'){
+                if(globalMemCPSCIDA.nowNoteRowCount == 0){
+                    globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.noteLinePosition.noteLine.length - 1;
+                }else{
+                    globalMemCPSCIDA.nowNoteRowCount -= 1;                
+                }          
+            }else if(globalMemCPSCIDA.practicePointMode == 'chunk'){
+                
+                var chunkHeadLinePositionsNowIndex = globalMemCPSCIDA.chunkHeadLinePositions.indexOf(globalMemCPSCIDA.nowNoteRowCount);                
+                
+                if(chunkHeadLinePositionsNowIndex == 0){
+                    globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[globalMemCPSCIDA.chunkHeadLinePositions.length-1];
+                }else if(chunkHeadLinePositionsNowIndex == -1){
+                    if(globalMemCPSCIDA.chunkHeadLinePositions.length >0){
+                        globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[0];
+                    }else{
+                        rejectChunkPracticeMode();
+                        isRejectChunkPractice = true;
+                    }
+                }else{
+                    globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[chunkHeadLinePositionsNowIndex-1];
+                }
+            }
+            
+            if(!isRejectChunkPractice){
+                setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisX, 
+                                globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisY
+                               )
+                ; 
+            }
+        });
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        rightPositionButton.click(function(){
+            
+            var isRejectChunkPractice = false;
+            
+            if(globalMemCPSCIDA.practicePointMode == 'notePosition'){
+               
+                if(globalMemCPSCIDA.nowNoteRowCount == globalMemCPSCIDA.noteLinePosition.noteLine.length - 1){
+                    globalMemCPSCIDA.nowNoteRowCount = 0;
+                }else{
+                    globalMemCPSCIDA.nowNoteRowCount += 1;                
+                }
+            }else if(globalMemCPSCIDA.practicePointMode == 'chunk'){
+            
+                var chunkHeadLinePositionsNowIndex = globalMemCPSCIDA.chunkHeadLinePositions.indexOf(globalMemCPSCIDA.nowNoteRowCount);
+                   
+                if(chunkHeadLinePositionsNowIndex == -1 && globalMemCPSCIDA.chunkHeadLinePositions.length == 0){
+                    rejectChunkPracticeMode();
+                    isRejectChunkPractice = true;
+                }else if(chunkHeadLinePositionsNowIndex == globalMemCPSCIDA.chunkHeadLinePositions.length-1){
+                    globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[0];
+                }else{
+                    globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[chunkHeadLinePositionsNowIndex+1];
+                }                
+            }
+            
+            if(!isRejectChunkPractice){
+                setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisX, 
+                                globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisY
+                               )
+                ;  
+            }
+        });        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         loadChunkButton.click(function(){
             // todo: data で userName をサーバに渡し，その userName のファイルだけを req するようにする．
             // ここではサーバに保存されている ChunkPianoData 名のリストをリクエストしているだけ．
@@ -194,5 +326,16 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         if(callback) callback();
     };
     
-    return {initDomAction:initDomAction};
+    setPlayPosition = function(left, top){
+        var playPositionHeight = parseInt(playPosition.css('height'), 10),
+            playPositionWidth = parseInt(playPosition.css('width'), 10)
+        ;
+        
+        playPosition.css({
+            'top' : (top  - (playPositionHeight / 2)),
+            'left': (left - (playPositionWidth  / 2))
+        });
+    };
+    
+    return {initDomAction:initDomAction, setPlayPosition:setPlayPosition};
 };
