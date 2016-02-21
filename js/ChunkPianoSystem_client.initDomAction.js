@@ -131,7 +131,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         ///////////////////////////////////////////////
         saveChunkButton.click(function(mode){
 
-            if(Object.keys(globalMemCPSCIDA.chunkDataObj.chunkData).length == 0){ // chunk が一つも描画されていない時は保存処理を行わない
+            if(Object.keys(globalMemCPSCIDA.chunkDataObj.chunkData).length == 0){ // chunk が一つも描画されていない時は保存処理を行わない．
                 swal('保存するにはチャンクを\n1つ以上記入してください!', '', 'warning');
             }else{
                 var practiceDayChecker, swalPromptOptionForPracDayProp; 

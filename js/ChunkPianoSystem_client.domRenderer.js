@@ -3,8 +3,7 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     var domUtil = ChunkPianoSystem_client.utility(),
-        createChunkDom,
-        isReReqNoteLinePosition = false;
+        createChunkDom, getChunkHeadLine
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -18,7 +17,10 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
           ){
 
             var render, chunkDom, chunkDomId, chunkDomDelBtn; 
-                        
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            // noteLinePosition が正しく受信されている / されていない で chunk 描画処理の順番を変更する必要がある．
+            // そのため，チャンク描画処理を render 関数としてまとめた．
             render = function(){
                 // マウスドラッグの x 方向がマイナス方向だった時に正しく描画するための処理．
                 if(chunkPropCCD.width < 0){ 
@@ -30,7 +32,9 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                     chunkPropCCD.top += chunkPropCCD.height;
                     chunkPropCCD.height = Math.abs(chunkPropCCD.height);
                 }
-
+                ///////////////////////////////////////////////
+                ///////////////////////////////////////////////
+                // chunk dom のテンプレート生成，描画位置情報を css に変換，イベント登録
                 chunkDomId = String() + chunkPropCCD.chunkType + 'Chunk_' + globalMemCPSDDR.patternChunkCount;
                 chunkDom = $('<div class="chunk pattern" id="' + chunkDomId + '"></div>');
 
@@ -41,8 +45,14 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                     'height': chunkPropCCD.height + 'px'
                 });
 
+                chunkDom.mousedown(function(){
+                    globalMemCPSDDR.isEditedByChunkMovingOrDelete = true; // chunkDom がクリック，または移動された際は編集された，と定義する
+                });
+                
                 domUtil.appendDruggAndDropEvent(chunkDom, globalMemCPSDDR.chunkDrawingArea);
-
+                ///////////////////////////////////////////////
+                ///////////////////////////////////////////////
+                // chunk 消去ボタンのテンプレート生成，css 計算，イベント付与
                 chunkDomDelBtn = $('<div class="chunkDeleteButton" id="' + chunkDomId +'_DeleteButton">' + 
                                         '<p class="chunkDeleteButtonFont">×</p>' + 
                                    '</div>'
@@ -53,15 +63,12 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                     var parentChunkDom = $(this).parent(),
                         parentChunkDomId = parentChunkDom[0].id
                     ;
-                    parentChunkDom.remove();
-                    // html の chunkDom の削除と同時に オブジェクトのデータ構造にも chunkDom を削除．
+                    parentChunkDom.remove(); // クリックされた chunkDomDelBtn の親要素 == ユーザが消したい chunk dom
+                    // html の chunkDom の削除と同時に オブジェクトのデータ構造内の該当する chunkDom も削除．
+                    // !!!! ChunkDom 関連の実装を拡張する際は，オブジェクトのデータ構造とDOMの状態をバラバラにしないように細心の注意を !!!!
                     delete globalMemCPSDDR.chunkDataObj.chunkData[parentChunkDomId];
                     globalMemCPSDDR.isEditedByChunkMovingOrDelete = true;
                     console.log(globalMemCPSDDR.chunkDataObj);
-                });
-
-                chunkDom.mousedown(function(){
-                    globalMemCPSDDR.isEditedByChunkMovingOrDelete = true; // chunkDom がクリック，または移動された際は編集された，と定義する
                 });
 
                 chunkDom.append(chunkDomDelBtn);
@@ -74,16 +81,16 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                     chunkType  : chunkPropCCD.chunkType,
                     parentChunk: null
                 };
-                console.log(globalMemCPSDDR.chunkDataObj);
-
+                
                 globalMemCPSDDR.chunkDrawingArea.append(chunkDom);
-
+                console.log(globalMemCPSDDR.chunkDataObj);
+                
                 if(chunkPropCCD.chunkType == 'pattern'){
                     globalMemCPSDDR.patternChunkCount++; // todo: phraseChunk, hardChunk 描画時のカウンティング処理を追加
                 }
-            
-            };
-            
+            };          
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
             // noteLinePosition が正しく受信されていない場合，チャンクの頭出し位置を計算できない．
             // その場合は main class の reqNoteLinePosition を呼び出し再受信する．
             if(globalMemCPSDDR.noteLinePosition == null || globalMemCPSDDR.noteLinePosition == undefined){
@@ -100,6 +107,12 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
             console.log('createChunkDom; size 0');
         }
     };
-    
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
+    getChunkHeadLine = function(){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
+        
+    };
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     return{createChunkDom:createChunkDom};
 };
