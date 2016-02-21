@@ -1,1 +1,14 @@
-{"userName":"dfa","chunkData":{"patternChunk_2":{"left":130,"top":183,"width":415,"height":249,"chunkType":"pattern","parentChunk":null}},"practiceDay":"123"}
+{
+    "userName": "dfa",
+    "chunkData": {
+        "patternChunk_2": {
+            "left": 130,
+            "top": 183,
+            "width": 415,
+            "height": 249,
+            "chunkType": "pattern",
+            "parentChunk": null
+        }
+    },
+    "practiceDay": "123"
+}
