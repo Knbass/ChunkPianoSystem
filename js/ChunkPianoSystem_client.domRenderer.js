@@ -17,6 +17,7 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
           ){
 
             var render, chunkDom, chunkDomId, chunkDomDelBtn; 
+            console.log(globalMemCPSDDR.noteLinePosition);
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
             // noteLinePosition が正しく受信されている / されていない で chunk 描画処理の順番を変更する必要がある．
@@ -32,6 +33,11 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                     chunkPropCCD.top += chunkPropCCD.height;
                     chunkPropCCD.height = Math.abs(chunkPropCCD.height);
                 }
+                ///////////////////////////////////////////////
+                ///////////////////////////////////////////////
+                
+                getChunkHeadLine(chunkPropCCD);
+                
                 ///////////////////////////////////////////////
                 ///////////////////////////////////////////////
                 // chunk dom のテンプレート生成，描画位置情報を css に変換，イベント登録
@@ -109,7 +115,13 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    getChunkHeadLine = function(){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
+    getChunkHeadLine = function(chunkPropGCL){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
+        
+        var chunkMiddleAxisY = 0;
+        
+        chunkMiddleAxisY = chunkPropGCL.top + (Math.floor(chunkPropGCL.height / 2));
+        
+        
         
     };
     ///////////////////////////////////////////////
