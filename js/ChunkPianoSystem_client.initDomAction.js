@@ -198,7 +198,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         rejectChunkPracticeMode = function(){
-            swal('チャンクで頭出しするには\nチャンクを1つ以上記入する\n必要があります!', '', 'warning');
+            swal('チャンクで頭出しするには\nチャンクを1つ以上記入する\n必要があります...', '', 'warning');
             globalMemCPSCIDA.practicePointMode = 'notePosition';
             practicePointModeSelector.val('notePosition');
             globalMemCPSCIDA.nowNoteRowCount = 0;
