@@ -27,11 +27,10 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             saveConfirmModalWindow,
             rejectChunkPracticeMode
         ;
-        globalMemCPSCIDA.practicePointMode = $('#practicePointModeSelector option:selected').val();
+        globalMemCPSCIDA.practicePointMode = $('#practicePointModeSelector option:selected').val(); 
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // user name 入力処理
-        
         // 一度ユーザネームを入力している場合，次回以降は localStorage に保存されている unerName をデフォルトで入力する．
         // localStrage はブラウザのバージョンによっては実装されていないので念のため try - catch する. 
         try{
@@ -48,6 +47,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             type: 'input',
             inputValue: defaultUserName,
             showCancelButton: false,
+            allowEscapeKey:false,
             closeOnConfirm: false, // これを true にすると practiceDayChecker が呼び出されなくなる!!!
             animation: 'slide-from-top',
             inputPlaceholder: 'ここにユーザ名を入力'                    
@@ -238,7 +238,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             
             var isRejectChunkPractice = false;
             
-            if(globalMemCPSCIDA.practicePointMode == 'notePosition'){
+            if(globalMemCPSCIDA.practicePointMode == 'notePosition'){ //
                 if(globalMemCPSCIDA.nowNoteRowCount == 0){
                     globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.noteLinePosition.noteLine.length - 1;
                 }else{

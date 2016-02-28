@@ -78,7 +78,7 @@ html {
  }
  }
 
-.testFrame{ 
+.cpsWrappers{ 
     /* . とクラス名で html の要素を取得 */
     position: relative; /* relative は相対位置で表示．absolute は絶対位置で表示*/
     background-color: rgba(239, 233, 227, 1.0);
@@ -88,11 +88,11 @@ html {
 }
 
 /*
-.testFrame:hover{ 
+.cpsWrappers:hover{ 
     background-color: #ccc3b9;
 }
 
-.testFrame:active{ 
+.cpsWrappers:active{ 
     background-color: #605f5e;
 }
 */
@@ -109,21 +109,21 @@ html {
     top:0px;
 }
 
-.testFrame #changeColorButton{
-    /* testFrame クラスの子要素の id changeColorButton にアクセス */
+.cpsWrappers #changeColorButton{
+    /* cpsWrappers クラスの子要素の id changeColorButton にアクセス */
     margin-left: 10px;
 }
 
-.testFrame #changeColorButton:active{ 
+.cpsWrappers #changeColorButton:active{ 
     background-color: #fffefc;
 }
 
-.testFrame #alertText{
+.cpsWrappers #alertText{
     width: 300px;
 }
 
-.testFrame #textArea{
-    /* testFrame クラスの子要素の id changeColorButton にアクセス */
+.cpsWrappers #textArea{
+    /* cpsWrappers クラスの子要素の id changeColorButton にアクセス */
     position: absolute;
     text-align: center;
     top: 210px;

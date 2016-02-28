@@ -175,12 +175,14 @@ var ChunkPianoSystem_client = function(){
         $(window).unload(function(){
         });     
         
-        if(callback){callback();}
+        if(callback){
+            callback();
+        }
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     constructor = function(){
-        // 逆の方が安全かもしれぬ... 
+        // todo: 実行順が原因のバグが起きないか確認．
         initSocketIo(initDomAction);
     };
     ///////////////////////////////////////////////
