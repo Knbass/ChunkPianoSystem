@@ -32,7 +32,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         ///////////////////////////////////////////////
         // user name 入力処理
         // 一度ユーザネームを入力している場合，次回以降は localStorage に保存されている unerName をデフォルトで入力する．
-        // localStrage はブラウザのバージョンによっては実装されていないので念のため try - catch する. 
+        // localStrage はブラウザのバージョンによっては実装されていないので念のため try - catch する.
         try{
             defaultUserName = localStorage.getItem('chunkPianoSystem_userName');
             if(defaultUserName == null || defaultUserName == undefined){

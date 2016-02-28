@@ -1,6 +1,6 @@
 html {
      /*background-color: #000000;*/
-    background-color: #ffffff;
+    background-color: #000000;
 }
  
  body {
@@ -48,18 +48,21 @@ html {
      padding: 0px 5px 4px 5px;
      border-radius: 3px;
      border: solid 2px;
-     border-color: #b9ac92;
+     border-color: rgba(20, 115, 226, 0.78);
      font-size: 20px;
-     color: #b9ac92; /* font color */
+     color: #b4b4b4;
      cursor: pointer;
  }
  
  .button:hover{
      background-color: transparent;
-     border-color: #9d8e71;
-     color: #9d8e71;
+     border-color: #b4b4b4;
  }
  
+ .button:active{
+     color: rgba(20, 115, 226, 0.78);
+ }
+
  @-webkit-keyframes colorize {
  0% {
  -webkit-filter: grayscale(100%);
@@ -81,7 +84,7 @@ html {
 .cpsWrappers{ 
     /* . とクラス名で html の要素を取得 */
     position: relative; /* relative は相対位置で表示．absolute は絶対位置で表示*/
-    background-color: rgba(239, 233, 227, 1.0);
+    background-color: rgb(52, 52, 52);
     width: inherit;
     top:-50px;
     margin: 0 auto; /* 中央寄せは position が relative でないといかん */
@@ -169,14 +172,14 @@ html {
     position: absolute;
     height: 150px;
     width: 6px;
-    background-color: rgba(0, 0, 0, 0.62);
+    background-color: rgba(20, 115, 226, 0.78);
     margin: 0 auto;
 }
 
 .chunk{
     position: absolute;
     border: solid 3px;
-    background-color: rgba(209, 163, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.19);
     cursor: move;
 }
 
