@@ -15,6 +15,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             alertText = $('.textInput#alertText'),
             textArea = $('#textArea'),
             practicePointModeSelector = $('#practicePointModeSelector'),
+            chunkModeSelector = $('#chunkModeSelector'),
             practicePointMode = $('#practicePointModeSelector option:selected').val(),
             leftPositionButton = $('#leftPositionButton'),
             rightPositionButton = $('#rightPositionButton'),
@@ -28,6 +29,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             saveConfirmModalWindow,
             rejectChunkPracticeMode
         ;
+        globalMemCPSCIDA.nowChunkMode = String() + $('#chunkModeSelector option:selected').val();
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // user name 入力処理
@@ -141,7 +143,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                     top        : chunkDrawingAreaMouseDowmPosY,
                     width      : chunkSizeX,
                     height     : chunkSizeY,
-                    chunkType  : 'pattern',
+                    chunkType  : globalMemCPSCIDA.nowChunkMode,
                     parentChunk: null
                 };
 
@@ -150,7 +152,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 globalMemCPSCIDA.isEditedByNewChunk = true;
                 isChunkDrawing = false;
             }
-        });    
+        });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         saveChunkButton.click(function(mode){
@@ -206,7 +208,13 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                             globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisY
                            )
             ;  
-        };        
+        };      
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        chunkModeSelector.change(function(){
+            globalMemCPSCIDA.nowChunkMode =  $('#chunkModeSelector option:selected').val();
+            // console.log('nowChunkMode: ' + globalMemCPSCIDA.nowChunkMode);
+        }); 
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         practicePointModeSelector.change(function(){
@@ -214,9 +222,11 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             practicePointMode = $('#practicePointModeSelector option:selected').val();
             
             if(practicePointMode == 'chunk'){
+                // chunk モードにもかかわらず chunk の頭出し位置が1つもない，つまりチャンクが描画されていない際は chunkMode を拒否．
                 if(globalMemCPSCIDA.chunkHeadLinePositions.length == 0){
                     rejectChunkPracticeMode();
-                }else{                    
+                }else{
+                    // 上記条件に合致しない場合は 1つめの chunk の頭出し位置に演奏位置を設定．
                     globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[0];
                     setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.chunkHeadLinePositions[0]].axisX, 
                                     globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.chunkHeadLinePositions[0]].axisY
@@ -224,6 +234,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                     ;  
                     
                 }
+            // 音符列で演奏位置を変更するモードの際は，初期位置は譜面の先頭列とする．
             }else if(practicePointMode == 'notePosition'){
                 globalMemCPSCIDA.nowNoteRowCount = 0;
                 setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[0].axisX, 
@@ -261,7 +272,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                     globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[chunkHeadLinePositionsNowIndex-1];
                 }
             }
-            
+
             if(!isRejectChunkPractice){
                 setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisX, 
                                 globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisY

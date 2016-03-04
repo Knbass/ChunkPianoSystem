@@ -20,6 +20,7 @@ var ChunkPianoSystem_client = function(){
             noteLinePosition:null,
             chunkHeadLinePositions:[], // チャンクによる頭出し位置を昇順ソートして格納．チャンクの移動が生じる度にソートしなおす．
             nowNoteRowCount:0,
+            nowChunkMode:null, 
             chunkDataObj:{
                 userName:null,
                 chunkData:{},

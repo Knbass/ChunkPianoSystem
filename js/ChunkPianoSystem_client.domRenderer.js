@@ -15,9 +15,8 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
         if((chunkPropCCD.width  != 0 && chunkPropCCD.width  != null && chunkPropCCD.width  != undefined ) ||
            (chunkPropCCD.height != 0 && chunkPropCCD.height != null && chunkPropCCD.height != undefined )
           ){
-
             var render, chunkDom, chunkDomId, chunkDomDelBtn; 
-            console.log(globalMemCPSDDR.noteLinePosition);
+            // console.log(globalMemCPSDDR.noteLinePosition);
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
             // noteLinePosition が正しく受信されている / されていない で chunk 描画処理の順番を変更する必要がある．
@@ -36,8 +35,11 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                 ///////////////////////////////////////////////
                 ///////////////////////////////////////////////
                 // chunk dom のテンプレート生成，描画位置情報を css に変換，イベント登録
-                chunkDomId = String() + chunkPropCCD.chunkType + 'Chunk_' + globalMemCPSDDR.patternChunkCount;
-                chunkDom = $('<div class="chunk pattern" id="' + chunkDomId + '"></div>');
+                // done: pattern チャンク以外の処理を追加 
+                
+                /////////////////////////////////////////////////////////// ↓ globalMem から該当する chunk の描画数カウント値 を取得し，id として付与．
+                chunkDomId = String() + chunkPropCCD.chunkType + 'Chunk_' + globalMemCPSDDR[chunkPropCCD.chunkType + 'ChunkCount'];
+                chunkDom = $('<div class="chunk ' + chunkPropCCD.chunkType + '" id="' + chunkDomId + '"></div>');
 
                 chunkDom.css({ // jQuery で dom の css を変更するときの書法
                     'top'   : chunkPropCCD.top    + 'px',
@@ -128,11 +130,20 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                 
                 globalMemCPSDDR.chunkDrawingArea.append(chunkDom);
                 console.log(globalMemCPSDDR.chunkDataObj);
-                
-                if(chunkPropCCD.chunkType == 'pattern'){
-                    globalMemCPSDDR.patternChunkCount++; // todo: phraseChunk, hardChunk 描画時のカウンティング処理を追加
+                 
+                // chunk type 毎に個数をカウンティング．
+                switch(chunkPropCCD.chunkType){
+                    case 'pattern':
+                        globalMemCPSDDR.patternChunkCount++;
+                        break;
+                    case 'phrase':
+                        globalMemCPSDDR.phraseChunkCount++;
+                        break;
+                    case 'hard':
+                        globalMemCPSDDR.hardChunkCount++;
+                        break;    
                 }
-            };          
+            };
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
             // noteLinePosition が正しく受信されていない場合，チャンクの頭出し位置を計算できない．
