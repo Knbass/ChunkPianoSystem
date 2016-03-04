@@ -15,7 +15,6 @@ var ChunkPianoSystem_client = function(){
             turnNotEditedMode:null, // 後方参照ができないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
             createChunkDom:null,
             isFromLoadChunkButton:false,
-            practicePointMode:null,
             isEditedByChunkMovingOrDelete:false, 
             isEditedByNewChunk:false,
             noteLinePosition:null,
