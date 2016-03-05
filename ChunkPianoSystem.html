@@ -20,33 +20,52 @@
     <body>
         
         <div class="cpsWrappers" id="upperFrame">
-            <h1 class="cpsWrappersInnnerText" id="textArea"></h1>
+
+            <div id="lowerFrame">
+                <div class="button fileBtn" id="loadChunkButton">ファイル読込</div>
+                <div class="button fileBtn" id="saveChunkButton">チャンクを保存</div>
+
+
+                <select id="chunkModeSelector">
+                    <option value="pattern" selected>パターンチャンク</option>
+                    <option value="phrase">フレーズチャンク</option>
+                    <option value="hard">高難度チャンク</option>
+                </select>
+
+                <select id="practicePointModeSelector">
+                    <option value="notePosition" selected>音符列で頭出し</option>
+                    <option value="chunk">チャンクで頭出し</option>
+                </select>
+
+                <div class="button changePlayPosBtn" id="leftPositionButton">←</div>
+                <div class="button changePlayPosBtn" id="rightPositionButton">→</div>
+
+            </div> 
+            
             <img src="scoreImage/TurcoScore.png" id="scoreImage" alt="譜面画像データがありません．"/>
             <div id="playPositionArea">
                 <div id="playPosition"></div>
             </div>
-            <div id="chunkDrawingArea"></div>
+            <div id="chunkDrawingArea">
+                <!--div class="chunk pattern" id="patternChunk_ForDebug" style="top: 85px; left: 210px; width: 382px; height: 247px;">
+                    <div class="chunkDeleteButton" id="patternChunk_1_DeleteButton"><p class="chunkDeleteButtonFont">×</p></div>
+                </div-->
+            </div>
+            
+            <div id="annotationTextFlame">
+                <div class="annotationTxtWrapper">
+                    <p class="annotationTxt annotationChunkId">AnnotationTemplateForDevelop</p>
+                    <p class="annotationTxt">AnnotationTemplateForDevelop</p>
+                </div>
+                <div class="annotationTxtWrapper">
+                    <p class="annotationTxt annotationChunkId">AnnotationTemplateForDevelop</p>
+                    <p class="annotationTxt">AnnotationTemplateForDevelop</p>
+                </div>
+                <div class="annotationTxtWrapper">
+                    <p class="annotationTxt annotationChunkId">AnnotationTemplateForDevelop</p>
+                    <p class="annotationTxt">AnnotationTemplateForDevelop</p>
+                </div>
+            </div> 
         </div>
-        <div class="cpsWrappers" id="lowerFrame">
-            <div class="button" id="loadChunkButton">ファイル読込</div>
-            <!--input type="input/text" class="textInput" id="alertText" placeholder="テキストを入力してください..." /-->
-            <div class="button" id="saveChunkButton">チャンクを保存</div>
-            
-            
-            <select id="chunkModeSelector">
-                <option value="pattern" selected>パターンチャンク</option>
-                <option value="phrase">フレーズチャンク</option>
-                <option value="hard">高難度チャンク</option>
-            </select>
-            
-            <select id="practicePointModeSelector">
-                <option value="notePosition" selected>音符列で頭出し</option>
-                <option value="chunk">チャンクで頭出し</option>
-            </select>
-            
-            <div class="button" id="leftPositionButton">←</div>
-            <div class="button" id="rightPositionButton">→</div>
-
-        </div>        
     </body>
 </html>

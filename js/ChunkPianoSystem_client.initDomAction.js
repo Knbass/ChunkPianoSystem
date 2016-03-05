@@ -72,7 +72,9 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             }
         };
         
+        // ↓ comment out for debug
         swal(swalPromptOptionForUserNameProp, userNameSetter);   
+        
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // 演奏位置初期化処理

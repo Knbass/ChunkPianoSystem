@@ -6,7 +6,7 @@ html {
  body {
      margin: 0 auto;
      padding: 0px;
-     width: 1366px;
+     width: 1900px;
      height: 768px;
      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
      font-size: 16px;
@@ -42,18 +42,29 @@ html {
      background-color: rgba(255, 255, 255, 0);
      height: 25px;
      position: relative;
-     top: 6px;
-     left: 10px;
-     display: inline;
+     left: 4px;
+     display: block;
      padding: 0px 5px 4px 5px;
      border-radius: 3px;
      border: solid 2px;
      border-color: rgba(20, 115, 226, 0.78);
-     font-size: 20px;
+     font-size: 16px;
      color: #b4b4b4;
      cursor: pointer;
  }
- 
+
+ .button.fileBtn{
+     top: 5px;
+     width: 120px;
+     margin-bottom: 15px;
+}
+
+.button.changePlayPosBtn{
+    display: inline-block;
+    top:10px;
+    width: 50px;
+}
+
  .button:hover{
      background-color: transparent;
      border-color: #b4b4b4;
@@ -107,9 +118,24 @@ html {
 }
 
 #lowerFrame{
-    height: 39px;
+    position: relative;
+    width:140px;
+    top: 0px;
+    height: inherit;
     margin-top: 10px;
+    background: #1d2027;
+    padding-top: 5px;
+}
+
+#annotationTextFlame{
+    position: absolute;
+    height: inherit;
+    padding-left: 3px;
+    padding-right: 3px;
+    width: 440px;    
     top:0px;
+    left: 1453px;
+    background: #1d2027;
 }
 
 .cpsWrappers #changeColorButton{
@@ -138,19 +164,21 @@ html {
 
 #scoreImage{ /* id は # で指定，クラスは . でしてい*/
     display: block;
-    position: relative;
+    position: absolute;
+    top: 0px;
     height: 705px;
     border: solid 0px;
-    margin: 0 auto;
+    left: 139px;
 }
 
 #chunkDrawingArea{
     display: block;
     position: absolute;
     top:13px;
-    left: 33px;
+    left: 150px;
     height: 679px;
     width: 1294px;
+    //background-color: rgba(255, 0, 0, 0.56);
     background-color: transparent;
     margin: 0 auto;
 }
@@ -160,9 +188,10 @@ html {
     display: block;
     position: absolute;
     top:13px;
-    left: 33px;
+    left: 150px;
     height: 679px;
     width: 1294px;
+    //background-color: rgba(10, 0, 255, 0.56);
     background-color: transparent;
     margin: 0 auto;
 }
@@ -228,5 +257,24 @@ html {
 #practicePointModeSelector, #chunkModeSelector{
     position: relative;
     top:4px;
-    margin-left: 20px;
+    margin-left: 1px;
+    margin-bottom: 15px;
+    width: 138px;
+}
+
+
+.annotationTxtWrapper{
+    background: #505050;
+    padding-left: 5px;
+    margin: 1px;
+    margin-bottom: -10px;
+}
+
+.annotationTxt{
+    margin-bottom: -13px;
+    color: white;
+}
+
+.annotationChunkId{
+    color: aqua
 }
