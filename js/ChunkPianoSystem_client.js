@@ -2,14 +2,14 @@ var ChunkPianoSystem_client = function(){
     'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    var constructor, createChunkDom, initSocketIo,
+    var constructor, initSocketIo,
         resetChunkDrawingAreaAndChunkData, turnNotEditedMode,
         // 複数のクラスで利用するメンバはこの globalMem オブジェクトに定義し，インスタンス生成時に引数として渡す.
         // しかしこれはベストプラクティスではないような...
         // Java のように this でメンバを渡せるようにできないか?
         globalMem = { // 複数のクラスで利用するメンバ/メソッドはここで定義すること
-            setPlayPosition:ChunkPianoSystem_client.initDomAction(globalMem).setPlayPosition,
             chunkDrawingArea:$('#chunkDrawingArea'),
+            annotationTextFlame:$('#annotationTextFlame'), // todo: このメンバは annotationRenderer でしか使わない場合は annotationRenderer に単独で与える．
             socketIo:null,
             reqNoteLinePosition:null,
             turnNotEditedMode:null, // 後方参照ができないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
@@ -17,6 +17,7 @@ var ChunkPianoSystem_client = function(){
             isFromLoadChunkButton:false,
             isEditedByChunkMovingOrDelete:false, 
             isEditedByNewChunk:false,
+            isEditedByAnnotation:false,
             noteLinePosition:null,
             chunkHeadLinePositions:[], // チャンクによる頭出し位置を昇順ソートして格納．チャンクの移動が生じる度にソートしなおす．
             nowNoteRowCount:0,
@@ -28,13 +29,18 @@ var ChunkPianoSystem_client = function(){
             },
             patternChunkCount:0,
             phraseChunkCount:0,
-            hardChunkCount:0
+            hardChunkCount:0,
+            annotationDomRenderer:null,
+            setPlayPosition:null
         }, 
+        // todo: ステートレスなクラスメソッドは chunkDomRenderer = ChunkPianoSystem_client.chunkDomRenderer(globalMem)
+        //       と宣言し，chunkDomRenderer.createChunkDom(); と実行するように変更．名前空間の汚染を防ぐ．
         // !!! グローバルメンバを宣言してからサブクラスのインスタンス化を行う
-        createChunkDom =  ChunkPianoSystem_client.domRenderer(globalMem).createChunkDom,
         initDomAction =  ChunkPianoSystem_client.initDomAction(globalMem).initDomAction
     ;
-    globalMem.createChunkDom = createChunkDom;
+    globalMem.setPlayPosition = ChunkPianoSystem_client.initDomAction(globalMem).setPlayPosition;
+    globalMem.createChunkDom = ChunkPianoSystem_client.chunkDomRenderer(globalMem).createChunkDom;
+    globalMem.annotationDomRenderer = ChunkPianoSystem_client.annotationDomRenderer(globalMem); // annotationTextFlame を取得した後に実行すること．
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // このメソッドは chunkDataObj の chunkData のみを初期化する
@@ -45,6 +51,7 @@ var ChunkPianoSystem_client = function(){
         globalMem.phraseChunkCount = 0;
         globalMem.hardChunkCount = 0;
         globalMem.chunkDrawingArea.empty();
+        globalMem.annotationTextFlame.empty();
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -52,6 +59,7 @@ var ChunkPianoSystem_client = function(){
     globalMem.turnNotEditedMode = function(){                        
         globalMem.isEditedByChunkMovingOrDelete = false;
         globalMem.isEditedByNewChunk = false;
+        globalMem.isEditedByAnnotation = false;
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -62,12 +70,12 @@ var ChunkPianoSystem_client = function(){
         globalMem.socketIo = io.connect();
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
-        // noteLinePosition が正しく受信されていない場合に domRenderer クラスは 再受信のために reqNoteLinePosition を呼び出す．
+        // noteLinePosition が正しく受信されていない場合に chunkDomRenderer クラスは 再受信のために reqNoteLinePosition を呼び出す．
         // そのため, reqNoteLinePosition を globalMem に追加した．
         // このメソッドは必ず即時実行すること (忘れてもバックアップがあるけども)．
         (globalMem.reqNoteLinePosition = function(callback){
             globalMem.socketIo.emit('reqNoteLinePosition', {data:0});
-            //  noteLinePosition 再受信の再，domRenderer クラスは noteLinePosition の受信が完了してから
+            //  noteLinePosition 再受信の再，chunkDomRenderer クラスは noteLinePosition の受信が完了してから
             //  dom rendering を行う必要がある．
             //  そのため，callback で処理を受け取り，initSocketIo スコープ変数 reqNoteLinePositionCallback を経由し
             //  noteLinePosition の socket on 時にこれを実行．
@@ -160,10 +168,10 @@ var ChunkPianoSystem_client = function(){
             resetChunkDrawingAreaAndChunkData();
             data.reqestedChunkData = JSON.parse(data.reqestedChunkData);
             
-            // createChunkDom メソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
+            // globalMem.createChunkDom メソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
             // for in 文で回し1つずつ描画する．
             for(var chunkId in data.reqestedChunkData.chunkData){
-                createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
+                globalMem.createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
             }
             
             globalMem.turnNotEditedMode();

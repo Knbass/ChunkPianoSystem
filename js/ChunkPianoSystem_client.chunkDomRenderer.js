@@ -1,4 +1,4 @@
-ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){ 
+ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){ 
     'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -95,6 +95,8 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                         parentChunkDomId = parentChunkDom[0].id
                     ;
                     parentChunkDom.remove(); // クリックされた chunkDomDelBtn の親要素 == ユーザが消したい chunk dom
+                    globalMemCPSDDR.annotationDomRenderer.removeAnnotationDom(parentChunkDomId); // 対応するアノテーションも削除
+                    
                     // html の chunkDom の削除と同時に オブジェクトのデータ構造内の該当する chunkDom も削除．
                     // !!!! ChunkDom 関連の実装を拡張する際は，オブジェクトのデータ構造とDOMの状態をバラバラにしないように細心の注意を !!!!
                     delete globalMemCPSDDR.chunkDataObj.chunkData[parentChunkDomId];
@@ -107,22 +109,33 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
 
                 chunkDom.append(chunkDomDelBtn);
             
+                // html への chunkDom の追加と同時に オブジェクトのデータ構造にも chunkDom を追加．
                 // todo: globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId] (domrenderer), chunkPropaties (initDomAction) など，
                 //       同じ情報もしくはその拡張を複数箇所で定義しており，バグを生みやすい状況にある．
                 //       object の ファクトリ関数を定義し，最初から全てのプロパティを定義し，サブクラスでプロパティを拡張しないようにする．
                 //       現状ではオブジェクトプロパティを確認するにはプログラムを実行する必要があり，メンテナンス性が低い!!!
-                // html への chunkDom の追加と同時に オブジェクトのデータ構造にも chunkDom を追加．
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId] = {
+                    chunkDomId    : chunkDomId,
                     left          : chunkPropCCD.left,
                     top           : chunkPropCCD.top,
                     width         : chunkPropCCD.width,
                     height        : chunkPropCCD.height,
                     chunkType     : chunkPropCCD.chunkType, // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
                     chunkHeadLine : getChunkHeadLine(chunkPropCCD), 
-                    parentChunk   : null  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
+                    parentChunk   : null,  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
+                    chunkAnnotationText : null
                 };
                 
-                
+                // チャンクのアノテーションテキストは globalMemCPSDDR.chunkDataObj.chunkData で一括に管理する．
+                // 以下はアノテーションテキストが存在しない chunkData の処理．
+                if(chunkPropCCD.chunkAnnotationText == undefined || chunkPropCCD.chunkAnnotationText == null || 
+                   chunkPropCCD.chunkAnnotationText == '' || chunkPropCCD.chunkAnnotationText == false)
+                {
+                    globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkAnnotationText = '';
+                }else{
+                    globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkAnnotationText = chunkPropCCD.chunkAnnotationText;
+                }
+
                 // グローバルメンバの chunkHeadLinePositions にソート済みのチャンク頭出し位置を配列で格納
                 // todo : この処理は delete, mouseup の際にも行う必要あり，
                 //        それぞれの処理を終えてからこの処理を行うこと!!
@@ -130,7 +143,10 @@ ChunkPianoSystem_client.domRenderer = function(globalMemCPSDDR){
                 
                 globalMemCPSDDR.chunkDrawingArea.append(chunkDom);
                 console.log(globalMemCPSDDR.chunkDataObj);
-                 
+                
+                // 数行前の処理で作成した chunk データをもとにアノテーションを生成．
+                globalMemCPSDDR.annotationDomRenderer.createAnnotationDom(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId]);
+                
                 // chunk type 毎に個数をカウンティング．
                 switch(chunkPropCCD.chunkType){
                     case 'pattern':

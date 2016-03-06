@@ -71,10 +71,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 swal.close();
             }
         };
-        
         // ↓ comment out for debug
-        swal(swalPromptOptionForUserNameProp, userNameSetter);   
-        
+        // swal(swalPromptOptionForUserNameProp, userNameSetter);   
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // 演奏位置初期化処理
@@ -136,7 +134,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 chunkSizeX = parseInt(e.offsetX, 10) - chunkDrawingAreaMouseDowmPosX;
                 chunkSizeY = parseInt(e.offsetY, 10) - chunkDrawingAreaMouseDowmPosY;
 
-                // todo: globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId] (domrenderer), chunkPropaties (initDomAction) など，
+                // todo: globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId] (chunkDomRenderer), chunkPropaties (initDomAction) など，
                 //       同じ情報もしくはその拡張を複数箇所で定義しており，バグを生みやすい状況にある．
                 //       object の ファクトリ関数を定義し，最初から全てのプロパティを定義し，サブクラスでプロパティを拡張しないようにする．
                 //       現状ではオブジェクトプロパティを確認するにはプログラムを実行する必要があり，メンテナンス性が低い!!!
@@ -326,7 +324,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
 
             // chank が編集された際の処理
             // 編集の定義... chank が動かされた，削除された，記入された とき．
-            if(globalMemCPSCIDA.isEditedByChunkMovingOrDelete || globalMemCPSCIDA.isEditedByNewChunk){ 
+            if(globalMemCPSCIDA.isEditedByChunkMovingOrDelete || globalMemCPSCIDA.isEditedByNewChunk || globalMemCPSCIDA.isEditedByAnnotation){ 
                 saveConfirmModalWindow(function(){
                     loadChunkButton.click();
                 });

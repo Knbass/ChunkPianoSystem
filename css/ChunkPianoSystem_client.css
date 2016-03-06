@@ -130,6 +130,7 @@ html {
 #annotationTextFlame{
     position: absolute;
     height: inherit;
+    overflow: scroll;
     padding-left: 3px;
     padding-right: 3px;
     width: 440px;    
@@ -262,19 +263,61 @@ html {
     width: 138px;
 }
 
-
 .annotationTxtWrapper{
-    background: #505050;
+    position: relative;
+    background: #292929;
     padding-left: 5px;
     margin: 1px;
+    margin-top: 0px;
     margin-bottom: -10px;
 }
 
+.annotationTxtWrapper:hover{
+    background: #3b3b3b;
+}
+
+.annotationTxtWrapper.selected{
+    background-color: #464545;
+}
+
 .annotationTxt{
-    margin-bottom: -13px;
+    position: relative;
+    width:422px;
+    top: 0px;
+    max-width: 422px;
+    min-width: 422px;
+    background-color: #1d2138;
     color: white;
 }
 
 .annotationChunkId{
+    position: relative;
+    top: 4px;
     color: aqua
+}
+
+.goodBtn{
+    position: absolute;
+    left:320px;
+    top:4px;
+    width: 46px;
+    height: 16px;
+    font-size: 10px;
+}
+
+.hintBtn{
+    position: absolute;
+    left:380px;
+    top:4px;
+    width: 46px;
+    height: 16px;
+    font-size: 10px;
+}
+
+
+.fade{
+    -webkit-transition: 0.15s ease-in-out;
+       -moz-transition: 0.15s ease-in-out;
+         -o-transition: 0.15s ease-in-out;
+            transition: 0.15s ease-in-out;
 }
