@@ -163,8 +163,10 @@ var ChunkPianoSystem_client = function(){
         globalMem.socketIo.on('reqestedChunkData', function(data){ // ロードリクエストをした chunkData がレスポンスされた時
             
             // data.reqestedChunkData にユーザが指定した ChunkData が格納されている．
-            // これは stringfy (文字列化) されているので JSON.parse() で JavaScript のオブジェクトに変換する．
+            // これは stringfy (文字列化) されているので JSON.parse() で JavaScript のオブジェクトに変換する．            
             
+            // ロード前にデータ構造をリセット．
+            // ロードデータによるデータ構造の再生は chunkDomRenderer で描画完了後に行っていることに注意．
             resetChunkDrawingAreaAndChunkData();
             data.reqestedChunkData = JSON.parse(data.reqestedChunkData);
             

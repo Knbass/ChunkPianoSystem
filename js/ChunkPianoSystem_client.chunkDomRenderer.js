@@ -122,7 +122,8 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     height        : chunkPropCCD.height,
                     chunkType     : chunkPropCCD.chunkType, // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
                     chunkHeadLine : getChunkHeadLine(chunkPropCCD), 
-                    parentChunk   : null,  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
+                    parentChunk   : chunkPropCCD.parentChunk,  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
+                    good          : chunkPropCCD.good,
                     chunkAnnotationText : null
                 };
                 
