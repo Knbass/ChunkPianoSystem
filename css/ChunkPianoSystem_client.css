@@ -209,7 +209,7 @@ html {
 .chunk{
     position: absolute;
     border: solid 3px;
-    background-color: rgba(255, 255, 255, 0.19);
+    background-color: rgba(255, 255, 255, 0.1);
     cursor: move;
 }
 
@@ -224,6 +224,11 @@ html {
 .chunk.hard{ /* chunk クラスかつ pattern クラスを持っている要素に適用 */
     border-color: #05119a;
 }
+
+.chunk.selected{
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 
 .chunkDeleteButton{
     position: absolute;

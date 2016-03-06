@@ -13,7 +13,7 @@ var ChunkPianoSystem_client = function(){
             socketIo:null,
             reqNoteLinePosition:null,
             turnNotEditedMode:null, // 後方参照ができないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
-            createChunkDom:null,
+            chunkDomRenderer:null,
             isFromLoadChunkButton:false,
             isEditedByChunkMovingOrDelete:false, 
             isEditedByNewChunk:false,
@@ -39,7 +39,7 @@ var ChunkPianoSystem_client = function(){
         initDomAction =  ChunkPianoSystem_client.initDomAction(globalMem).initDomAction
     ;
     globalMem.setPlayPosition = ChunkPianoSystem_client.initDomAction(globalMem).setPlayPosition;
-    globalMem.createChunkDom = ChunkPianoSystem_client.chunkDomRenderer(globalMem).createChunkDom;
+    globalMem.chunkDomRenderer = ChunkPianoSystem_client.chunkDomRenderer(globalMem);
     globalMem.annotationDomRenderer = ChunkPianoSystem_client.annotationDomRenderer(globalMem); // annotationTextFlame を取得した後に実行すること．
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -168,10 +168,10 @@ var ChunkPianoSystem_client = function(){
             resetChunkDrawingAreaAndChunkData();
             data.reqestedChunkData = JSON.parse(data.reqestedChunkData);
             
-            // globalMem.createChunkDom メソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
+            // globalMem.chunkDomRenderer.createChunkDom メソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
             // for in 文で回し1つずつ描画する．
             for(var chunkId in data.reqestedChunkData.chunkData){
-                globalMem.createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
+                globalMem.chunkDomRenderer.createChunkDom(data.reqestedChunkData.chunkData[chunkId]);
             }
             
             globalMem.turnNotEditedMode();

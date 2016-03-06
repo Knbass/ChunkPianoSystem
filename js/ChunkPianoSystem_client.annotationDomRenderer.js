@@ -2,7 +2,7 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
     'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    var createAnnotationDom, removeAnnotationDom;
+    var createAnnotationDom, removeAnnotationDom, selectAnnotationDom;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     createAnnotationDom = function(annotationPropCAD){ 
@@ -33,6 +33,21 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
         annotationTxtWrapperDom.append(goodBtnDom);
         annotationTxtWrapperDom.append(hintBtnDom);
         annotationTxtWrapperDom.append(annotationTxtDom);
+        annotationTxtWrapperDom.click(function(){
+            // click され選択状態にある annotationTxtWrapperDom は selected クラスを持っている．
+            // これを利用しスイッチング処理を行う．
+            if($(this).hasClass('selected')){
+                selectAnnotationDom(''); // 選択状態にある annotationTxtWrapperDom がクリックされた際はその要素の選択状態を解除する．
+                globalMemCPSADR.chunkDomRenderer.selectChunkDom('');
+            }else{
+                var splitedAnnotationDomId = String() + $(this)[0].id;
+                splitedAnnotationDomId = splitedAnnotationDomId.split('_');
+                splitedAnnotationDomId = String() + splitedAnnotationDomId[1] + '_' + splitedAnnotationDomId[2];
+                
+                selectAnnotationDom($(this)[0].id);
+                globalMemCPSADR.chunkDomRenderer.selectChunkDom(splitedAnnotationDomId);
+            }
+        });
         
         globalMemCPSADR.annotationTextFlame.append(annotationTxtWrapperDom);
         autosize($('textarea')); // chunk annotation 入力用 textarea を自動可変に変更．
@@ -41,10 +56,19 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
     // for(var i=0; i<10; i++){ createAnnotationDom();}
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+    // 引数に '' を受け取った際は 全ての annotationDom の選択状態を解除する．
+    selectAnnotationDom = function(annotationTxtWrapperDomIdSAD){
+        $('.annotationTxtWrapper').each(function(index, element){
+            $(element).removeClass('selected');
+        });
+        $('#' + annotationTxtWrapperDomIdSAD).addClass('selected');
+    };
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     removeAnnotationDom = function(chunkDomIdRAD){
         $('#annotationText_' + chunkDomIdRAD).remove();
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    return{createAnnotationDom:createAnnotationDom, removeAnnotationDom:removeAnnotationDom};
+    return{createAnnotationDom:createAnnotationDom, removeAnnotationDom:removeAnnotationDom, selectAnnotationDom:selectAnnotationDom};
 };

@@ -147,7 +147,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                     parentChunk: null
                 };
 
-                globalMemCPSCIDA.createChunkDom(chunkProperties);
+                globalMemCPSCIDA.chunkDomRenderer.createChunkDom(chunkProperties);
 
                 globalMemCPSCIDA.isEditedByNewChunk = true;
                 isChunkDrawing = false;

@@ -3,7 +3,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     var domUtil = ChunkPianoSystem_client.utility(),
-        createChunkDom, getChunkHeadLine, getSortedChunkHeadLine
+        createChunkDom, selectChunkDom, getChunkHeadLine, getSortedChunkHeadLine
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -180,6 +180,14 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+    selectChunkDom = function(chunkDomIdSCD){
+        $('.chunk').each(function(index, element){
+            $(element).removeClass('selected');
+        });
+        $('#' + chunkDomIdSCD).addClass('selected');
+    };
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     getChunkHeadLine = function(chunkPropGCL){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
         
         var getPositionByBruteForceSearch, 
@@ -251,5 +259,5 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    return{createChunkDom:createChunkDom};
+    return{createChunkDom:createChunkDom, selectChunkDom:selectChunkDom};
 };
