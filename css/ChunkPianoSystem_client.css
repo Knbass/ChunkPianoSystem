@@ -14,6 +14,11 @@ html {
      color: #545454;
      /*background-color: #2c2c2c;*/
      box-shadow: 0 0 2px rgba(0, 0, 0, 0.06);
+     /* ダブルクリック時に画面上の文字や画像を選択できないようにする */
+     user-select: none; /* CSS3 */
+     -moz-user-select: none; /* Firefox */
+     -webkit-user-select: none; /* Safari、Chromeなど */
+     -ms-user-select: none; /* IE10かららしい */
  }
  
  h1, h2, h3, h4, h5, h6 {
@@ -215,15 +220,15 @@ html {
 }
 
 .chunk.pattern{ /* chunk クラスかつ pattern クラスを持っている要素に適用 */
-    border-color: #d1a3ff;
+    border-color: #397ae2;
 }
 
 .chunk.phrase{ /* chunk クラスかつ pattern クラスを持っている要素に適用 */
-    border-color: #085002;
+    border-color: #0eba00;
 }
 
 .chunk.hard{ /* chunk クラスかつ pattern クラスを持っている要素に適用 */
-    border-color: #05119a;
+    border-color: #de4646;
 }
 
 .chunk.selected{
@@ -299,7 +304,19 @@ html {
 .annotationChunkId{
     position: relative;
     top: 4px;
-    color: aqua;
+    color: #b9b9b9;
+}
+
+.annotationChunkId.pattern{
+    color: #397ae2;
+}
+
+.annotationChunkId.phrase{
+    color: #0eba00;
+}
+
+.annotationChunkId.hard{
+    color: #de4646;
 }
 
 .goodBtn{

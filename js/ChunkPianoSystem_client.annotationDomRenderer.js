@@ -7,12 +7,34 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
     ///////////////////////////////////////////////
     createAnnotationDom = function(annotationPropCAD){ 
         
-        var annotationTxtWrapperDom, annotationChunkIdDom, goodBtnDom, hintBtnDom, annotationTxtDom
+        var annotationTxtWrapperDom, annotationChunkIdDom, goodBtnDom, hintBtnDom, annotationTxtDom;
         
         // アノテーション用 dom のtemplate生成．それぞれのDomにイベントを定義する可能生があるので個別に生成．
         // todo: イベントを定義しない dom template は個別でなくまとめて生成する．
         annotationTxtWrapperDom = $('<div class="annotationTxtWrapper fade" id="annotationText_' + annotationPropCAD.chunkDomId + '"></div>');
-        annotationChunkIdDom = $('<p class="annotationChunkId">' + annotationPropCAD.chunkDomId + '</p>');
+        // 日本語のチャンク名 japaneseChunkName を生成し，アノテーションのタイトルとする．
+        (function(){
+            var splitedChunkDomId = annotationPropCAD.chunkDomId,
+                japaneseChunkName = null
+            ;
+            splitedChunkDomId = splitedChunkDomId.split('_');
+            
+            switch(splitedChunkDomId[0]){
+                case 'patternChunk':
+                    japaneseChunkName = 'パターンチャンク'
+                    break;
+                case 'phraseChunk':
+                    japaneseChunkName = 'フレーズチャンク'
+                    break;
+                case 'hardChunk':
+                    japaneseChunkName = '高難度チャンク'
+                    break;
+            }
+            japaneseChunkName = String() + japaneseChunkName + ' ' + splitedChunkDomId[1];
+            
+            annotationChunkIdDom = $('<p class="annotationChunkId">' + japaneseChunkName + '</p>');
+            annotationChunkIdDom.addClass(annotationPropCAD.chunkType);
+        })();
         goodBtnDom = $('<div class="button goodBtn">いいね! ' + calcGoodCount(annotationPropCAD) + '</div>');
         
         // 自分がいいね! を押したアノテーションのいいね!ボタンの色を変更．
