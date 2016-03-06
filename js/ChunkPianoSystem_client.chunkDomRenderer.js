@@ -68,7 +68,8 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     
                     mouseupedChunkDomData.left = parseInt(mouseupedChunkDom.css('left'), 10);
                     mouseupedChunkDomData.top = parseInt(mouseupedChunkDom.css('top'), 10);
-                    mouseupedChunkDomData.chunkHeadLine = getChunkHeadLine(mouseupedChunkDomData);
+                    mouseupedChunkDomData.chunkHeadLine = +getChunkHeadLine(mouseupedChunkDomData, 'head');
+                    mouseupedChunkDomData.chunkTailLine = +getChunkHeadLine(mouseupedChunkDomData, 'tail');
                     
                     globalMemCPSDDR.chunkHeadLinePositions = getSortedChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData);
                     
@@ -126,7 +127,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     chunkTailLine   : null,
                     parentChunk     : chunkPropCCD.parentChunk,  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
                     good            : chunkPropCCD.good,
-                    chunkAnnotationText : null
+                    chunkAnnotationText : null // annotationDomRenderer モジュールによって定義される．
                 };
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){
                     // todo: チャンクの y 座標を引数として与えると，譜面の何段目に当たっているかを判定するメソッドを追加．これじゃハードコーディングでダサい!
@@ -139,7 +140,14 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     }
                 })();
                 // getChunkHeadLine は stringScoreCol を利用するので実行順を変更してはいけない．
-                globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkHeadLine = getChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId]);                 
+                globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkHeadLine = +getChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId],
+                                                                                                     'head'
+                                                                                                    )
+                ;                 
+                globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkTailLine = +getChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId],
+                                                                                                     'tail'
+                                                                                                    )
+                ;
                 // チャンクのアノテーションテキストは globalMemCPSDDR.chunkDataObj.chunkData で一括に管理する．
                 // 以下はアノテーションテキストが存在しない chunkData の処理．
                 if(chunkPropCCD.chunkAnnotationText == undefined || chunkPropCCD.chunkAnnotationText == null || 
@@ -202,9 +210,10 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    getChunkHeadLine = function(chunkDataGCL){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
+    ////////////////////////////////////////  ↓ チャンク先頭の音符番号を取得する際は 'head'，末尾であれば 'tail'
+    getChunkHeadLine = function(chunkDataGCL, headOrTail){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
         
-        var getPositionByBruteForceSearch;
+        var getPositionByBruteForceSearch, searchLine;
         
         // 2分木探索によるチャンク頭出し音符列の算出
         // getPosition = function(startIndex, endIndex, notePositionArray){
@@ -225,15 +234,29 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     break;
                 }
             }
+            
+            // 右辺の音符番号は1つ引いた値が正しい音符番号となる．
+            if(headOrTail == 'tail'){
+                nearestNotePosition--;
+            }
+            
             return nearestNotePosition;
         };
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
-        // チャンク頭出し位置の算出
-        console.log('chunkDataGCL.stringScoreCol: ' + chunkDataGCL.stringScoreCol);
+        // チャンク頭出し位置の算出        
+        if(headOrTail == 'head'){
+            searchLine = parseInt(chunkDataGCL.left, 10);
+        }else if(headOrTail == 'tail'){
+            var tail = chunkDataGCL.left + chunkDataGCL.width;
+            searchLine = parseInt(tail, 10);
+        }else{
+            throw new Error('error occured in getChunkHeadLine');
+        }
+        
         return getPositionByBruteForceSearch(globalMemCPSDDR.noteLinePosition.scoreCol[chunkDataGCL.stringScoreCol].start, // '1' は1段目の音符列を意味する．
                                              globalMemCPSDDR.noteLinePosition.scoreCol[chunkDataGCL.stringScoreCol].end,
-                                             parseInt(chunkDataGCL.left, 10),
+                                             searchLine,
                                              globalMemCPSDDR.noteLinePosition.noteLine
                                             )
         ;
