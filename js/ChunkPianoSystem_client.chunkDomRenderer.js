@@ -77,7 +77,6 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                         
                     // }
                     console.log(globalMemCPSDDR.chunkDataObj.chunkData);
-                    // console.log(getChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData[mouseupedChunkDom[0].id])); 
                 });
                 
                 domUtil.appendDruggAndDropEvent(chunkDom, globalMemCPSDDR.chunkDrawingArea);
@@ -115,18 +114,32 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                 //       object の ファクトリ関数を定義し，最初から全てのプロパティを定義し，サブクラスでプロパティを拡張しないようにする．
                 //       現状ではオブジェクトプロパティを確認するにはプログラムを実行する必要があり，メンテナンス性が低い!!!
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId] = {
-                    chunkDomId    : chunkDomId,
-                    left          : chunkPropCCD.left,
-                    top           : chunkPropCCD.top,
-                    width         : chunkPropCCD.width,
-                    height        : chunkPropCCD.height,
-                    chunkType     : chunkPropCCD.chunkType, // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
-                    chunkHeadLine : getChunkHeadLine(chunkPropCCD), 
-                    parentChunk   : chunkPropCCD.parentChunk,  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
-                    good          : chunkPropCCD.good,
+                    chunkDomId      : chunkDomId,
+                    left            : chunkPropCCD.left,
+                    top             : chunkPropCCD.top,
+                    width           : chunkPropCCD.width,
+                    height          : chunkPropCCD.height,
+                    stringScoreCol  : null,
+                    chunkMiddleAxisY: chunkPropCCD.top + (Math.floor(chunkPropCCD.height / 2)),
+                    chunkType       : chunkPropCCD.chunkType, // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
+                    chunkHeadLine   : null, // getChunkHeadLine は stringScoreCol や chunkMiddleAxisY を利用するのでここではまだ実行してはいけない．
+                    chunkTailLine   : null,
+                    parentChunk     : chunkPropCCD.parentChunk,  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
+                    good            : chunkPropCCD.good,
                     chunkAnnotationText : null
                 };
-                
+                globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){
+                    // todo: チャンクの y 座標を引数として与えると，譜面の何段目に当たっているかを判定するメソッドを追加．これじゃハードコーディングでダサい!
+                    //     : ScoreDataParser で判定メソッドをオブジェクトに詰めてここで実行する? 
+                    
+                    if(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkMiddleAxisY <= globalMemCPSDDR.noteLinePosition.middleAxisY){
+                        return '1';
+                    }else{
+                        return '2';
+                    }
+                })();
+                // getChunkHeadLine は stringScoreCol を利用するので実行順を変更してはいけない．
+                globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkHeadLine = getChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId]);                 
                 // チャンクのアノテーションテキストは globalMemCPSDDR.chunkDataObj.chunkData で一括に管理する．
                 // 以下はアノテーションテキストが存在しない chunkData の処理．
                 if(chunkPropCCD.chunkAnnotationText == undefined || chunkPropCCD.chunkAnnotationText == null || 
@@ -189,11 +202,9 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    getChunkHeadLine = function(chunkPropGCL){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
+    getChunkHeadLine = function(chunkDataGCL){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
         
-        var getPositionByBruteForceSearch, 
-            chunkMiddleAxisY = 0
-        ;
+        var getPositionByBruteForceSearch;
         
         // 2分木探索によるチャンク頭出し音符列の算出
         // getPosition = function(startIndex, endIndex, notePositionArray){
@@ -218,29 +229,14 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
         };
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
-        chunkMiddleAxisY = chunkPropGCL.top + (Math.floor(chunkPropGCL.height / 2));
-        // console.log('chunkMiddleAxisY: ' + chunkMiddleAxisY);
-        // console.log(globalMemCPSDDR.noteLinePosition.middleAxisY);
-        
-        // チャンクが上段に描画された場合のチャンク頭出し位置の算出
-        if(chunkMiddleAxisY <= globalMemCPSDDR.noteLinePosition.middleAxisY){
-            // todo: チャンクの y 座標を引数として与えると，譜面の何段目に当たっているかを判定するメソッドを追加．これじゃハードコーディングでダサい!
-            //     : ScoreDataParser で判定メソッドをオブジェクトに詰めてここで実行する? 
-            return getPositionByBruteForceSearch(globalMemCPSDDR.noteLinePosition.scoreCol['1'].start, // '1' は1段目の音符列を意味する．
-                                                 globalMemCPSDDR.noteLinePosition.scoreCol['1'].end,
-                                                 parseInt(chunkPropGCL.left, 10),
-                                                 globalMemCPSDDR.noteLinePosition.noteLine
-                                                )
-            ;
-        // チャンクが上段に描画された場合のチャンク頭出し位置の算出
-        }else{
-            return getPositionByBruteForceSearch(globalMemCPSDDR.noteLinePosition.scoreCol['2'].start, // '2' は2段目の音符列を意味する．
-                                                 globalMemCPSDDR.noteLinePosition.scoreCol['2'].end,
-                                                 parseInt(chunkPropGCL.left, 10),
-                                                 globalMemCPSDDR.noteLinePosition.noteLine
-                                                )
-            ;
-        }
+        // チャンク頭出し位置の算出
+        console.log('chunkDataGCL.stringScoreCol: ' + chunkDataGCL.stringScoreCol);
+        return getPositionByBruteForceSearch(globalMemCPSDDR.noteLinePosition.scoreCol[chunkDataGCL.stringScoreCol].start, // '1' は1段目の音符列を意味する．
+                                             globalMemCPSDDR.noteLinePosition.scoreCol[chunkDataGCL.stringScoreCol].end,
+                                             parseInt(chunkDataGCL.left, 10),
+                                             globalMemCPSDDR.noteLinePosition.noteLine
+                                            )
+        ;
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
