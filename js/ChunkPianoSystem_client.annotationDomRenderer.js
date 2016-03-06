@@ -16,11 +16,15 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
         goodBtnDom = $('<div class="button goodBtn">いいね! ' + calcGoodCount(annotationPropCAD) + '</div>');
         // 自分がいいね! を押したアノテーションのいいね!ボタンの色を変更．
         (function(){
-            var goodIndex = annotationPropCAD.good.indexOf(String() + globalMemCPSADR.chunkDataObj.userName);
-            if(goodIndex == -1){ // ユーザがいいね!をしていない場合
-                selectGoodBtnDom(goodBtnDom, false); // いいね!ボタンを非選択状態に変更．
-            }else{
-                selectGoodBtnDom(goodBtnDom, true); // いいね!ボタンを選択状態に変更．
+            try{
+                var goodIndex = annotationPropCAD.good.indexOf(String() + globalMemCPSADR.chunkDataObj.userName);
+                if(goodIndex == -1){ // ユーザがいいね!をしていない場合
+                    selectGoodBtnDom(goodBtnDom, false); // いいね!ボタンを非選択状態に変更．
+                }else{
+                    selectGoodBtnDom(goodBtnDom, true); // いいね!ボタンを選択状態に変更．
+                }
+            }catch(e){
+                console.info('chunkData に good プロパティがない可能性があります．');
             }
         })();
         hintBtnDom = $('<div class="button hintBtn">ヒント</div>');
