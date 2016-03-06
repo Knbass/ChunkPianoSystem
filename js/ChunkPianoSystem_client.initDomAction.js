@@ -253,7 +253,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 if(globalMemCPSCIDA.nowNoteRowCount == 0){
                     globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.noteLinePosition.noteLine.length - 1;
                 }else{
-                    globalMemCPSCIDA.nowNoteRowCount -= 1;                
+                    globalMemCPSCIDA.nowNoteRowCount--;                
                 }          
             }else if(practicePointMode == 'chunk'){
                 
@@ -291,7 +291,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 if(globalMemCPSCIDA.nowNoteRowCount == globalMemCPSCIDA.noteLinePosition.noteLine.length - 1){
                     globalMemCPSCIDA.nowNoteRowCount = 0;
                 }else{
-                    globalMemCPSCIDA.nowNoteRowCount += 1;                
+                    globalMemCPSCIDA.nowNoteRowCount++;                
                 }
             }else if(practicePointMode == 'chunk'){
             

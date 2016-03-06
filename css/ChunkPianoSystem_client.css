@@ -209,7 +209,7 @@ html {
 
 .chunk{
     position: absolute;
-    border: solid 3px;
+    border: solid 6px;
     background-color: rgba(255, 255, 255, 0.1);
     cursor: move;
 }
@@ -309,6 +309,10 @@ html {
     width: 95px;
     height: 16px;
     font-size: 10px;
+}
+
+.goodBtn.selected{
+    background-color: #7b0101;
 }
 
 .hintBtn{

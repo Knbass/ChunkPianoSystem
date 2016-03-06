@@ -2,7 +2,7 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
     'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    var createAnnotationDom, removeAnnotationDom, selectAnnotationDom, calcGoodCount;
+    var createAnnotationDom, removeAnnotationDom, selectAnnotationDom, selectGoodBtnDom, calcGoodCount;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     createAnnotationDom = function(annotationPropCAD){ 
@@ -14,9 +14,19 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
         annotationTxtWrapperDom = $('<div class="annotationTxtWrapper fade" id="annotationText_' + annotationPropCAD.chunkDomId + '"></div>');
         annotationChunkIdDom = $('<p class="annotationChunkId">' + annotationPropCAD.chunkDomId + '</p>');
         goodBtnDom = $('<div class="button goodBtn">いいね! ' + calcGoodCount(annotationPropCAD) + '</div>');
+        // 自分がいいね! を押したアノテーションのいいね!ボタンの色を変更．
+        (function(){
+            var goodIndex = annotationPropCAD.good.indexOf(String() + globalMemCPSADR.chunkDataObj.userName);
+            if(goodIndex == -1){ // ユーザがいいね!をしていない場合
+                selectGoodBtnDom(goodBtnDom, false); // いいね!ボタンを非選択状態に変更．
+            }else{
+                selectGoodBtnDom(goodBtnDom, true); // いいね!ボタンを選択状態に変更．
+            }
+        })();
         hintBtnDom = $('<div class="button hintBtn">ヒント</div>');
         annotationTxtDom = $('<textarea class="annotationTxt" cols="50" rows="2" placeholder="ここにチャンクへのコメントを入力"></textarea>');
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         // いいね! ボタンの動作．いいね回数の計算，ユーザチェック処理を行う．
         goodBtnDom.click(function(e){
             
@@ -31,23 +41,24 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             splitedParentAnnotationDomId = String() + splitedParentAnnotationDomId[1] + '_' + splitedParentAnnotationDomId[2];
             chunkData = globalMemCPSADR.chunkDataObj.chunkData[splitedParentAnnotationDomId];
             
-            if(chunkData.good == undefined || chunkData.good == null){
+            if(chunkData.good == undefined || chunkData.good == null){ // いいね!データが存在しないチャンクの場合
                 chunkData.good = [globalMemCPSADR.chunkDataObj.userName];
+                selectGoodBtnDom($(this), true); // いいね!ボタンを選択状態に変更．
             }else{                
                 // 該当するアノテーションについて，ユーザのいいね!があるかをチェック．
-                
                 var goodIndex = chunkData.good.indexOf(String() + globalMemCPSADR.chunkDataObj.userName);
-                console.info('goodIndex: ' + goodIndex);
                 if(goodIndex == -1){ // ユーザがいいね!をしていない場合
                     chunkData.good.push(globalMemCPSADR.chunkDataObj.userName);
+                    selectGoodBtnDom($(this), true); // いいね!ボタンを選択状態に変更．
                 }else{
                     chunkData.good.splice( goodIndex , 1);
+                    selectGoodBtnDom($(this), false); // いいね!ボタンを非選択状態に変更．
                 }
             }
-            
-            $(this).text('いいね! ' + calcGoodCount(chunkData));
+            $(this).text('いいね! ' + calcGoodCount(chunkData)); // いいね! ボタンに いいね! のカウント値を付与．
         });
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         annotationTxtDom.val(annotationPropCAD.chunkAnnotationText);
         annotationTxtDom.click(function(e){
             e.stopPropagation(); // 親要素へのイベントはブリングを禁止． 
@@ -62,7 +73,8 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
                 globalMemCPSADR.chunkDataObj.chunkData[annotationPropCAD.chunkDomId].chunkAnnotationText = $(this).val();
             }
         });
-        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         annotationTxtWrapperDom.append(annotationChunkIdDom);
         annotationTxtWrapperDom.append(goodBtnDom);
         annotationTxtWrapperDom.append(hintBtnDom);
@@ -97,6 +109,15 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             $(element).removeClass('selected');
         });
         $('#' + annotationTxtWrapperDomIdSAD).addClass('selected');
+    };
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
+    selectGoodBtnDom = function(goodBtnDomSGBD, isSelected){
+        if(isSelected){
+            goodBtnDomSGBD.addClass('selected');
+        }else{
+            goodBtnDomSGBD.removeClass('selected');
+        }
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
