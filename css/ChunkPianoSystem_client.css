@@ -122,7 +122,7 @@ html {
     position: relative;
     width:140px;
     top: 0px;
-    height: inherit;
+    height: 695px;
     margin-top: 10px;
     background: #1d2027;
     padding-top: 5px;
@@ -227,7 +227,7 @@ html {
 }
 
 .chunk.selected{
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 0, 0, 0.3);
 }
 
 
@@ -299,7 +299,7 @@ html {
 .annotationChunkId{
     position: relative;
     top: 4px;
-    color: aqua
+    color: aqua;
 }
 
 .goodBtn{
@@ -324,10 +324,78 @@ html {
     font-size: 10px;
 }
 
-
 .fade{
     -webkit-transition: 0.15s ease-in-out;
        -moz-transition: 0.15s ease-in-out;
          -o-transition: 0.15s ease-in-out;
             transition: 0.15s ease-in-out;
+}
+
+.annotationHintWrapper{
+    position: absolute;
+    background-color: rgba(92, 57, 3, 1.0);
+    border: solid #ffde9f 3px;
+    padding: 2px;
+    width: 400px;
+    height: 400px;
+}
+
+.annotationHintDeleteButton{
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    right:0px; /* CSS で absolute 要素をボックス内で右寄せ: http://so-zou.jp/web-app/tech/css/sample/align.htm */
+    top:0px;
+    background: rgba(216, 0, 0, 1.0);
+    cursor: pointer;
+}
+
+.annotationHintInst{
+    position: relative;
+    color: antiquewhite;
+    top:-13px;
+    text-align: center;
+}
+
+.annotationHintListWrapper{
+    position: relative;
+    background-color: rgba(0, 0, 0, 1.0);
+    width: inherit;
+    height: 345px;
+    top:-45px;
+    overflow: scroll;
+}
+
+.annotationHintList{
+    position: relative;
+    background: #382b00;
+    padding-left: 5px;
+    margin: 1px;
+    margin-top: 0px;
+    margin-bottom: -10px;
+}
+
+.hintAnnotationUserName{
+    position: relative;
+    top: 4px;
+    color:antiquewhite;
+}
+
+.annotationHintTxt{
+    position: relative;
+    width:400px;
+    top: 0px;
+    max-width: 384px;
+    min-width: 384px;
+    background-color: #000000;
+    color: white;
+}
+
+.refBtn{
+    position: absolute;
+    left:288px;
+    top:4px;
+    width: 95px;
+    height: 16px;
+    font-size: 10px;
 }

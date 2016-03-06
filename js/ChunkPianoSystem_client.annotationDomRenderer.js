@@ -14,9 +14,11 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
         annotationTxtWrapperDom = $('<div class="annotationTxtWrapper fade" id="annotationText_' + annotationPropCAD.chunkDomId + '"></div>');
         annotationChunkIdDom = $('<p class="annotationChunkId">' + annotationPropCAD.chunkDomId + '</p>');
         goodBtnDom = $('<div class="button goodBtn">いいね! ' + calcGoodCount(annotationPropCAD) + '</div>');
+        
         // 自分がいいね! を押したアノテーションのいいね!ボタンの色を変更．
+        // 名前空間の汚染を防ぐために即時実行関数で実行．
         (function(){
-            try{
+            try{ // chunkData に good プロパティがない場合に indexOf でバグが発生するのを catch．
                 var goodIndex = annotationPropCAD.good.indexOf(String() + globalMemCPSADR.chunkDataObj.userName);
                 if(goodIndex == -1){ // ユーザがいいね!をしていない場合
                     selectGoodBtnDom(goodBtnDom, false); // いいね!ボタンを非選択状態に変更．
@@ -33,7 +35,6 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
         ///////////////////////////////////////////////
         // いいね! ボタンの動作．いいね回数の計算，ユーザチェック処理を行う．
         goodBtnDom.click(function(e){
-            
             e.stopPropagation(); // 親要素へのイベントはブリングを禁止．
             
             // いいね! ボタンの親要素から，対応するチャンクの id を抽出．
@@ -55,7 +56,8 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
                     chunkData.good.push(globalMemCPSADR.chunkDataObj.userName);
                     selectGoodBtnDom($(this), true); // いいね!ボタンを選択状態に変更．
                 }else{
-                    chunkData.good.splice( goodIndex , 1);
+                    // ユーザがいいね!をしている状態で いいね!をクリックした際は，いいね! を解除．
+                    chunkData.good.splice( goodIndex , 1); // いいね!をしたユーザ名リストからユーザ名を削除
                     selectGoodBtnDom($(this), false); // いいね!ボタンを非選択状態に変更．
                 }
             }
@@ -63,6 +65,7 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
+        // アノテーション内容を textarea に挿入．undefined や null の際の '' への置き換えは chunkDomRenderer が既に行っている．
         annotationTxtDom.val(annotationPropCAD.chunkAnnotationText);
         annotationTxtDom.click(function(e){
             e.stopPropagation(); // 親要素へのイベントはブリングを禁止． 
@@ -76,6 +79,25 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             }else{
                 globalMemCPSADR.chunkDataObj.chunkData[annotationPropCAD.chunkDomId].chunkAnnotationText = $(this).val();
             }
+        });
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        hintBtnDom.click(function(e){
+            
+            // ヒント ボタンの親要素から，対応するチャンクの id を抽出．
+            // todo: この処理は何度も書かれているので関数化すべし．
+            var parentAnnotationDom = $(this).parent(),
+                parentAnnotationDomId = parentAnnotationDom[0].id,
+                splitedParentAnnotationDomId = parentAnnotationDomId.split('_'),
+                chunkData = null
+            ;
+            splitedParentAnnotationDomId = String() + splitedParentAnnotationDomId[1] + '_' + splitedParentAnnotationDomId[2];
+            chunkData = globalMemCPSADR.chunkDataObj.chunkData[splitedParentAnnotationDomId];
+            if(chunkData.chunkDomId == undefined || chunkData.chunkDomId == null){
+                chunkData.chunkDomId = splitedParentAnnotationDomId;
+            }
+            
+            globalMemCPSADR.annotationHintDomRenderer.createAnnotationHintDom(parentAnnotationDom, chunkData);
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////

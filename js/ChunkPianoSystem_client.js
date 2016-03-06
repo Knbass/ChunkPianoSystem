@@ -31,6 +31,7 @@ var ChunkPianoSystem_client = function(){
             phraseChunkCount:0,
             hardChunkCount:0,
             annotationDomRenderer:null,
+            annotationHintDomRenderer:null,
             setPlayPosition:null
         }, 
         // todo: ステートレスなクラスメソッドは chunkDomRenderer = ChunkPianoSystem_client.chunkDomRenderer(globalMem)
@@ -41,6 +42,7 @@ var ChunkPianoSystem_client = function(){
     globalMem.setPlayPosition = ChunkPianoSystem_client.initDomAction(globalMem).setPlayPosition;
     globalMem.chunkDomRenderer = ChunkPianoSystem_client.chunkDomRenderer(globalMem);
     globalMem.annotationDomRenderer = ChunkPianoSystem_client.annotationDomRenderer(globalMem); // annotationTextFlame を取得した後に実行すること．
+    globalMem.annotationHintDomRenderer = ChunkPianoSystem_client.annotationHintDomRenderer(globalMem);
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     // このメソッドは chunkDataObj の chunkData のみを初期化する

@@ -15,19 +15,17 @@
         <script type = "text/javascript" src = "js/ChunkPianoSystem_client.utility.js"></script>
         <script type = "text/javascript" src = "js/ChunkPianoSystem_client.chunkDomRenderer.js"></script>
         <script type = "text/javascript" src = "js/ChunkPianoSystem_client.annotationDomRenderer.js"></script>
+        <script type = "text/javascript" src = "js/ChunkPianoSystem_client.annotationHintDomRenderer.js"></script>
         <!-- ScoreDataCreator.js は譜面データを作成する時のみ，他の js をコメントアウトして単一で読み込む．-->
         <!--script type = "text/javascript" src = "js/libraries/ScoreDataCreator.js"></script-->
     </head>
     
     <body>
-        
         <div class="cpsWrappers" id="upperFrame">
-
             <div id="lowerFrame">
                 <div class="button fileBtn" id="loadChunkButton">ファイル読込</div>
                 <div class="button fileBtn" id="saveChunkButton">チャンクを保存</div>
-
-
+                
                 <select id="chunkModeSelector">
                     <option value="pattern" selected>パターンチャンク</option>
                     <option value="phrase">フレーズチャンク</option>
@@ -41,7 +39,6 @@
 
                 <div class="button changePlayPosBtn" id="leftPositionButton">←</div>
                 <div class="button changePlayPosBtn" id="rightPositionButton">→</div>
-
             </div> 
             
             <img src="scoreImage/TurcoScore.png" id="scoreImage" alt="譜面画像データがありません．"/>
@@ -67,7 +64,22 @@
                     <div class="button hintBtn">ヒント</div>
                     <textarea class="annotationTxt" cols="50" rows="2" placeholder="ここにチャンクへのコメントを入力"></textarea>
                 </div-->
-            </div> 
+                
+                <!--div class="annotationHintWrapper">
+                    <p class="annotationHintInst">他の学習者は類似する部分に以下の<br>アノテーションを付与しています:</p>
+                    <div class="annotationHintDeleteButton"><p class="chunkDeleteButtonFont">×</p></div>
+                    
+                    <div class="annotationHintListWrapper">
+                        <div class="annotationHintList fade">
+                            <p class="hintAnnotationUserName">上田 さん</p>
+                            <div class="button refBtn">引用する</div>
+                            <textarea class="annotationHintTxt" cols="50" rows="2" readonly placeholder="ここにチャンクへのコメントを入力"></textarea>
+                        </div>
+                    </div>
+                </div-->
+                
+            </div>
+            
         </div>
     </body>
 </html>
