@@ -21,13 +21,16 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             
             switch(splitedChunkDomId[0]){
                 case 'patternChunk':
-                    japaneseChunkName = 'パターンチャンク'
+                    japaneseChunkName = 'パターンチャンク';
                     break;
                 case 'phraseChunk':
-                    japaneseChunkName = 'フレーズチャンク'
+                    japaneseChunkName = 'フレーズチャンク';
                     break;
                 case 'hardChunk':
-                    japaneseChunkName = '高難度チャンク'
+                    japaneseChunkName = '高難度チャンク';
+                    break;
+                case 'summaryChunk':
+                    japaneseChunkName = '練習振り返りまとめ';
                     break;
             }
             japaneseChunkName = String() + japaneseChunkName + ' ' + splitedChunkDomId[1];

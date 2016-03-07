@@ -231,6 +231,10 @@ html {
     border-color: #de4646;
 }
 
+.chunk.summary{ /* chunk クラスかつ pattern クラスを持っている要素に適用 */
+    border-color: #8d8d8d;
+}
+
 .chunk.selected{
     background-color: rgba(255, 0, 0, 0.3);
 }
@@ -298,6 +302,7 @@ html {
     max-width: 422px;
     min-width: 422px;
     background-color: #1d2138;
+    font-size: 18px;
     color: white;
 }
 
@@ -317,6 +322,10 @@ html {
 
 .annotationChunkId.hard{
     color: #de4646;
+}
+
+.annotationChunkId.summary{
+    color: #8d8d8d;
 }
 
 .goodBtn{
@@ -405,6 +414,7 @@ html {
     max-width: 384px;
     min-width: 384px;
     background-color: #000000;
+    font-size: 18px;
     color: white;
 }
 

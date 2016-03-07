@@ -180,6 +180,8 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     case 'hard':
                         globalMemCPSDDR.hardChunkCount++;
                         break;    
+                    case 'summary':
+                        globalMemCPSDDR.summaryChunkCount++;
                 }
             };
             ///////////////////////////////////////////////

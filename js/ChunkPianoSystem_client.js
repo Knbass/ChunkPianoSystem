@@ -30,6 +30,7 @@ var ChunkPianoSystem_client = function(){
             patternChunkCount:0,
             phraseChunkCount:0,
             hardChunkCount:0,
+            summaryChunkCount:0,
             annotationDomRenderer:null,
             annotationHintDomRenderer:null,
             setPlayPosition:null
