@@ -236,7 +236,7 @@ html {
 }
 
 .chunk.selected{
-    background-color: rgba(255, 0, 0, 0.3);
+    background-color: rgba(195, 144, 8, 0.5);
 }
 
 
@@ -292,7 +292,7 @@ html {
 }
 
 .annotationTxtWrapper.selected{
-    background-color: #464545;
+    background-color: #65571b;
 }
 
 .annotationTxt{

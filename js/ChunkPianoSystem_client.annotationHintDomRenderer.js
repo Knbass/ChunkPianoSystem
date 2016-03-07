@@ -81,7 +81,6 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
                 chunkDomId = null
             ;
             // クリックされた refBtnDom が所属する annotation div の textarea に引用したヒント文 hintText を挿入．
-            autosize($('textarea')); // chunk annotation 入力用 textarea を自動可変に変更．
             parentAnnotationDom.children('.annotationTxt').val(hintText);
             // データ構造にも引用を反映する．
             // parentAnnotationDom は id が annotationText_チャンクid となっているので，
@@ -90,7 +89,7 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
             chunkDomId = chunkDomId.split('_');
             chunkDomId = String() + chunkDomId[1] + '_' + chunkDomId[2];
             globalMemCPSAHDR.chunkDataObj.chunkData[chunkDomId].chunkAnnotationText = hintText;
-            
+
             removeAnnotationHintDom();
         });
         
