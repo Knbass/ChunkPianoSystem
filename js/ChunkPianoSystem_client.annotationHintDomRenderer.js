@@ -34,11 +34,16 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         //       サーバで annotation hint db を作成するモジュールを作成．
         //       annotation hint の chunktype を表示するようにする．
         // アノテーションヒントの dom は creadAndAppendAnnotationHintTxtDom で生成する．
-        creadAndAppendAnnotationHintTxtDom('上田', 'コードがずっとA minor なので同じ運指を繰り返すだけで良い．', annotationHintListWrapperDom);
-        creadAndAppendAnnotationHintTxtDom('岩淵', 'スタッカートを意識しながら跳ねるように演奏すると上手くいく．', annotationHintListWrapperDom);
-        creadAndAppendAnnotationHintTxtDom('Okura', 'ここは小指，人差し指，親指で演奏すると鍵盤を見なくても弾けた．', annotationHintListWrapperDom);
-        creadAndAppendAnnotationHintTxtDom('Kobayashi', '同じ運指の連続で左手は簡単．右手に意識を集中する．', annotationHintListWrapperDom);
-        creadAndAppendAnnotationHintTxtDom('Mito', '最後の部分だけ左手のパターンが変わるので要注意!', annotationHintListWrapperDom);
+        creadAndAppendAnnotationHintTxtDom('上田', 'コードがずっとA minor なので同じ運指を繰り返すだけで良い．', 
+                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        creadAndAppendAnnotationHintTxtDom('岩淵', 'スタッカートを意識しながら跳ねるように演奏すると上手くいく．', 
+                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        creadAndAppendAnnotationHintTxtDom('Okura', 'ここは小指，人差し指，親指で演奏すると鍵盤を見なくても弾けた．', 
+                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        creadAndAppendAnnotationHintTxtDom('Kobayashi', '同じ運指の連続で左手は簡単．右手に意識を集中する．', 
+                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        creadAndAppendAnnotationHintTxtDom('Mito', '最後の部分だけ左手のパターンが変わるので要注意!', 
+                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
         
         annotationHintWrapperDom.append(annotationHintListWrapperDom);
             
@@ -60,7 +65,7 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////    
-    creadAndAppendAnnotationHintTxtDom = function(annotationUserName, innerText, parentDom){
+    creadAndAppendAnnotationHintTxtDom = function(annotationUserName, innerText, parentDom, parentAnnotationDom){
 
         var 
             annotationHintListDom = $('<div class="annotationHintList fade"></div>'),
@@ -70,6 +75,22 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         ;
         
         refBtnDom.click(function(){
+            var parentAnnotationHintDom = $(this).parent(),
+                // クリックされた refBtnDom が所属する annotation hint div の textarea からヒント文を抽出．
+                hintText = parentAnnotationHintDom.children('.annotationHintTxt').val(),
+                chunkDomId = null
+            ;
+            // クリックされた refBtnDom が所属する annotation div の textarea に引用したヒント文 hintText を挿入．
+            autosize($('textarea')); // chunk annotation 入力用 textarea を自動可変に変更．
+            parentAnnotationDom.children('.annotationTxt').val(hintText);
+            // データ構造にも引用を反映する．
+            // parentAnnotationDom は id が annotationText_チャンクid となっているので，
+            // annotationText_ を除去し chunkData 用のキーに整形． 
+            chunkDomId = parentAnnotationDom[0].id;
+            chunkDomId = chunkDomId.split('_');
+            chunkDomId = String() + chunkDomId[1] + '_' + chunkDomId[2];
+            globalMemCPSAHDR.chunkDataObj.chunkData[chunkDomId].chunkAnnotationText = hintText;
+            
             removeAnnotationHintDom();
         });
         
