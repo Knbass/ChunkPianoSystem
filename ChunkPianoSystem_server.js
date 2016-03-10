@@ -213,12 +213,13 @@ var ChunkPianoSystem_server = function(){
     /////////////////////////////////////////////// 
     var cpss = ChunkPianoSystem_server();
     cpss.constructor();
+    
     /////////////////////////////////////////////// 
     ///////////////////////////////////////////////
     // This is for ScoreDataParser.js debug. 
     // var sdp = require('./myNodeModules/ScoreDataParser.js')('TurcoScore.json'),
         // noteLinePosition = sdp.getNoteLinePosition()
     // ;
-    // console.log(noteLinePosition.scoreCol);
+    // console.log(noteLinePosition.scoreCol);    
 })();
 

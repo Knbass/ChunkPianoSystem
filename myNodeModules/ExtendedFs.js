@@ -1,18 +1,19 @@
-// 指定されたディレクトリ内の，指定された拡張子のファイルのみのファイル名を配列で返却するモジュール．
-// !!!フォルダ内にディレクトリがあると正常に動作しないことに注意!!!
+// fs を継承し拡張した ExtendedFs モジュール．
 module.exports = (function(){
     'use strict'
     var constructor, getFileNameListAsync, readFileSync, readFilesAsync,
-	    fs = require('fs')
+	    ExtendedFs = require('fs')
     ;    
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // 指定されたディレクトリ内の指定された拡張子のファイルを配列に格納し返却．
     // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
     // readdir は非同期実行なので次処理は callback で渡す．
     // callback にファイルネームが格納された配列が渡される．
-    getFileNameListAsync = function(directryPath, extention, callback){
+    // !!!フォルダ内にディレクトリがあると正常に動作しないことに注意!!!
+    ExtendedFs.getFileNameListAsync = function(directryPath, extention, callback){
         
-        fs.readdir(directryPath, function(err, files){
+        ExtendedFs.readdir(directryPath, function(err, files){
             if (err) throw err; 
     
             var fileNameList = [];
@@ -37,30 +38,22 @@ module.exports = (function(){
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    // fs の readFileSync と同様の動作．
-    readFileSync = function(filePathRFC){
-        var file;
-        try{
-            file = fs.readFileSync(filePathRFC, 'utf-8');
-        }catch(e){
-            console.log(e);
-        }
-        return file;
-    };
-    //////////////////////////////////////////////
-    //////////////////////////////////////////////
+    // [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
     // directry path を指定する際，末尾に '/' を付けずに実行しなければならない. 
     // callback にファイルデータが格納された配列が渡される．
-    readFilesAsync = function(directryPathRFA, extentionRFA, callback){
+    ExtendedFs.readFilesAsync = function(directryPathRFA, extentionRFA, callback){
         // fileNameList には指定された拡張子を持つファイル名のみが格納されている．
-        getFileNameListAsync(directryPathRFA, extentionRFA, function(fNameList){
+        ExtendedFs.getFileNameListAsync(directryPathRFA, extentionRFA, function(fNameList){
             
             var fileDataList = [];
             
             for(var file_i in fNameList){
                 try{
                     var filePath = String() + directryPathRFA + '/' + fNameList[file_i];
-                    fileDataList.push(readFileSync(filePath));
+                    fileDataList.push({
+                        'fileName':fNameList[file_i],
+                        'file':ExtendedFs.readFileSync(filePath)
+                    });
                 }catch(e){
                     console.log(e);
                     console.log('dhirectry path の末尾に / が付いている可能性があります．除去してください．');
@@ -71,5 +64,5 @@ module.exports = (function(){
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    return {getFileNameListAsync:getFileNameListAsync, readFilesAsync:readFilesAsync, readFileSync:readFileSync};
+    return ExtendedFs;
 })();

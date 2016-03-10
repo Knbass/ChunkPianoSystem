@@ -238,6 +238,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
             }
             
             // 右辺の音符番号は1つ引いた値が正しい音符番号となる．
+            // todo: チャンクが1音符列分しか囲っていない場合，不正な値になるのを修正．
             if(headOrTail == 'tail'){
                 nearestNotePosition--;
             }
@@ -273,6 +274,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
             // css プロパティは勝手に string に変換されている場合があるので　parseInt を忘れずに行う．
             sortedChunkHeadLine.push(parseInt(chunkData[chunk_dom_id].chunkHeadLine, 10));
         }
+        // 値を昇順にソート
         sortedChunkHeadLine.sort(function(a,b){
             return a - b;
         });
