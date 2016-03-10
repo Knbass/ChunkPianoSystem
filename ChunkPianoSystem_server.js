@@ -7,8 +7,8 @@ var ChunkPianoSystem_server = function(){
         getChunkDataJsonList,
         initHttpAndSocketIo,
         splitedIoi = [],
-        sdp = require('./myNodeModules/ScoreDataParser.js')('TurcoScore.json'),
-        noteLinePosition = sdp.getNoteLinePosition(),
+        scoreDataParser = require('./myNodeModules/ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
+        noteLinePosition = scoreDataParser.getNoteLinePosition(),
         fs = require('fs'),
         http = require('http'),
         socketIo = require('socket.io'), 
@@ -210,16 +210,8 @@ var ChunkPianoSystem_server = function(){
 (function main(){
     'use strict'
     ///////////////////////////////////////////////
-    /////////////////////////////////////////////// 
-    var cpss = ChunkPianoSystem_server();
-    cpss.constructor();
-    
-    /////////////////////////////////////////////// 
     ///////////////////////////////////////////////
-    // This is for ScoreDataParser.js debug. 
-    // var sdp = require('./myNodeModules/ScoreDataParser.js')('TurcoScore.json'),
-        // noteLinePosition = sdp.getNoteLinePosition()
-    // ;
-    // console.log(noteLinePosition.scoreCol);    
+    var cpss = ChunkPianoSystem_server();
+    cpss.constructor();    
 })();
 

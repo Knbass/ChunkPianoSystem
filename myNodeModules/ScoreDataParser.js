@@ -1,4 +1,5 @@
-module.exports = function(fileName){
+module.exports = function(scoreFilePath){
+// var ScoreDataPaerser = function(scoreFilePath){ // モジュール単体テストのための記述．
     'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -7,8 +8,7 @@ module.exports = function(fileName){
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    getNoteLinePosition = function(){
-        
+    getNoteLinePosition = function(callback){
         var noteLinePositionObj = {
                 noteLine:[],
                 upperY:scoreDataJson.scoreRow.upperAxisY,
@@ -27,43 +27,55 @@ module.exports = function(fileName){
                                                      )
         ;
                 
-        for(var noteLine in scoreDataJson.notesCol){
+        for(var notesCol_i in scoreDataJson.notesCol){
             
-            var intNoteLine = parseInt(noteLine, 10), 
-                beforeStringNoteLine = null
+            var intNotesCol_i = parseInt(notesCol_i, 10), 
+                beforeStringNotesCol_i = null
             ;
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
-            // 音符列番号のどこからどこまでが譜面の1段目，2段目かをデータ化
+            // 音符列番号のどこからどこまでが譜面の1段目，2段目かをデータ化する．
             // 出力例: { '1': { start: '0', end: '48' }, '2': { start: '49', end: 82 } }
-            if((intNoteLine > 0) && (intNoteLine < (Object.keys(scoreDataJson.notesCol).length -1))){
-                beforeStringNoteLine = String() + (intNoteLine-1) // オブジェクトのキーにするために String に変換．
+            // 音符列の 最新 y 座標(scoreDataJson.notesCol[notesCol_i].axisY) と
+            // 1つ前の音符列のy座標(scoreDataJson.notesCol[beforeStringNotesCol_i]) を
+            // 比較する必要があるため if 条件文に (intNotesCol_i > 0) を加えている．
+            // 音符列番号のどこからどこまでが譜面の1段目，2段目かをデータ化する処理のため，
+            // 「音符番号が 0 から始まるべきなのに 1から始まる」という問題は気にしなくて良い．
+            if((intNotesCol_i > 0) && (intNotesCol_i < (Object.keys(scoreDataJson.notesCol).length -1))){
+                beforeStringNotesCol_i = String() + (intNotesCol_i-1) // オブジェクトのキーにするために String に変換．
                 // 各譜面の段の最初の音符番号を抽出．
                 if(isScoreColFirstLine){ 
-                    scoreColFirstLine = beforeStringNoteLine;
+                    scoreColFirstLine = beforeStringNotesCol_i;
                     isScoreColFirstLine = false;
                 }
-    
                 // 各譜面の段の最後の音符番号を抽出． 
-                // 音符列の y 座標は列の中央 y 座標 middleAxisY になっている．これが変わった瞬間が段が切り替わった瞬間，
-                if(scoreDataJson.notesCol[noteLine].axisY != scoreDataJson.notesCol[beforeStringNoteLine].axisY){
-                    noteLinePositionObj.scoreCol[scoreColCounter] = {'start':scoreColFirstLine, 'end':beforeStringNoteLine};
+                // 音符列の y 座標(scoreDataJson.notesCol[notesCol_i].axisY)は列の中央 y 座標 middleAxisY になっている．
+                // 最新の音符列の 最新 y 座標(scoreDataJson.notesCol[notesCol_i].axisY) と
+                // これが1つ前の音符列のy座標(scoreDataJson.notesCol[beforeStringNotesCol_i])
+                // が異なった瞬間が段が切り替わった瞬間となる．
+                if(scoreDataJson.notesCol[notesCol_i].axisY != scoreDataJson.notesCol[beforeStringNotesCol_i].axisY){
+                    noteLinePositionObj.scoreCol[scoreColCounter] = {'start':parseInt(scoreColFirstLine, 10), 'end':parseInt(beforeStringNotesCol_i, 10)};
                     isScoreColFirstLine = true;
                     scoreColCounter++
                 }
-            // 譜面の最後の音符番号のみ別処理．
-            }else if(noteLine == (Object.keys(scoreDataJson.notesCol).length -1)){
-                noteLinePositionObj.scoreCol[scoreColCounter] = {'start':scoreColFirstLine, 'end':intNoteLine};
+            // 譜面の最後の音符番号のみ別に処理する．次の譜面の段がないため．
+            }else if(notesCol_i == (Object.keys(scoreDataJson.notesCol).length -1)){
+                noteLinePositionObj.scoreCol[scoreColCounter] = {'start':parseInt(scoreColFirstLine, 10), 'end':parseInt(intNotesCol_i, 10)};
             }
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
-            // ScoreData から音符列の x 座標，y 座標のみを抽出．
+            // ScoreData から音符列の x 座標，y 座標のみを抽出し配列に格納．
+            // この処理は push を利用するか迷ったが，push では ScoreData の音符番号が 0 から始まっていない場合，
+            // 座標データとの食い違いが発生する．notesCol_i をインデックスに利用すれば バグ発生 or undefined格納により
+            // 食い違いに気づくことができる．
             // 音符個別の y 座標は取得しない．音符個別の y 座標も取得したい場合は，getRawData を利用すべし．
-            noteLinePositionObj.noteLine[noteLine] = {
-                'axisX':scoreDataJson.notesCol[noteLine].axisX,                                       
-                'axisY':scoreDataJson.notesCol[noteLine].axisY
+            noteLinePositionObj.noteLine[notesCol_i] = {
+                'axisX':scoreDataJson.notesCol[notesCol_i].axisX,                                       
+                'axisY':scoreDataJson.notesCol[notesCol_i].axisY
             };
         }
+        
+        if(callback) callback();
         
         return noteLinePositionObj; 
     };
@@ -75,7 +87,7 @@ module.exports = function(fileName){
     };
     // constructor が行うのは json データのロードのみ
     (constructor = function(){
-        scoreDataJson = fs.readFileSync('./ScoreData/' + fileName, 'utf-8');
+        scoreDataJson = fs.readFileSync(scoreFilePath, 'utf-8');
         scoreDataJson = JSON.parse(scoreDataJson);
         // console.log(scoreDataJson);
     })();
@@ -83,3 +95,21 @@ module.exports = function(fileName){
     ///////////////////////////////////////////////
     return{getNoteLinePosition:getNoteLinePosition, getRawData:getRawData};
 };
+
+/* // モジュール単体テストのための処理．
+(function moduleTest(){
+    var scoreDataParser = ScoreDataPaerser('../ScoreData/TurcoScore.json'),
+        noteLinePosition = scoreDataParser.getNoteLinePosition(),
+        extendedFs = require('./ExtendedFs.js')
+    ;
+
+    noteLinePosition = JSON.stringify(noteLinePosition);
+    extendedFs.writeFile('ParsedScoreData.json', noteLinePosition, function(err){
+       if(err){
+           console.log(err);
+       }else{
+           console.log('data has written!');
+       }
+    });
+})();
+*/ 

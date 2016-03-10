@@ -129,10 +129,10 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     good            : chunkPropCCD.good == undefined ? null : chunkPropCCD.good, // 三項演算子を利用．
                     chunkAnnotationText : null // annotationDomRenderer モジュールによって定義される．
                 };
-                globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){
-                    // todo: チャンクの y 座標を引数として与えると，譜面の何段目に当たっているかを判定するメソッドを追加．これじゃハードコーディングでダサい!
-                    //     : ScoreDataParser で判定メソッドをオブジェクトに詰めてここで実行する? 
-                    
+                // チャンクの中央 y 座標から，譜面の上段/下段どちらに付与されたチャンクかを判定．
+                // todo: これじゃハードコーディングになっているので修正すべき．
+                //       ScoreDataParser で判定メソッドをオブジェクトに詰めてここで実行する? 
+                globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){                    
                     if(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkMiddleAxisY <= globalMemCPSDDR.noteLinePosition.middleAxisY){
                         return '1';
                     }else{
@@ -212,7 +212,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    ////////////////////////////////////////  ↓ チャンク先頭の音符番号を取得する際は 'head'，末尾であれば 'tail'
+    ////////////////////////////////////////    ↓ チャンク先頭の音符番号を取得する際は 'head'，末尾であれば 'tail'
     getChunkHeadLine = function(chunkDataGCL, headOrTail){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
         
         var getPositionByBruteForceSearch, searchLine;
@@ -223,6 +223,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
         // };
         
         // 力任せ法によるチャンク頭出し音符列の算出
+        // todo: チャンク頭出し音符列の算出方法を2分木探索に変更し計算量を減らす．
         getPositionByBruteForceSearch = function(startIndex, endIndex, chunkLeftPosition, notePositionArray){
             var euclidDistance = 0,
                 nearestNotePosition = null
@@ -238,9 +239,12 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
             }
             
             // 右辺の音符番号は1つ引いた値が正しい音符番号となる．
-            // todo: チャンクが1音符列分しか囲っていない場合，不正な値になるのを修正．
             if(headOrTail == 'tail'){
-                nearestNotePosition--;
+                // todo: チャンクが1音符列分しか囲っていない場合，不正な値になるのを修正．
+                //       head と tail が同じときは nearestNotePosition-- をしない．
+                if(nearestNotePosition > 0){
+                    nearestNotePosition--;
+                }
             }
             
             return nearestNotePosition;

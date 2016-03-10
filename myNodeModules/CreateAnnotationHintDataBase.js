@@ -1,15 +1,30 @@
-//module.exports = (function(){
+// module.exports = (function(){
 var CreateAnnotationHintDataBase = function(){
     'use strict'
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     var extendedFs = require('./ExtendedFs.js'),
-        createDataBase, parseChunkDataJson, annotationHintDataBaseFactory, 
+        scoreDataParser = require('./ScoreDataParser.js')('../ScoreData/TurcoScore.json'),
+        createDataBase, parseChunkDataJson, annotationHintDataBaseFactory, initAnnotationHintDataBase,
         chunkDataWithFileNameList = [], 
         annotationHintDataBase = {
             
         }
     ;
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////    
+    (initAnnotationHintDataBase = function(){
+        var noteLinePosition = scoreDataParser.getNoteLinePosition();
+        
+        noteLinePosition = JSON.stringify(noteLinePosition);
+        extendedFs.writeFile('ParsedScoreData.json', noteLinePosition, function(err){
+           if(err){
+               console.log(err);
+           }else{
+               console.log('data has written!');
+           }
+        });
+    })();
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     annotationHintDataBaseFactory = function(chunkDataWithFileName){
@@ -20,9 +35,7 @@ var CreateAnnotationHintDataBase = function(){
     //////////////////////////////////////////////
     createDataBase = function(){
         extendedFs.readFilesAsync('../ChunkData', 'json', function(cData){
-            
             chunkDataWithFileNameList = cData;
-            
             // chunkDataWithFileName は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
             for(var file_i in chunkDataWithFileNameList){
                 chunkDataWithFileNameList[file_i].file = JSON.parse(chunkDataWithFileNameList[file_i].file);
