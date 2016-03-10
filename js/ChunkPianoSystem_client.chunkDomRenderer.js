@@ -126,7 +126,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     chunkHeadLine   : null, // getChunkHeadLine は stringScoreCol や chunkMiddleAxisY を利用するのでここではまだ実行してはいけない．
                     chunkTailLine   : null,
                     parentChunk     : chunkPropCCD.parentChunk,  // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
-                    good            : chunkPropCCD.good,
+                    good            : chunkPropCCD.good == undefined ? null : chunkPropCCD.good, // 三項演算子を利用．
                     chunkAnnotationText : null // annotationDomRenderer モジュールによって定義される．
                 };
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){

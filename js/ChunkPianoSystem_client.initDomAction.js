@@ -5,7 +5,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
     var initDomAction, setPlayPosition, 
         playPosition = $('#playPosition')
     ;
-    
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////    
     initDomAction = function(callback){
         
         var upperFrame = $('#upperFrame'),        

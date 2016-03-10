@@ -1,6 +1,8 @@
 // fs を継承し拡張した ExtendedFs モジュール．
 module.exports = (function(){
     'use strict'
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
     var constructor, getFileNameListAsync, readFileSync, readFilesAsync,
 	    ExtendedFs = require('fs')
     ;    
@@ -10,7 +12,7 @@ module.exports = (function(){
     // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
     // readdir は非同期実行なので次処理は callback で渡す．
     // callback にファイルネームが格納された配列が渡される．
-    // !!!フォルダ内にディレクトリがあると正常に動作しないことに注意!!!
+    // !!! フォルダ内にディレクトリがあると正常に動作しないことに注意 !!!
     ExtendedFs.getFileNameListAsync = function(directryPath, extention, callback){
         
         ExtendedFs.readdir(directryPath, function(err, files){

@@ -1,34 +1,34 @@
 //module.exports = (function(){
-
 var CreateAnnotationHintDataBase = function(){
+    'use strict'
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     var extendedFs = require('./ExtendedFs.js'),
         createDataBase, parseChunkDataJson, annotationHintDataBaseFactory, 
-        fileDataList = [], 
-        annotationHintDataBase={
+        chunkDataWithFileNameList = [], 
+        annotationHintDataBase = {
             
         }
     ;
-    
-    annotationHintDataBaseFactory = function(){
-        
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
+    annotationHintDataBaseFactory = function(chunkDataWithFileName){
+        console.log(chunkDataWithFileName);
     };
-    
     // todo: annotationHintDataBase の設計を考える．summaryChunk はどうする? 
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     createDataBase = function(){
-        extendedFs.readFilesAsync('../ChunkData', 'json', function(fData){
+        extendedFs.readFilesAsync('../ChunkData', 'json', function(cData){
             
-            fileDataList = fData;
+            chunkDataWithFileNameList = cData;
             
-            // fileDataList は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
-            for(var file_i in fileDataList){
-                fileDataList[file_i].file = JSON.parse(fileDataList[file_i].file);
+            // chunkDataWithFileName は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
+            for(var file_i in chunkDataWithFileNameList){
+                chunkDataWithFileNameList[file_i].file = JSON.parse(chunkDataWithFileNameList[file_i].file);
             }
-            
-            console.log(fileDataList);
+            // console.log(chunkDataWithFileNameList);
+            annotationHintDataBaseFactory(chunkDataWithFileNameList[0]);
         });
     };
     //////////////////////////////////////////////
