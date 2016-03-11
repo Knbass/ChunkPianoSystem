@@ -143,6 +143,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                 //       ScoreDataParser で判定メソッドをオブジェクトに詰めてここで実行する? 
                 //       noteLinePosition.scoreCol(譜面各行の中央y座標) と chunkMiddleAxisY の距離を比較し，最短距離になる
                 //       scoreCol を stringScoreCol とする．
+                //       まずは ScoreDataParser の修正を先に行う．
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){                    
                     if(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkMiddleAxisY <= globalMemCPSDDR.noteLinePosition.middleAxisY){
                         return '1';
