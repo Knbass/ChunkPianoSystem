@@ -1,3 +1,11 @@
+/*
+todo: chunkData に自身が付与された譜面段番号を持たせる．
+todo: annotationDomRenderer の createChunkDom は肥大化していて読みにくい．処理ごとに関数に分離し，
+         処理フローを理解しやすくする．
+         chunkDom 描画モジュールとデータ構造作成モジュールを分離する．
+	 chunkDomDelBtn 描画モジュールも分離．
+*/
+
 ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){ 
     'use strict'
     ///////////////////////////////////////////////
@@ -36,8 +44,8 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                 ///////////////////////////////////////////////
                 // chunk dom のテンプレート生成，描画位置情報を css に変換，イベント登録
                 // done: pattern チャンク以外の処理を追加 
-                
-                /////////////////////////////////////////////////////////// ↓ globalMem から該当する chunk の描画数カウント値 を取得し，id として付与．
+                // globalMem から該当する chunk の描画数カウント値 を取得し，id として付与．
+                // patternChunk の場合，globalMemCPSDDR[chunkPropCCD.chunkType + 'ChunkCount'] は globalMemCPSDDR[patternChunkCount] となる．
                 chunkDomId = String() + chunkPropCCD.chunkType + 'Chunk_' + globalMemCPSDDR[chunkPropCCD.chunkType + 'ChunkCount'];
                 chunkDom = $('<div class="chunk ' + chunkPropCCD.chunkType + '" id="' + chunkDomId + '"></div>');
 

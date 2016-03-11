@@ -3,7 +3,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     var initDomAction, setPlayPosition, 
-        playPosition = $('#playPosition')
+        playPosition = $('#playPosition') // このDOMは複数メソッドで利用するため global に宣言．
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////    
@@ -31,6 +31,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             rejectChunkPracticeMode
         ;
         globalMemCPSCIDA.nowChunkMode = String() + $('#chunkModeSelector option:selected').val();
+        
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // user name 入力処理
@@ -76,6 +77,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         swal(swalPromptOptionForUserNameProp, userNameSetter);   
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
+        
         // 演奏位置初期化処理
         // noteLinePosition を受け取ってから処理をしなければならないため，
         // callback を利用し サーバから noteLinePosition を受け取ってから下記の処理を行う．
