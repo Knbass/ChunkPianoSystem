@@ -3,7 +3,8 @@ todo: chunkData に自身が付与された譜面段番号を持たせる．
 todo: annotationDomRenderer の createChunkDom は肥大化していて読みにくい．処理ごとに関数に分離し，
          処理フローを理解しやすくする．
          chunkDom 描画モジュールとデータ構造作成モジュールを分離する．
-	 chunkDomDelBtn 描画モジュールも分離．
+	 chunkDomDelBtn 描画モジュールも分離．annotationHintDomRenderer でも chunkDomDelBtn 作成処理を行っているので，
+     共通化する．
 */
 
 ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){ 
@@ -128,7 +129,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     top             : chunkPropCCD.top,
                     width           : chunkPropCCD.width,
                     height          : chunkPropCCD.height,
-                    stringScoreCol  : null,
+                    stringScoreCol  : null, // 楽譜の何段目の音符列かを格納．1段目の場合は 1
                     chunkMiddleAxisY: chunkPropCCD.top + (Math.floor(chunkPropCCD.height / 2)),
                     chunkType       : chunkPropCCD.chunkType, // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
                     chunkHeadLine   : null, // getChunkHeadLine は stringScoreCol や chunkMiddleAxisY を利用するのでここではまだ実行してはいけない．
@@ -137,14 +138,14 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     good            : chunkPropCCD.good == undefined ? null : chunkPropCCD.good, // 三項演算子を利用．
                     chunkAnnotationText : null // annotationDomRenderer モジュールによって定義される．
                 };
-                // チャンクの中央 y 座標から，譜面の上段/下段どちらに付与されたチャンクかを判定．
-                // todo: これじゃハードコーディングになっているので修正すべき．
+                // チャンクの中央 y 座標から，譜面の何段目に付与されたチャンクかを判定．
+                // todo: これではハードコーディングになっているので修正すべき．
                 //       ScoreDataParser で判定メソッドをオブジェクトに詰めてここで実行する? 
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){                    
                     if(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkMiddleAxisY <= globalMemCPSDDR.noteLinePosition.middleAxisY){
-                        return '1';
+                        return 1;
                     }else{
-                        return '2';
+                        return 2;
                     }
                 })();
                 // getChunkHeadLine は stringScoreCol を利用するので実行順を変更してはいけない．
@@ -261,8 +262,10 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
         ///////////////////////////////////////////////
         // チャンク頭出し位置の算出        
         if(headOrTail == 'head'){
+            // 頭出し位置はチャンクの左辺なので，left の位置で音符列をサーチする．
             searchLine = parseInt(chunkDataGCL.left, 10);
         }else if(headOrTail == 'tail'){
+            // チャンクの終了位置はチャンクの右辺なので，left + width の位置で音符列をサーチする．
             var tail = chunkDataGCL.left + chunkDataGCL.width;
             searchLine = parseInt(tail, 10);
         }else{
