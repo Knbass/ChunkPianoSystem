@@ -252,18 +252,23 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             
             var isRejectChunkPractice = false;
             
-            if(practicePointMode == 'notePosition'){ //
+            if(practicePointMode == 'notePosition'){ // 音符列で演奏位置を変更するモードの場合
                 if(globalMemCPSCIDA.nowNoteRowCount == 0){
                     globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.noteLinePosition.noteLine.length - 1;
                 }else{
                     globalMemCPSCIDA.nowNoteRowCount--;                
                 }          
-            }else if(practicePointMode == 'chunk'){
+            }else if(practicePointMode == 'chunk'){ // チャンク先頭位置で演奏位置を変更するモードの場合
                 
                 var chunkHeadLinePositionsNowIndex = globalMemCPSCIDA.chunkHeadLinePositions.indexOf(globalMemCPSCIDA.nowNoteRowCount);                
                 
+                // 譜面の先頭音符列で leftPositionButton を押された場合は，それ以上左の音符列はないのでチャンク頭出し位置格納配列の末尾の位置に演奏位置を移動する．
                 if(chunkHeadLinePositionsNowIndex == 0){
                     globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[globalMemCPSCIDA.chunkHeadLinePositions.length-1];
+                // 現在の音符列番号がチャンク頭出し位置格納配列に存在しない場合において，そもそもチャンク頭出し位置格納配列がからの場合は
+                // チャンク頭出しモードを拒否する．
+                // そうでない場合はチャンク頭出し位置格納配列の先頭の位置に演奏位置を移動．
+                // todo: 演奏位置音符列から直近のチャンク頭出し位置を検索するように変更．
                 }else if(chunkHeadLinePositionsNowIndex == -1){
                     if(globalMemCPSCIDA.chunkHeadLinePositions.length >0){
                         globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[0];
@@ -271,12 +276,14 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                         rejectChunkPracticeMode();
                         isRejectChunkPractice = true;
                     }
+                // チャンク頭出しモード かつ 演奏中の音符列が譜面の先頭音符列でない場合はチャンク頭出し位置を1つ左に移動する．
                 }else{
                     globalMemCPSCIDA.nowNoteRowCount = globalMemCPSCIDA.chunkHeadLinePositions[chunkHeadLinePositionsNowIndex-1];
                 }
             }
-
-            if(!isRejectChunkPractice){
+            // チャンクモードを拒否するのはチャンク頭出し位置を格納する配列が空の時であるため，以下の処理はバグる．
+            // そのため，rejectChunkPractice を実行した際は以下の処理はスキップする．
+            if(!isRejectChunkPractice){ 
                 setPlayPosition(globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisX, 
                                 globalMemCPSCIDA.noteLinePosition.noteLine[globalMemCPSCIDA.nowNoteRowCount].axisY
                                )

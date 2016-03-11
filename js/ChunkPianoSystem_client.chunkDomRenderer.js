@@ -129,7 +129,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     top             : chunkPropCCD.top,
                     width           : chunkPropCCD.width,
                     height          : chunkPropCCD.height,
-                    stringScoreCol  : null, // 楽譜の何段目の音符列かを格納．1段目の場合は 1
+                    stringScoreCol  : null, // 楽譜の何段目の音符列かを格納．オブジェクトのキーに利用するためStringにする，1段目の場合は '1'
                     chunkMiddleAxisY: chunkPropCCD.top + (Math.floor(chunkPropCCD.height / 2)),
                     chunkType       : chunkPropCCD.chunkType, // 本メソッドで拡張したプロパティ．ファクトリ関数で最初から生成するように変更すべし．
                     chunkHeadLine   : null, // getChunkHeadLine は stringScoreCol や chunkMiddleAxisY を利用するのでここではまだ実行してはいけない．
@@ -141,11 +141,13 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                 // チャンクの中央 y 座標から，譜面の何段目に付与されたチャンクかを判定．
                 // todo: これではハードコーディングになっているので修正すべき．
                 //       ScoreDataParser で判定メソッドをオブジェクトに詰めてここで実行する? 
+                //       noteLinePosition.scoreCol(譜面各行の中央y座標) と chunkMiddleAxisY の距離を比較し，最短距離になる
+                //       scoreCol を stringScoreCol とする．
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){                    
                     if(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkMiddleAxisY <= globalMemCPSDDR.noteLinePosition.middleAxisY){
-                        return 1;
+                        return '1';
                     }else{
-                        return 2;
+                        return '2';
                     }
                 })();
                 // getChunkHeadLine は stringScoreCol を利用するので実行順を変更してはいけない．
