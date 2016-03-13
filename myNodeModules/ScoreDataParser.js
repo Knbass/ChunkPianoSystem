@@ -8,7 +8,8 @@ module.exports = function(scoreFilePath){
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    getNoteLinePosition = function(callback){
+    getNoteLinePosition = function(){
+        
         var noteLinePositionObj = {
                 noteLine:[],
                 upperY:scoreDataJson.scoreRow.upperAxisY,
@@ -16,7 +17,7 @@ module.exports = function(scoreFilePath){
                 middleAxisY:null, // チャンク先頭位置が上段か下段かの判定に利用
                 scoreCol:{}
             },
-            scoreColCounter = 1,
+            scoreColCounter = 0,
             isScoreColFirstLine = true,
             scoreColFirstLine = null
         ;
@@ -74,9 +75,7 @@ module.exports = function(scoreFilePath){
                 'axisY':scoreDataJson.notesCol[notesCol_i].axisY
             };
         }
-        
-        if(callback) callback();
-        
+                
         return noteLinePositionObj; 
     };
     ///////////////////////////////////////////////

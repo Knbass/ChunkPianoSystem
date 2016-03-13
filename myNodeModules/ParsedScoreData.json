@@ -253,11 +253,11 @@
     "lowerY": 475,
     "middleAxisY": 334,
     "scoreCol": {
-        "1": {
+        "0": {
             "start": 0,
             "end": 48
         },
-        "2": {
+        "1": {
             "start": 49,
             "end": 82
         }

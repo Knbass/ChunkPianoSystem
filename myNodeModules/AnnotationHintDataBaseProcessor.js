@@ -22,8 +22,17 @@ var AnnotationHintDataBaseProcessor = function(){
     // todo: noteLinePosition から全音符番号を取得し，annotationHintDataBase を初期化．
     // todo: クライアントサイドで chunkDom に自身が所属する譜面行番号を付与する処理を行う． 
     (initAnnotationHintDataBase = function(){
-        var noteLinePosition = scoreDataParser.getNoteLinePosition();        
-        noteLinePosition = JSON.stringify(noteLinePosition);
+        var noteLinePosition = scoreDataParser.getNoteLinePosition(), 
+            noteLineLength = 0
+        ;
+        // noteLinePosition の scoreCol(音符列の何段目までが譜面の何段目に格納されているかの情報を格納) の中から，
+        // 最後尾の譜面段の最後尾の音符列を取り出す．
+        // つまり，音符列の最大値を取得している．
+        // Object.keys(noteLinePosition.scoreCol).length] となっているのは，scoreCol は '1' から始まっているため．
+        // プログラム的には scoreCol が 0 から始まるようにしたほうが良いかも... 
+        noteLineLength = parseInt(noteLinePosition.scoreCol[String() + Object.keys(noteLinePosition.scoreCol).length].end, 10);
+        
+        console.log(noteLineLength);
     })();
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -41,7 +50,7 @@ var AnnotationHintDataBaseProcessor = function(){
                 chunkDataWithFileNameList[file_i].file = JSON.parse(chunkDataWithFileNameList[file_i].file);
             }
             // console.log(chunkDataWithFileNameList);
-            annotationHintDataBaseFactory(chunkDataWithFileNameList[0]);
+            // annotationHintDataBaseFactory(chunkDataWithFileNameList[0]);
         });
     };
     //////////////////////////////////////////////

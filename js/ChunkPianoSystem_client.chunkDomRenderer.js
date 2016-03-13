@@ -146,9 +146,9 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                 //       まずは ScoreDataParser の修正を先に行う．
                 globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].stringScoreCol = (function(){                    
                     if(globalMemCPSDDR.chunkDataObj.chunkData[chunkDomId].chunkMiddleAxisY <= globalMemCPSDDR.noteLinePosition.middleAxisY){
-                        return '1';
+                        return '0';
                     }else{
-                        return '2';
+                        return '1';
                     }
                 })();
                 // getChunkHeadLine は stringScoreCol を利用するので実行順を変更してはいけない．
@@ -275,7 +275,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
             throw new Error('error occured in getChunkHeadLine');
         }
         
-        return getPositionByBruteForceSearch(globalMemCPSDDR.noteLinePosition.scoreCol[chunkDataGCL.stringScoreCol].start, // '1' は1段目の音符列を意味する．
+        return getPositionByBruteForceSearch(globalMemCPSDDR.noteLinePosition.scoreCol[chunkDataGCL.stringScoreCol].start, 
                                              globalMemCPSDDR.noteLinePosition.scoreCol[chunkDataGCL.stringScoreCol].end,
                                              searchLine,
                                              globalMemCPSDDR.noteLinePosition.noteLine

@@ -7,7 +7,7 @@
             "top": 181,
             "width": 837,
             "height": 80,
-            "stringScoreCol": "1",
+            "stringScoreCol": "0",
             "chunkMiddleAxisY": 221,
             "chunkType": "pattern",
             "chunkHeadLine": 4,
@@ -22,7 +22,7 @@
             "top": 205,
             "width": 24,
             "height": 38,
-            "stringScoreCol": "1",
+            "stringScoreCol": "0",
             "chunkMiddleAxisY": 224,
             "chunkType": "hard",
             "chunkHeadLine": 46,
@@ -37,7 +37,7 @@
             "top": 465,
             "width": 114,
             "height": 80,
-            "stringScoreCol": "2",
+            "stringScoreCol": "1",
             "chunkMiddleAxisY": 505,
             "chunkType": "pattern",
             "chunkHeadLine": 49,
@@ -52,7 +52,7 @@
             "top": 466,
             "width": 85,
             "height": 69,
-            "stringScoreCol": "2",
+            "stringScoreCol": "1",
             "chunkMiddleAxisY": 500,
             "chunkType": "hard",
             "chunkHeadLine": 58,
@@ -67,7 +67,7 @@
             "top": 395,
             "width": 243,
             "height": 87,
-            "stringScoreCol": "2",
+            "stringScoreCol": "1",
             "chunkMiddleAxisY": 438,
             "chunkType": "pattern",
             "chunkHeadLine": 65,
@@ -82,7 +82,7 @@
             "top": 594,
             "width": 110,
             "height": 70,
-            "stringScoreCol": "2",
+            "stringScoreCol": "1",
             "chunkMiddleAxisY": 629,
             "chunkType": "summary",
             "chunkHeadLine": 0,
@@ -92,5 +92,5 @@
             "chunkAnnotationText": "反復練習が大事だと思う。まずは１フレーズできるように目標を立てて、そこができたら次に進むとうまくいった。 左手と合わせるととても難しく感じるから、まずは右手だけでも完璧にしたら左手に集中できるようになる。"
         }
     },
-    "practiceDay": "11111"
+    "practiceDay": "1"
 }
