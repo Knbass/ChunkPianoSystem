@@ -1,10 +1,12 @@
+// ScoreData 内の指定された譜面データをパースするモジュール．
+// 利用例: var scoreDataParser = require('./myNodeModules/ScoreDataParser.js')('./ScoreData/TurcoScore.json');
 module.exports = function(scoreFilePath){
 // var ScoreDataPaerser = function(scoreFilePath){ // モジュール単体テストのための記述．
     'use strict'
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    var fs = require('fs'), 
-        constructor, scoreDataJson, getNoteLinePosition, getRawData
+    var extendedFs = require('./ExtendedFs.js'),
+        constructor, scoreDataJson, getNoteLinePosition, getRawData, saveNoteLinePosition
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -80,35 +82,40 @@ module.exports = function(scoreFilePath){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+    // 本メソッドの実行の前に getNoteLinePosition を実行する必要はない．
+    saveNoteLinePosition = function(){
+        var noteLinePositionObjSNP = getNoteLinePosition();
+        noteLinePositionObjSNP = JSON.stringify(noteLinePositionObjSNP);
+        
+        extendedFs.writeFile('ParsedScoreData.json', noteLinePositionObjSNP, function(err){
+           if(err){
+               console.log(err);
+           }else{
+               console.log('data has written!');
+           }
+        });
+    };
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     // ScoreData の生データを返す．
     getRawData = function(){
         return scoreDataJson; 
     };
     // constructor が行うのは json データのロードのみ
     (constructor = function(){
-        scoreDataJson = fs.readFileSync(scoreFilePath, 'utf-8');
+        scoreDataJson = extendedFs.readFileSync(scoreFilePath, 'utf-8');
         scoreDataJson = JSON.parse(scoreDataJson);
         // console.log(scoreDataJson);
     })();
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    return{getNoteLinePosition:getNoteLinePosition, getRawData:getRawData};
+    return{getNoteLinePosition:getNoteLinePosition, getRawData:getRawData, saveNoteLinePosition:saveNoteLinePosition};
 };
-
-/* // モジュール単体テストのための処理．
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+/*
 (function moduleTest(){
-    var scoreDataParser = ScoreDataPaerser('../ScoreData/TurcoScore.json'),
-        noteLinePosition = scoreDataParser.getNoteLinePosition(),
-        extendedFs = require('./ExtendedFs.js')
-    ;
-
-    noteLinePosition = JSON.stringify(noteLinePosition);
-    extendedFs.writeFile('ParsedScoreData.json', noteLinePosition, function(err){
-       if(err){
-           console.log(err);
-       }else{
-           console.log('data has written!');
-       }
-    });
+    var scoreDataParser = ScoreDataPaerser('../ScoreData/TurcoScore.json');
+    scoreDataParser.saveNoteLinePosition();
 })();
-*/ 
+*/
