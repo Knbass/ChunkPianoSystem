@@ -1,0 +1,54 @@
+{
+    "userName": "ueda",
+    "chunkData": {
+        "patternChunk_0": {
+            "chunkDomId": "patternChunk_0",
+            "left": 254,
+            "top": 111,
+            "width": 233,
+            "height": 154,
+            "stringScoreCol": "0",
+            "chunkMiddleAxisY": 188,
+            "chunkType": "pattern",
+            "chunkHeadLine": 6,
+            "chunkTailLine": 17,
+            "chunkMiddleLine": 11,
+            "parentChunk": null,
+            "good": null,
+            "chunkAnnotationText": "コードがずっとA minor なので同じ運指を繰り返すだけで良い．"
+        },
+        "hardChunk_0": {
+            "chunkDomId": "hardChunk_0",
+            "left": 254,
+            "top": 400,
+            "width": 274,
+            "height": 202,
+            "stringScoreCol": "1",
+            "chunkMiddleAxisY": 501,
+            "chunkType": "hard",
+            "chunkHeadLine": 55,
+            "chunkTailLine": 64,
+            "chunkMiddleLine": 59,
+            "parentChunk": null,
+            "good": null,
+            "chunkAnnotationText": "スタッカートを意識しながら跳ねるように演奏すると上手くいく．"
+        },
+        "phraseChunk_0": {
+            "chunkDomId": "phraseChunk_0",
+            "left": 924,
+            "top": 106,
+            "width": 195,
+            "height": 202,
+            "stringScoreCol": "0",
+            "chunkMiddleAxisY": 170,
+            "chunkType": "phrase",
+            "chunkHeadLine": 39,
+            "chunkTailLine": 46,
+            "chunkMiddleLine": 42,
+            "parentChunk": null,
+            "good": null,
+            "chunkAnnotationText": "ここは小指，人差し指，親指で演奏すると鍵盤を見なくても弾けた．"
+        }
+    },
+    "practiceDay": "1"
+}

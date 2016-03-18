@@ -79,7 +79,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     mouseupedChunkDomData.top = parseInt(mouseupedChunkDom.css('top'), 10);
                     
                     // マウスアップ時は再度 chunk の頭出し位置を算出し，chunkHeadLinePositions を再度ソートする．
-                    getChunkHeadTailMidlleLine();
+                    getChunkHeadTailMidlleLine(mouseupedChunkDomData);
                     globalMemCPSDDR.chunkHeadLinePositions = getSortedChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData);
                     
                     console.log(globalMemCPSDDR.chunkDataObj.chunkData);
@@ -214,7 +214,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     ////////////////////////////////////////    ↓ チャンク先頭の音符番号を取得する際は 'head'，末尾であれば 'tail'
-    getChunkHeadTailMidlleLine = function(chunkDataGCL, headOrTail){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
+    getChunkHeadTailMidlleLine = function(chunkDataGCL){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
         
         var getPositionByBruteForceSearch, searchLine, searchStartLine, searchEndLine, 
             noteLine =  globalMemCPSDDR.noteLinePosition.noteLine
@@ -230,7 +230,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
         // chunlDom の left だけで頭出し位置を計算すると，1段目に付与したチャンクなのに2段目の音符x座標で頭出しされる
         // 可能性がある．そのため，chunkDom のstringScoreColの値を利用し，譜面の n 段目のみを探索するようにしている．
         // ある音符が譜面の何段目かの処理をクライアントで行っているが，この処理はScoreDataParser で一括に行うべきだ．
-        getPositionByBruteForceSearch = function(startIndex, endIndex, chunkLeftPosition, notePositionArray){
+        getPositionByBruteForceSearch = function(startIndex, endIndex, chunkLeftPosition, notePositionArray, isTail){
             var euclidDistance = 0,
                 nearestNotePosition = null
             ;
@@ -245,7 +245,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
             }
             
             // 右辺の音符番号は1つ引いた値が正しい音符番号となる．
-            if(headOrTail == 'tail'){
+            if(isTail){
                 // todo: チャンクが1音符列分しか囲っていない場合，不正な値になるのを修正．
                 //       head と tail が同じときは nearestNotePosition-- をしない．
                 if(nearestNotePosition > 0){
@@ -265,12 +265,12 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
         // チャンク頭出し位置の算出
         // 頭出し位置はチャンクの左辺なので，left の位置で音符列をサーチする．
         searchLine = parseInt(chunkDataGCL.left, 10);
-        chunkDataGCL.chunkHeadLine = +getPositionByBruteForceSearch(searchStartLine, searchEndLine, searchLine, noteLine);
+        chunkDataGCL.chunkHeadLine = +getPositionByBruteForceSearch(searchStartLine, searchEndLine, searchLine, noteLine, false);
         // チャンク終了位置の算出
         // チャンク終了位置はチャンクの右辺なので，left + width の位置で音符列をサーチする．
         searchLine= chunkDataGCL.left + chunkDataGCL.width;
         searchLine = parseInt(searchLine, 10);
-        chunkDataGCL.chunkTailLine = +getPositionByBruteForceSearch(searchStartLine, searchEndLine, searchLine, noteLine);
+        chunkDataGCL.chunkTailLine = +getPositionByBruteForceSearch(searchStartLine, searchEndLine, searchLine, noteLine, true);
         // chunk 中心音符列の算出．
         // これは annotationHintDataBase の作成時にインデックスとして利用する．
         chunkDataGCL.chunkMiddleLine = Math.floor((chunkDataGCL.chunkHeadLine + chunkDataGCL.chunkTailLine) / 2);

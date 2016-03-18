@@ -12,9 +12,7 @@ var AnnotationHintDataBaseProcessor = function(){
     //////////////////////////////////////////////
     var extendedFs = require('./ExtendedFs.js'),
         scoreDataParser = require('./ScoreDataParser.js')('../ScoreData/TurcoScore.json'),
-        createDataBase, parseChunkDataJson, annotationHintDataBaseFactory, initAnnotationHintDataBase,
-        saveDbAsJson, 
-        chunkDataWithFileNameList = [], 
+        createDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDbAsJson, 
         annotationHintDataBase = {
             
         }
@@ -34,36 +32,77 @@ var AnnotationHintDataBaseProcessor = function(){
         
         for(var annoHintDB_noteLine_i = 0; annoHintDB_noteLine_i <= noteLineLength; annoHintDB_noteLine_i++){
             annotationHintDataBase[String() + annoHintDB_noteLine_i] = {
-                patternChunkCount:null,
-                phraseChunkCount:null,
-                hardChunkCount:null,
-                summaryChunkCount:null
+                patternChunk:{}, // 後で変数を利用してオブジェクトキーを追加するので null で初期化してはいけない．
+                phraseChunk :{}, // null では annotationHintDataBase[chunkMiddleLine][chunkType][userName] == ~~ のようにキーを追加できない．
+                hardChunk   :{},
+                summaryChunk:{}
             };
-        }        
+        }
         // console.log(annotationHintDataBase);
     })();
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    annotationHintDataBaseFactory = function(chunkDataWithFileName){
-        console.log(chunkDataWithFileName);
-    };
-    //////////////////////////////////////////////
-    //////////////////////////////////////////////
     createDataBase = function(){
-        extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkDomData){
-            chunkDataWithFileNameList = chunkDomData;
-            // chunkDataWithFileName は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
-            for(var file_i in chunkDataWithFileNameList){
-                chunkDataWithFileNameList[file_i].file = JSON.parse(chunkDataWithFileNameList[file_i].file);
-            
-                console.log(chunkDataWithFileNameList[file_i].file.userName);
-                
-                for(var chunkData_i in chunkDataWithFileNameList[file_i].file.chunkData){
-                    
+        // server モジュールから呼び出すメソッドのため，念入りに try-catch する．
+        // ここでバグが発生しても，annotationHint データベース更新が不能になる以外のトラブルを
+        // 起こさない(フォールトトレラント設計)．
+        try{
+            extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){
+                // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
+                // (1) まず，ファイルを1つずつ読み込む．
+                for(var file_i in chunkData){
+
+                    try{
+                        var userName, // userName, practiceDay は chunkData を parse した後に格納すること．
+                            practiceDay
+                        ;
+                        chunkData[file_i].file = JSON.parse(chunkData[file_i].file);
+                        userName = chunkData[file_i].file.userName;
+                        // practiceDay は annotationHintDataBase のインデックスに利用するため文字列化する．
+                        practiceDay = String() + chunkData[file_i].file.practiceDay;
+
+                        // (2) ファイル内のchunkData を1つずつ読み込み，データベースに格納．
+                        try{
+                            for(var chunkData_i in chunkData[file_i].file.chunkData){
+                                // chunkMiddleLine は chunk の中心位置と対応する音符列番号．これを annotation hint のインデックスとする．
+                                // オブジェクトアクセスを減らすために変数に格納．
+                                // オブジェクトのキーにするため文字列化．
+                                var chunkMiddleLine = String() + chunkData[file_i].file.chunkData[chunkData_i].chunkMiddleLine,
+                                    // chunkData obj の chunkType は hard や pattern のようになっているので，'Chunk' を末尾に連結．
+                                    chunkType = String() + chunkData[file_i].file.chunkData[chunkData_i].chunkType + 'Chunk',
+                                    objTemplate
+                                ;
+
+                                // annotationHintDataBase[chunkMiddleLine][chunkType] 以降のデータが undefined の場合は，
+                                // キー毎にオブジェクトを定義し初期化する．これを行わないと annotationHintDataBase[chunkMiddleLine][chunkType] 以降の
+                                // キーを  annotationHintDataBase[chunkMiddleLine][chunkType][userName][practiceDay][chunkData_i] = ~~ のように追加できない
+                                if(annotationHintDataBase[chunkMiddleLine][chunkType][userName] == undefined){
+                                    annotationHintDataBase[chunkMiddleLine][chunkType][userName] = {};
+                                    annotationHintDataBase[chunkMiddleLine][chunkType][userName][practiceDay] = {};
+                                    annotationHintDataBase[chunkMiddleLine][chunkType][userName][practiceDay][chunkData_i] =
+                                        chunkData[file_i].file.chunkData[chunkData_i]
+                                    ;
+                                }
+
+                            }
+                        }catch(e){
+                            console.log(e);
+                            console.log('chunkData個別処理でエラー．annotationHintDataBase を更新できません．');
+                        }
+                    }catch(e){
+                        console.log(e);
+                        console.log('chunkData全体処理でエラー．annotationHintDataBase を更新できません．');
+                    }
+
                 }
-            }
-            // console.log(chunkDataWithFileNameList);            
+            // console.log(chunkData);           
+            saveDbAsJson();
         });
+        }catch(e){
+            console.log(e);
+            console.log('readFilesAsyncでエラー．annotationHintDataBase を更新できません．');
+        }
+        
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -74,7 +113,7 @@ var AnnotationHintDataBaseProcessor = function(){
            if(err){
                console.log(err);
            }else{
-               console.log('data has written!');
+               console.log('AnnotationHintDataBase.json has written!');
            }
         });  
     };
@@ -87,5 +126,4 @@ var AnnotationHintDataBaseProcessor = function(){
 (function moduleTest(){
     var ahdbp = AnnotationHintDataBaseProcessor();
     ahdbp.createDataBase();
-    // ahdbp.saveDbAsJson();
 })();
