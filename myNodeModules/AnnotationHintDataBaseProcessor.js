@@ -12,10 +12,9 @@ var AnnotationHintDataBaseProcessor = function(){
     //////////////////////////////////////////////
     var extendedFs = require('./ExtendedFs.js'),
         scoreDataParser = require('./ScoreDataParser.js')('../ScoreData/TurcoScore.json'),
-        createDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDbAsJson, 
-        annotationHintDataBase = {
-            
-        }
+        uppdateDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDbAsJson, 
+        annotationHintDataBase = {},
+        uppdateDataBase_callback = null
     ;
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -42,11 +41,14 @@ var AnnotationHintDataBaseProcessor = function(){
     })();
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    createDataBase = function(){
+    uppdateDataBase = function(callback){
         // server モジュールから呼び出すメソッドのため，念入りに try-catch する．
         // ここでバグが発生しても，annotationHint データベース更新が不能になる以外のトラブルを
         // 起こさない(フォールトトレラント設計)．
         try{
+            
+            if(callback != undefined) uppdateDataBase_callback = callback;
+            
             extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){
                 // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
                 // (1) まず，ファイルを1つずつ読み込む．
@@ -109,21 +111,22 @@ var AnnotationHintDataBaseProcessor = function(){
     saveDbAsJson = function(){
         
         var strinfiedAnnotationHintDataBase = JSON.stringify(annotationHintDataBase);
-        extendedFs.writeFile('AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
+        extendedFs.writeFile('../AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
            if(err){
                console.log(err);
            }else{
+               if(uppdateDataBase_callback != null) uppdateDataBase_callback();
                console.log('AnnotationHintDataBase.json has written!');
            }
         });  
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    return {createDataBase:createDataBase, saveDbAsJson:saveDbAsJson};
+    return {uppdateDataBase:uppdateDataBase, saveDbAsJson:saveDbAsJson};
 };
 //})();
 
 (function moduleTest(){
     var ahdbp = AnnotationHintDataBaseProcessor();
-    ahdbp.createDataBase();
+    ahdbp.uppdateDataBase();
 })();
