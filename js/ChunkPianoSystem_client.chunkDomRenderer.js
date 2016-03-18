@@ -270,7 +270,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
         // チャンク終了位置はチャンクの右辺なので，left + width の位置で音符列をサーチする．
         searchLine= chunkDataGCL.left + chunkDataGCL.width;
         searchLine = parseInt(searchLine, 10);
-        chunkDataGCL.chunkTailLine = +getPositionByBruteForceSearch(searchStartLine, searchEndLine, parseInt(chunkDataGCL.left, 10), noteLine);
+        chunkDataGCL.chunkTailLine = +getPositionByBruteForceSearch(searchStartLine, searchEndLine, searchLine, noteLine);
         // chunk 中心音符列の算出．
         // これは annotationHintDataBase の作成時にインデックスとして利用する．
         chunkDataGCL.chunkMiddleLine = Math.floor((chunkDataGCL.chunkHeadLine + chunkDataGCL.chunkTailLine) / 2);
