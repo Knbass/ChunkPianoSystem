@@ -104,7 +104,6 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
     removeAnnotationHintDom = function(){
         $('.annotationHintWrapper').remove();
     };
-    
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     return{createAnnotationHintDom:createAnnotationHintDom, removeAnnotationHintDom:removeAnnotationHintDom};

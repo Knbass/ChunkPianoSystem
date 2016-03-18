@@ -33,9 +33,14 @@ var AnnotationHintDataBaseProcessor = function(){
         noteLineLength = parseInt(noteLinePosition.scoreCol[String() + Object.keys(noteLinePosition.scoreCol).length - 1].end, 10);
         
         for(var annoHintDB_noteLine_i = 0; annoHintDB_noteLine_i <= noteLineLength; annoHintDB_noteLine_i++){
-            annotationHintDataBase[String() + annoHintDB_noteLine_i] = null;
+            annotationHintDataBase[String() + annoHintDB_noteLine_i] = {
+                patternChunkCount:null,
+                phraseChunkCount:null,
+                hardChunkCount:null,
+                summaryChunkCount:null
+            };
         }        
-        console.log(annotationHintDataBase);
+        // console.log(annotationHintDataBase);
     })();
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -43,7 +48,25 @@ var AnnotationHintDataBaseProcessor = function(){
         console.log(chunkDataWithFileName);
     };
     //////////////////////////////////////////////
-    //////////////////////////////////////////////    
+    //////////////////////////////////////////////
+    createDataBase = function(){
+        extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkDomData){
+            chunkDataWithFileNameList = chunkDomData;
+            // chunkDataWithFileName は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
+            for(var file_i in chunkDataWithFileNameList){
+                chunkDataWithFileNameList[file_i].file = JSON.parse(chunkDataWithFileNameList[file_i].file);
+            
+                console.log(chunkDataWithFileNameList[file_i].file.userName);
+                
+                for(var chunkData_i in chunkDataWithFileNameList[file_i].file.chunkData){
+                    
+                }
+            }
+            // console.log(chunkDataWithFileNameList);            
+        });
+    };
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
     saveDbAsJson = function(){
         
         var strinfiedAnnotationHintDataBase = JSON.stringify(annotationHintDataBase);
@@ -53,22 +76,8 @@ var AnnotationHintDataBaseProcessor = function(){
            }else{
                console.log('data has written!');
            }
-        });
-        
+        });  
     };
-    //////////////////////////////////////////////
-    //////////////////////////////////////////////
-    createDataBase = function(){
-        extendedFs.readFilesAsync('../ChunkData', 'json', function(cData){
-            chunkDataWithFileNameList = cData;
-            // chunkDataWithFileName は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
-            for(var file_i in chunkDataWithFileNameList){
-                chunkDataWithFileNameList[file_i].file = JSON.parse(chunkDataWithFileNameList[file_i].file);
-            }
-            // console.log(chunkDataWithFileNameList);
-            // annotationHintDataBaseFactory(chunkDataWithFileNameList[0]);
-        });
-    };    
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     return {createDataBase:createDataBase, saveDbAsJson:saveDbAsJson};
