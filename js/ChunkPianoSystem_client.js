@@ -32,15 +32,14 @@ var ChunkPianoSystem_client = function(){
             hardChunkCount:0,
             summaryChunkCount:0,
             annotationDomRenderer:null,
-            annotationHintDomRenderer:null,
-            setPlayPosition:null
+            annotationHintDomRenderer:null
         }, 
         // todo: ステートレスなクラスメソッドは chunkDomRenderer = ChunkPianoSystem_client.chunkDomRenderer(globalMem)
-        //       と宣言し，chunkDomRenderer.createChunkDom(); と実行するように変更．名前空間の汚染を防ぐ．
+        //       などと宣言し，chunkDomRenderer.createChunkDom(); と実行するように変更．名前空間の汚染を防ぐ．
         // !!! グローバルメンバを宣言してからサブクラスのインスタンス化を行う
         initDomAction =  ChunkPianoSystem_client.initDomAction(globalMem).initDomAction
     ;
-    globalMem.setPlayPosition = ChunkPianoSystem_client.initDomAction(globalMem).setPlayPosition;
+    // 以下は globalMem を初期値として与えるため，globalMem オブジェクトを宣言した後に値を設定する．
     globalMem.chunkDomRenderer = ChunkPianoSystem_client.chunkDomRenderer(globalMem);
     globalMem.annotationDomRenderer = ChunkPianoSystem_client.annotationDomRenderer(globalMem); // annotationTextFlame を取得した後に実行すること．
     globalMem.annotationHintDomRenderer = ChunkPianoSystem_client.annotationHintDomRenderer(globalMem);

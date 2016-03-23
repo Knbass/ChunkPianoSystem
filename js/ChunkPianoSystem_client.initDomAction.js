@@ -358,5 +358,5 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         });
     };
     
-    return {initDomAction:initDomAction, setPlayPosition:setPlayPosition};
+    return {initDomAction:initDomAction};
 };
