@@ -4,9 +4,10 @@
 // todo: 現在はデータベースを利用していないため，AnnotationHintDataBase のサイズが大きくなるにつれて，
 //       メモリを圧迫し処理できなくなる．
 //       最終的には mongoDbに移行すること．
-
-// module.exports = (function(){
-var AnnotationHintDataBaseProcessor = function(){
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+module.exports = (function(){ // node module として利用する際はこちらを有効化
+// var AnnotationHintDataBaseProcessor = function(){ // // moduleTest の際はこちらを有効化
     'use strict'
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -123,10 +124,12 @@ var AnnotationHintDataBaseProcessor = function(){
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     return {uppdateDataBase:uppdateDataBase, saveDbAsJson:saveDbAsJson};
-};
-//})();
+// }; // moduleTest の際はこちらを有効化
+})();;// node module として利用する際はこちらを有効化
 
+/*
 (function moduleTest(){
     var ahdbp = AnnotationHintDataBaseProcessor();
     ahdbp.uppdateDataBase();
 })();
+*/
