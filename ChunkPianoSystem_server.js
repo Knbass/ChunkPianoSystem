@@ -8,6 +8,7 @@ var ChunkPianoSystem_server = function(){
         initHttpAndSocketIo,
         splitedIoi = [],
         scoreDataParser = require('./myNodeModules/ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
+        annotationHintDataBaseProcessor = require('./myNodeModules/AnnotationHintDataBaseProcessor.js'),
         noteLinePosition = scoreDataParser.getNoteLinePosition(),
         fs = require('fs'),
         http = require('http'),
@@ -108,6 +109,13 @@ var ChunkPianoSystem_server = function(){
                            status: 'success', // status は success, error, sameFileExist
                            message: 'チャンクデータの保存を\n完了しました'
                        });
+                       
+                       // chunkData 保存時に annotationHintDataBase も更新．
+                       // todo: annotationHintDataBase の更新をクライアントにどのように送信する?
+                       //       ヒントボタン が押された時でよい?
+                       annotationHintDataBaseProcessor.uppdateDataBase(function(){
+                           console.log('uppdateDataBase');   
+                       });
                    }
                 });
             });
@@ -160,6 +168,7 @@ var ChunkPianoSystem_server = function(){
         });
     };
     
+    // todo: ExtendFs を利用すること．
     // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
     // readdir は非同期実行なので次処理は callback で渡す．
     getChunkDataJsonList = function(directryPathGCDJL, callback){        
@@ -196,6 +205,11 @@ var ChunkPianoSystem_server = function(){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     constructor = function(){
+        
+        annotationHintDataBaseProcessor.uppdateDataBase(function(){
+            console.log('uppdateDataBase');   
+        });
+        
         initHttpAndSocketIo();
     };
     ///////////////////////////////////////////////

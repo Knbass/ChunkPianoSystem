@@ -12,7 +12,8 @@ module.exports = (function(){ // node module として利用する際はこち�
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     var extendedFs = require('./ExtendedFs.js'),
-        scoreDataParser = require('./ScoreDataParser.js')('../ScoreData/TurcoScore.json'),
+        scoreDataParser = require('./ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
+        //scoreDataParser = require('./ScoreDataParser.js')('../ScoreData/TurcoScore.json'),
         uppdateDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDbAsJson, 
         annotationHintDataBase = {},
         uppdateDataBase_callback = null
@@ -50,7 +51,8 @@ module.exports = (function(){ // node module として利用する際はこち�
             
             if(callback != undefined) uppdateDataBase_callback = callback;
             
-            extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){
+            // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){
+            extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData){
                 // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
                 // (1) まず，ファイルを1つずつ読み込む．
                 for(var file_i in chunkData){
