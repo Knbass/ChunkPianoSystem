@@ -3,7 +3,7 @@ module.exports = function(mode){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     var readIoiFile, getIoiMaxMin,
-        fs = require('fs')
+        extendedFs = require('ExtendedFs')
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
@@ -11,7 +11,7 @@ module.exports = function(mode){
     readIoiFile = function(fileName){        
         var ioi;
 
-        ioi = fs.readFileSync('./files/' + fileName, 'utf-8');
+        ioi = extendedFs.readFileSync('./files/' + fileName, 'utf-8');
         splitedIoi = ioi.split('\n');
         for(var i in splitedIoi){
            splitedIoi[i] = parseInt(splitedIoi[i], 10);

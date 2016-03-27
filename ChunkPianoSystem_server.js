@@ -10,7 +10,7 @@ var ChunkPianoSystem_server = function(){
         scoreDataParser = require('./myNodeModules/ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
         annotationHintDataBaseProcessor = require('./myNodeModules/AnnotationHintDataBaseProcessor.js'),
         noteLinePosition = scoreDataParser.getNoteLinePosition(),
-        fs = require('fs'),
+        extendedFs = require('./myNodeModules/ExtendedFs'),
         http = require('http'),
         socketIo = require('socket.io'), 
         io
@@ -41,25 +41,25 @@ var ChunkPianoSystem_server = function(){
             switch(extension){
                 case 'js':
                     res.writeHead(200, {'Content-Type':'text/javascript'});
-                    data = fs.readFileSync('./' + req.url, 'utf-8');
+                    data = extendedFs.readFileSync('./' + req.url, 'utf-8');
                     res.end(data);
                     break;
                 case 'css':
                     res.writeHead(200, {'Content-Type':'text/css'});
-                    data = fs.readFileSync('./' + req.url, 'utf-8');
+                    data = extendedFs.readFileSync('./' + req.url, 'utf-8');
                     res.end(data);
                     break;
                 case 'png':
                     // How to serve an image using nodejs
                     // http://stackoverflow.com/questions/5823722/how-to-serve-an-image-using-nodejs
                     res.writeHead(200, {'Content-Type':'image/png'});
-                    data = fs.readFileSync('./' + req.url); // png なので utf-8 で読み込んではいけない．
+                    data = extendedFs.readFileSync('./' + req.url); // png なので utf-8 で読み込んではいけない．
                     res.end(data, 'binary');
                     break;
                 //default:
                 case '/':
                     res.writeHead(200, {'Content-Type':'text/html'});
-                    data = fs.readFileSync('./ChunkPianoSystem.html', 'utf-8');
+                    data = extendedFs.readFileSync('./ChunkPianoSystem.html', 'utf-8');
                     res.end(data);
                     break;
             }
@@ -96,7 +96,7 @@ var ChunkPianoSystem_server = function(){
                 
                 data.chunkDataObj = JSON.stringify(data.chunkDataObj); // chunkDataObj を JSONに変換
                 
-                fs.writeFile(fileName, data.chunkDataObj, function(err){
+                extendedFs.writeFile(fileName, data.chunkDataObj, function(err){
                    if(err){
                        console.log(err);
                        socket.emit('chunkDataSaveRes',{
@@ -144,7 +144,7 @@ var ChunkPianoSystem_server = function(){
                 var reqestedChunkData;
                 
                 try{
-                    reqestedChunkData = fs.readFileSync('./ChunkData/' + data.requestChunkDataFileName, 'utf-8');
+                    reqestedChunkData = extendedFs.readFileSync('./ChunkData/' + data.requestChunkDataFileName, 'utf-8');
                     socket.emit('reqestedChunkData',{
                         status: 'success', // status は success, error, sameFileExist
                         message: 'チャンクデータの読み込みを\n完了しました',
@@ -176,7 +176,7 @@ var ChunkPianoSystem_server = function(){
     // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
     // readdir は非同期実行なので次処理は callback で渡す．
     getChunkDataJsonList = function(directryPathGCDJL, callback){        
-        fs.readdir(directryPathGCDJL, function(err, files){    
+        extendedFs.readdir(directryPathGCDJL, function(err, files){    
             try{
             
                 if (err) throw err;

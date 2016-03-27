@@ -13,7 +13,7 @@ module.exports = (function(){ // node module として利用する際はこち�
     //////////////////////////////////////////////
     var extendedFs = require('./ExtendedFs.js'),
         scoreDataParser = require('./ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
-        //scoreDataParser = require('./ScoreDataParser.js')('../ScoreData/TurcoScore.json'),
+        // scoreDataParser = require('./ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
         uppdateDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDbAsJson, 
         annotationHintDataBase = {},
         uppdateDataBase_callback = null
@@ -112,7 +112,6 @@ module.exports = (function(){ // node module として利用する際はこち�
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     saveDbAsJson = function(){
-        
         var strinfiedAnnotationHintDataBase = JSON.stringify(annotationHintDataBase);
         // extendedFs.writeFile('../AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
         extendedFs.writeFile('./AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
