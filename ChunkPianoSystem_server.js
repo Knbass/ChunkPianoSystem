@@ -78,11 +78,13 @@ var ChunkPianoSystem_server = function(){
         ///////////////////////////////////////////////
         /////////////////////////////////////////////// 
         io.sockets.on('connection', function(socket){
-
+            ///////////////////////////////////////////////
+            /////////////////////////////////////////////// 
             socket.on('reqNoteLinePosition', function(data){
                 socket.emit('noteLinePosition', {noteLinePosition:noteLinePosition});
             });
-            
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////             
             socket.on('chunkSaveReq', function(data){ // data は chunkDataObj
                 
                 var fileName = '';
@@ -119,7 +121,8 @@ var ChunkPianoSystem_server = function(){
                    }
                 });
             });
-            
+            ///////////////////////////////////////////////
+            /////////////////////////////////////////////// 
             socket.on('chunkFileNameReq', function(data){
                 
                 getChunkDataJsonList('./ChunkData/', function(fileNameList, e){
@@ -135,7 +138,8 @@ var ChunkPianoSystem_server = function(){
                     }
                 });
             });
-            
+            ///////////////////////////////////////////////
+            /////////////////////////////////////////////// 
             socket.on('chunkDataReq', function(data){
                 var reqestedChunkData;
                 

@@ -51,7 +51,7 @@ module.exports = (function(){ // node module として利用する際はこち�
             
             if(callback != undefined) uppdateDataBase_callback = callback;
             
-            // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){
+            // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){ // moduleTest の時
             extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData){
                 // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
                 // (1) まず，ファイルを1つずつ読み込む．
@@ -114,12 +114,15 @@ module.exports = (function(){ // node module として利用する際はこち�
     saveDbAsJson = function(){
         
         var strinfiedAnnotationHintDataBase = JSON.stringify(annotationHintDataBase);
-        extendedFs.writeFile('../AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
+        // extendedFs.writeFile('../AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
+        extendedFs.writeFile('./AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
            if(err){
                console.log(err);
            }else{
                if(uppdateDataBase_callback != null) uppdateDataBase_callback();
-               console.log('AnnotationHintDataBase.json has written!');
+               console.log('////////////////////////////////');
+               console.log('AnnotationHintDataBase updated.');
+               console.log('////////////////////////////////');
            }
         });  
     };
