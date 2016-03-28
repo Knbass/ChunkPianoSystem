@@ -34,16 +34,16 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         //       サーバで annotation hint db を作成するモジュールを作成．
         //       annotation hint の chunktype を表示するようにする．
         // アノテーションヒントの dom は creadAndAppendAnnotationHintTxtDom で生成する．
-        creadAndAppendAnnotationHintTxtDom('上田', 'コードがずっとA minor なので同じ運指を繰り返すだけで良い．', 
-                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        creadAndAppendAnnotationHintTxtDom('岩淵', 'スタッカートを意識しながら跳ねるように演奏すると上手くいく．', 
-                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        creadAndAppendAnnotationHintTxtDom('Okura', 'ここは小指，人差し指，親指で演奏すると鍵盤を見なくても弾けた．', 
-                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        creadAndAppendAnnotationHintTxtDom('Kobayashi', '同じ運指の連続で左手は簡単．右手に意識を集中する．', 
-                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        creadAndAppendAnnotationHintTxtDom('Mito', '最後の部分だけ左手のパターンが変わるので要注意!', 
-                                           annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        //creadAndAppendAnnotationHintTxtDom('上田', 'コードがずっとA minor なので同じ運指を繰り返すだけで良い．', 
+        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        //creadAndAppendAnnotationHintTxtDom('岩淵', 'スタッカートを意識しながら跳ねるように演奏すると上手くいく．', 
+        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        //creadAndAppendAnnotationHintTxtDom('Okura', 'ここは小指，人差し指，親指で演奏すると鍵盤を見なくても弾けた．', 
+        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        //creadAndAppendAnnotationHintTxtDom('Kobayashi', '同じ運指の連続で左手は簡単．右手に意識を集中する．', 
+        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        //creadAndAppendAnnotationHintTxtDom('Mito', '最後の部分だけ左手のパターンが変わるので要注意!', 
+        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
         
         annotationHintWrapperDom.append(annotationHintListWrapperDom);
             

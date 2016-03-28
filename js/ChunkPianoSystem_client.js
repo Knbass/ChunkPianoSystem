@@ -12,6 +12,7 @@ var ChunkPianoSystem_client = function(){
             annotationTextFlame:$('#annotationTextFlame'), // todo: このメンバは annotationRenderer でしか使わない場合は annotationRenderer に単独で与える．
             socketIo:null,
             reqNoteLinePosition:null,
+            reqAnnotationHint:null,
             turnNotEditedMode:null, // 後方参照ができないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
             chunkDomRenderer:null,
             isFromLoadChunkButton:false,
@@ -67,7 +68,9 @@ var ChunkPianoSystem_client = function(){
     ///////////////////////////////////////////////
     initSocketIo = function(callback){
         
-        var reqNoteLinePositionCallback = null;
+        var reqNoteLinePositionCallback = null, 
+            reqAnnotationHintCallback   = null
+        ;
         // globalMem.socketIo = io.connect('http://127.0.0.1:3001');
         globalMem.socketIo = io.connect();
         ///////////////////////////////////////////////
@@ -91,6 +94,20 @@ var ChunkPianoSystem_client = function(){
                 reqNoteLinePositionCallback();
                 reqNoteLinePositionCallback = null; // これを行わなければ reqNoteLinePositionCallback が null でも実行されバグる．
             }
+        });
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        globalMem.reqAnnotationHint = function(chunkDataRAH, annotationHintSearchOptionRAH, callback){ 
+            // chunkData はユーザがクリックしたhintボタンと関連する chunk の chunkData. 
+            globalMem.socketIo.emit('annotationHintReq', {chunkData:chunkDataRAH, annotationHintSearchOption:annotationHintSearchOptionRAH});
+            if(callback){reqAnnotationHintCallback = callback;}
+        };
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        globalMem.socketIo.on('annotationHint', function(data){ // ユーザが hint ボタンを押下し要求した annotation hint が返却された際の動作．
+            
+            console.log(data);
+            // if(reqAnnotationHintCallback) reqAnnotationHintCallback(err, hintChunkData);
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////

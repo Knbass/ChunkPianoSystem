@@ -158,6 +158,26 @@ var ChunkPianoSystem_server = function(){
                     });
                 }
             });
+            ///////////////////////////////////////////////
+            /////////////////////////////////////////////// 
+            socket.on('annotationHintReq', function(data){
+                var searchResult = annotationHintDataBaseProcessor.search(data.chunkData, data.annotationHintSearchOption);
+                // 検索中に error が発生した際は文字列 'error' が返却される．
+
+                if(searchResult != 'error'){
+                    socket.emit('annotationHint',{
+                        status: 'success',
+                        message: 'ヒントアノテーションを受信しました',
+                        searchResult:searchResult
+                    });
+                }else{
+                    socket.emit('annotationHint',{
+                        status: 'error',
+                        message: 'ヒントアノテーションの受信に失敗しました',
+                        searchResult:searchResult
+                    });
+                }
+            });
             // io.sockets.emit では自分以外の全員に emit してしまう... 
             // 参考: http://www.tettori.net/post/852/ , http://blog.choilabo.com/20120320/31
             // io.sockets.emit  　→ 自分を含む全員にデータを送信する.

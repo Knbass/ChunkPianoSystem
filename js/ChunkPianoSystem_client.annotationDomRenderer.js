@@ -114,15 +114,33 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             var parentAnnotationDom = $(this).parent(),
                 parentAnnotationDomId = parentAnnotationDom[0].id,
                 splitedParentAnnotationDomId = parentAnnotationDomId.split('_'),
-                chunkData = null
+                chunkData = null,
+                annotationHintSearchOption = { // サーバで annotationHint をサーチする際のオプション
+                    patternChunk:true, // patternChunk をサーチ対象に入れるか否か．
+                    phraseChunk :true,
+                    hardChunk   :true,
+                    summaryChunk:true,
+                    margin      :5,    // chunk の chunkMiddleLine から +- いくつまで検索対象に入れるか．
+                    order       :'normal' // todo: 何を優先して検索するかを指定して検索できるようにする．normal はdbのインデックス順にそのまま返却するモード．
+                }
             ;
             splitedParentAnnotationDomId = String() + splitedParentAnnotationDomId[1] + '_' + splitedParentAnnotationDomId[2];
+            // ↑ は例えば patternChunk_0 のようになる．
             chunkData = globalMemCPSADR.chunkDataObj.chunkData[splitedParentAnnotationDomId];
+            // 念のため，chunkData にも id 情報を持たせておく．
             if(chunkData.chunkDomId == undefined || chunkData.chunkDomId == null){
                 chunkData.chunkDomId = splitedParentAnnotationDomId;
             }
             
-            globalMemCPSADR.annotationHintDomRenderer.createAnnotationHintDom(parentAnnotationDom, chunkData);
+            chunkData.userName = globalMemCPSADR.chunkDataObj.userName;
+            
+            globalMemCPSADR.reqAnnotationHint(chunkData, annotationHintSearchOption, function(err, hintChunkData){
+                if(err){
+                    console.error('reqAnnotationHint');
+                }else{
+                    // globalMemCPSADR.annotationHintDomRenderer.createAnnotationHintDom(parentAnnotationDom, chunkData);
+                }
+            });
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
