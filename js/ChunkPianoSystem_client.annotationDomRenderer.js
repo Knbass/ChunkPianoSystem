@@ -134,11 +134,12 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             
             chunkData.userName = globalMemCPSADR.chunkDataObj.userName;
             
-            globalMemCPSADR.reqAnnotationHint(chunkData, annotationHintSearchOption, function(err, hintChunkData){
-                if(err){
-                    console.error('reqAnnotationHint');
+            globalMemCPSADR.reqAnnotationHint(chunkData, annotationHintSearchOption, function(status, hintChunkData){
+                if(status == 'error'){
+                    console.error('error occured in reqAnnotationHint');
                 }else{
-                    // globalMemCPSADR.annotationHintDomRenderer.createAnnotationHintDom(parentAnnotationDom, chunkData);
+                    // console.log(hintChunkData);
+                    globalMemCPSADR.annotationHintDomRenderer.createAnnotationHintDom(parentAnnotationDom, hintChunkData);
                 }
             });
         });

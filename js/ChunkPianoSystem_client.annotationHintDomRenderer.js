@@ -5,7 +5,7 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
     var createAnnotationHintDom, removeAnnotationHintDom, creadAndAppendAnnotationHintTxtDom;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    createAnnotationHintDom = function(parentAnnotationDomCAHD, chunkDataCAHD){ 
+    createAnnotationHintDom = function(parentAnnotationDomCAHD, hintChunkDataCAHD){ 
         
         var annotationHintWrapperDom, annotationHintInstDom, annotationHintDeleteButtonDom, 
             annotationHintListWrapperDom, annotationHintListDom, hintAnnotationUserNameDom, refBtnDom, annotationHintTxtDom,
@@ -40,10 +40,24 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
         //creadAndAppendAnnotationHintTxtDom('Okura', 'ここは小指，人差し指，親指で演奏すると鍵盤を見なくても弾けた．', 
         //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        //creadAndAppendAnnotationHintTxtDom('Kobayashi', '同じ運指の連続で左手は簡単．右手に意識を集中する．', 
-        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        //creadAndAppendAnnotationHintTxtDom('Mito', '最後の部分だけ左手のパターンが変わるので要注意!', 
-        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
+        
+        // hdb とは annotationHintDataBase を意味する．
+        // annotationHintDataBase のキーの従い annotationHintDataBase を探索し annotationHintDom を描画
+        for(var hDbLine in hintChunkDataCAHD){ 
+            for(var hDbChunkType in hintChunkDataCAHD[hDbLine]){
+                for(var hDbUserName in hintChunkDataCAHD[hDbLine][hDbChunkType]){
+                    for(var hDbPracticeDay in hintChunkDataCAHD[hDbLine][hDbChunkType][hDbUserName]){
+                        for(var hDbChunkData in hintChunkDataCAHD[hDbLine][hDbChunkType][hDbUserName][hDbPracticeDay]){
+                            creadAndAppendAnnotationHintTxtDom(
+                                hDbUserName, 
+                                hintChunkDataCAHD[hDbLine][hDbChunkType][hDbUserName][hDbPracticeDay][hDbChunkData].chunkAnnotationText, 
+                                annotationHintListWrapperDom, parentAnnotationDomCAHD
+                            );
+                        } 
+                    }          
+                }          
+            }  
+        }
         
         annotationHintWrapperDom.append(annotationHintListWrapperDom);
             
