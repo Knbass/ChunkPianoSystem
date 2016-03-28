@@ -38,8 +38,6 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
         //creadAndAppendAnnotationHintTxtDom('岩淵', 'スタッカートを意識しながら跳ねるように演奏すると上手くいく．', 
         //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        //creadAndAppendAnnotationHintTxtDom('Okura', 'ここは小指，人差し指，親指で演奏すると鍵盤を見なくても弾けた．', 
-        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
         
         // hdb とは annotationHintDataBase を意味する．
         // annotationHintDataBase のキーの従い annotationHintDataBase を探索し annotationHintDom を描画
@@ -49,7 +47,7 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
                     for(var hDbPracticeDay in hintChunkDataCAHD[hDbLine][hDbChunkType][hDbUserName]){
                         for(var hDbChunkData in hintChunkDataCAHD[hDbLine][hDbChunkType][hDbUserName][hDbPracticeDay]){
                             creadAndAppendAnnotationHintTxtDom(
-                                hDbUserName, 
+                                hDbUserName + 'さん，' + hDbPracticeDay + '日目', // todo: 練習日数の表示は別domで行う方が良いかもしれない．
                                 hintChunkDataCAHD[hDbLine][hDbChunkType][hDbUserName][hDbPracticeDay][hDbChunkData].chunkAnnotationText, 
                                 annotationHintListWrapperDom, parentAnnotationDomCAHD
                             );
@@ -83,7 +81,7 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
 
         var 
             annotationHintListDom = $('<div class="annotationHintList fade"></div>'),
-            hintAnnotationUserNameDom = $('<p class="hintAnnotationUserName">' + annotationUserName + ' さん</p>'),
+            hintAnnotationUserNameDom = $('<p class="hintAnnotationUserName">' + annotationUserName + '</p>'),
             annotationHintTxtDom = $('<textarea class="annotationHintTxt" cols="50" rows="2" readonly>' + String() + innerText + '</textarea>'),
             refBtnDom = $('<div class="button refBtn">引用する</div>')
         ;
