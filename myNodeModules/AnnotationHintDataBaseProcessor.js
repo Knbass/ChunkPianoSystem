@@ -18,7 +18,6 @@ module.exports = (function(){ // node module として利用する際はこち�
         colors = require('colors'), // 色付きで console.log するモジュール．
         sys = require('sys'),       // node.js の標準入出力モジュール．
         annotationHintDataBase = {},
-        uppdateDataBase_callback = null,
         // noteLinePosition の scoreCol(音符列の何段目までが譜面の何段目に格納されているかの情報を格納) の中から，
         // 最後尾の譜面段の最後尾の音符列を取り出す．つまり，音符列の最大値を取得する．
         // noteLineLength は複数のメソッドで利用するため，モジュールグローバルスコープで宣言．
@@ -48,9 +47,7 @@ module.exports = (function(){ // node module として利用する際はこち�
         // 起こさない(フォールトトレラント設計)．
         try{
             initAnnotationHintDataBase(); // AnnotationHintDataBase の雛形を生成してからデータベースを構成．
-            
-            if(callback != undefined) uppdateDataBase_callback = callback;
-            
+                        
             // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){  // moduleTest 時のファイルパス
             extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData){
                 // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
@@ -100,8 +97,11 @@ module.exports = (function(){ // node module として利用する際はこち�
                     }
 
                 }
-            // console.log(chunkData);           
-            saveDataBaseAsJson();
+                // console.log(chunkData);           
+                
+                // 最新の annotationHintDataBase はメモリ内で構成されているため，最新の database を saveDataBaseAsJson で
+                // 保存してから loadDataBase する必要はない．
+                saveDataBaseAsJson(callback);
         });
         }catch(e){
             console.log(e);
@@ -190,14 +190,14 @@ module.exports = (function(){ // node module として利用する際はこち�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    saveDataBaseAsJson = function(){
+    saveDataBaseAsJson = function(callback){
         var strinfiedAnnotationHintDataBase = JSON.stringify(annotationHintDataBase);
         // extendedFs.writeFile('../AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){ // moduleTest 時のファイルパス
         extendedFs.writeFile('./AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
            if(err){
                console.log(err);
            }else{
-               if(uppdateDataBase_callback != null) uppdateDataBase_callback();
+               if(callback) callback();
                sys.puts('AnnotationHintDataBase updated.'.green);
            }
         });  
@@ -209,7 +209,7 @@ module.exports = (function(){ // node module として利用する際はこち�
             annotationHintDataBase = extendedFs.readFileSync('./AnnotationHintDataBase.json', 'utf-8');
             // annotationHintDataBase = extendedFs.readFileSync('../UserDataBase.json', 'utf-8'); // moduleTest 時のファイルパス
             annotationHintDataBase = JSON.parse(annotationHintDataBase);
-            if(callback != null || callback != undefined) callback();
+            if(callback) callback();
             sys.puts('AnnotationHintDataBase loaded.'.green);
         }catch(e){
             console.log(e);

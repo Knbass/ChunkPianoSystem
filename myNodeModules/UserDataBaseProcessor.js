@@ -6,7 +6,7 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     'use strict'
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    var constructor, initDataBase, loadDataBase, saveDataBaseAsJson, uppdateDataBase_callback,
+    var constructor, initDataBase, loadDataBase, saveDataBaseAsJson, addUserData,
         extendedFs = require('./ExtendedFs.js'), 
         colors = require('colors'), // 色付きで console.log するモジュール．
         sys = require('sys'),       // node.js の標準入出力モジュール．
@@ -20,28 +20,29 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    saveDataBaseAsJson = function(){
+    saveDataBaseAsJson = function(callback){
         var strinfiedUserDataBase = JSON.stringify(userDataBase);
 
         extendedFs.writeFile('../UserDataBase.json', strinfiedUserDataBase, function(err){
            if(err){
                console.log(err);
            }else{
-               if(uppdateDataBase_callback != null) uppdateDataBase_callback();
+               if(callback) callback();
                sys.puts('UserDataBase updated.' .green);
            }
         });
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // json 形式の userDataBase を読み込みパースする．
     loadDataBase = function(callback){
         try{
             // userDataBase = extendedFs.readFileSync('./UserDataBase.json', 'utf-8');
             userDataBase = extendedFs.readFileSync('../UserDataBase.json', 'utf-8'); // moduleTest 時のファイルパス
             userDataBase = JSON.parse(userDataBase);
-            if(callback != null || callback != undefined) callback();
+            if(callback) callback();
             sys.puts('UserDataBase loaded.'.green);
-            console.log(userDataBase);
+            // console.log(userDataBase);
         }catch(e){
             console.log(e);
             sys.puts('Error occured in loadDataBase.'.red);
@@ -51,8 +52,28 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // userDataAUD は {'userName':'userName', 'userPassword':'userPassword'} という形式を取る．
+    // userName が既に存在している場合は false を return. 
+    addUserData = function(userDataAUD){
+        // userName が既に存在している場合は false を return. 
+        if(userDataBase.hasOwnProperty(userDataAUD.userName) == false){
+            return false;
+        }else{
+            userDataBase[userDataAUD.userName] = userDataAUD.userPassword;
+            sys.puts('added userData to UserDataBase.'.green);
+            
+            console.log(userDataAUD);
+            // 最新の userDataBase はメモリ内で構成されているため，最新の database を saveDataBaseAsJson で
+            // 保存してから loadDataBase する必要はない．
+            saveDataBaseAsJson(); 
+        }
+    };
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
     (constructor = function(){
+        // 初期化時に UserDataBase.json をメモリに読込．
         loadDataBase();
+        console.log(userDataBase);
     })();
     //////////////////////////////////////////////
     //////////////////////////////////////////////    
