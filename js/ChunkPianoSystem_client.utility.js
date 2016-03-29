@@ -42,7 +42,6 @@ ChunkPianoSystem_client.utility = function(){
     };
     ////////////////////////////////////////////
     ////////////////////////////////////////////
-    // private. 引数... 適用するエレメント
     removeDruggAndDropEvent = function(elementADADE){
         
         try{            
@@ -83,7 +82,7 @@ ChunkPianoSystem_client.utility = function(){
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 
     return {appendDruggAndDropEvent:appendDruggAndDropEvent, 
-            removeDruggAndDropEvent:appendDruggAndDropEvent,
+            removeDruggAndDropEvent:removeDruggAndDropEvent,
             getElementPosition:getElementPosition
            }
     ;

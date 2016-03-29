@@ -118,7 +118,7 @@ module.exports = (function(){ // node module として利用する際はこち�
        // patternChunk:true, // patternChunk をサーチ対象に入れるか否か．
        // phraseChunk :true,
        // hardChunk   :true,
-       //summaryChunk:true,
+       // summaryChunk:true,
        // margin      :5,    // chunk の chunkMiddleLine から +- いくつまで検索対象に入れるか．
        // order       :'normal' // todo: 何を優先して検索するかを指定して検索できるようにする．normal はdbのインデックス順にそのまま返却するモード．
     // }

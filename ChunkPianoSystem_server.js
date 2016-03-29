@@ -159,7 +159,7 @@ var ChunkPianoSystem_server = function(){
                 }
             });
             ///////////////////////////////////////////////
-            /////////////////////////////////////////////// 
+            ///////////////////////////////////////////////
             socket.on('annotationHintReq', function(data){
                 var searchResult = annotationHintDataBaseProcessor.search(data.chunkData, data.annotationHintSearchOption);
                 // 検索中に error が発生した際は文字列 'error' が返却される．
