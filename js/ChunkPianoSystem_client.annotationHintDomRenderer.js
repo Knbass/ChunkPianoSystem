@@ -114,7 +114,12 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     removeAnnotationHintDom = function(){
-        $('.annotationHintWrapper').remove();
+        try{
+            $('.annotationHintWrapper').remove();
+        }catch(e){
+            console.log(e);   
+            console.error('Error occured in removeAnnotationHintDom.');
+        }
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////

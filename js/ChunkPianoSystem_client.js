@@ -204,9 +204,7 @@ var ChunkPianoSystem_client = function(){
         $(window).unload(function(){
         });     
         
-        if(callback){
-            callback();
-        }
+        if(callback) callback();
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////

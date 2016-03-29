@@ -107,11 +107,13 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                     // html の chunkDom の削除と同時に オブジェクトのデータ構造内の該当する chunkDom も削除．
                     // !!!! ChunkDom 関連の実装を拡張する際は，オブジェクトのデータ構造とDOMの状態をバラバラにしないように細心の注意を !!!!
                     delete globalMemCPSDDR.chunkDataObj.chunkData[parentChunkDomId];
-                    globalMemCPSDDR.isEditedByChunkMovingOrDelete = true;
                     
+                    globalMemCPSDDR.isEditedByChunkMovingOrDelete = true; // 編集モードを編集済に変更．別ファイルロード時に保存の確認を行う．
+                    // chunk が消された状態で chunk の頭出し位置を更新する．
                     globalMemCPSDDR.chunkHeadLinePositions = getSortedChunkHeadLine(globalMemCPSDDR.chunkDataObj.chunkData);
-                    
                     console.log(globalMemCPSDDR.chunkDataObj);
+                    // annotation hint 表示中に chunk が消去された際は annotationHintDom を削除．
+                    globalMemCPSDDR.annotationHintDomRenderer.removeAnnotationHintDom();
                 });
 
                 chunkDom.append(chunkDomDelBtn);
@@ -197,6 +199,8 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
                 });
                 return 0; // return しないと render が2度実行されてしまう．
             }
+            // chunk 描画時は annotation hint が表示されていると重なってしまうので，chunk 描画前に annotationHintDom を削除する．
+            globalMemCPSDDR.annotationHintDomRenderer.removeAnnotationHintDom();
             // console.log(globalMemCPSDDR.noteLinePosition);
             render(); // 上記if文より下で実行すること．実行順序を入れ替えると，noteLinePosition を再受信した際に render が2度実行される．
         }else{

@@ -230,11 +230,20 @@ var ChunkPianoSystem_server = function(){
     ///////////////////////////////////////////////
     constructor = function(){
         
-        annotationHintDataBaseProcessor.uppdateDataBase(function(){
-            console.log('uppdateDataBase');   
+        /*
+        // サーバ起動時に AnnotationHintDataBase を更新せずに起動する場合はこちらを有効化．
+        // この場合，サーバ起動時に AnnotationHintDataBase が構成されている必要がある．
+        annotationHintDataBaseProcessor.loadDataBase(function(){
+            initHttpAndSocketIo();
         });
+        */
         
-        initHttpAndSocketIo();
+        // サーバ起動時に AnnotationHintDataBase を更新してから起動する場合はこちらを有効化．
+        // この場合，AnnotationHintDataBase が構成されていなくても実行可能．
+        // サーバ負荷を気にしなくて良い場合はこちらで起動すること．
+        annotationHintDataBaseProcessor.uppdateDataBase(function(){
+            initHttpAndSocketIo();
+        });
     };
     ///////////////////////////////////////////////
     /////////////////////////////////////////////// 

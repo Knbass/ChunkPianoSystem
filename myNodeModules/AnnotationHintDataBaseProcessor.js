@@ -1,6 +1,6 @@
 // AnnotationHintDataBase の初期化，更新を行うモジュール．
-// このモジュールは状態を持つため， constructor で初期化してから
-// 利用すること．
+// このモジュールは json を db として利用しているため，loadDataBase または uppdateDataBase で
+// db をメモリに読み出してから利用すること．
 // todo: 現在はデータベースを利用していないため，AnnotationHintDataBase のサイズが大きくなるにつれて，
 //       メモリを圧迫し処理できなくなる．
 //       最終的には mongoDbに移行すること．
@@ -14,24 +14,22 @@ module.exports = (function(){ // node module として利用する際はこち�
     var extendedFs = require('./ExtendedFs.js'),
         scoreDataParser = require('./ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
         // scoreDataParser = require('./ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
-        uppdateDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDbAsJson, search,
+        uppdateDataBase, loadDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDataBaseAsJson, search,
         colors = require('colors'), // 色付きで console.log するモジュール．
         sys = require('sys'),       // node.js の標準入出力モジュール．
         annotationHintDataBase = {},
         uppdateDataBase_callback = null,
-        noteLineLength = 0
+        // noteLinePosition の scoreCol(音符列の何段目までが譜面の何段目に格納されているかの情報を格納) の中から，
+        // 最後尾の譜面段の最後尾の音符列を取り出す．つまり，音符列の最大値を取得する．
+        // noteLineLength は複数のメソッドで利用するため，モジュールグローバルスコープで宣言．
+        noteLinePosition = scoreDataParser.getNoteLinePosition(),
+        noteLineLength = parseInt(noteLinePosition.scoreCol[String() + Object.keys(noteLinePosition.scoreCol).length - 1].end, 10)
     ;
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     // todo: noteLinePosition から全音符番号を取得し，annotationHintDataBase を初期化．
     // todo: クライアントサイドで chunkDom に自身が所属する譜面行番号を付与する処理を行う． 
-    (initAnnotationHintDataBase = function(){
-        var noteLinePosition = scoreDataParser.getNoteLinePosition();
-        // noteLinePosition の scoreCol(音符列の何段目までが譜面の何段目に格納されているかの情報を格納) の中から，
-        // 最後尾の譜面段の最後尾の音符列を取り出す．
-        // つまり，音符列の最大値を取得している．
-        noteLineLength = parseInt(noteLinePosition.scoreCol[String() + Object.keys(noteLinePosition.scoreCol).length - 1].end, 10);
-        
+    initAnnotationHintDataBase = function(){
         for(var annoHintDB_noteLine_i = 0; annoHintDB_noteLine_i <= noteLineLength; annoHintDB_noteLine_i++){
             annotationHintDataBase[String() + annoHintDB_noteLine_i] = {
                 patternChunk:{}, // 後で変数を利用してオブジェクトキーを追加するので null で初期化してはいけない．
@@ -41,7 +39,7 @@ module.exports = (function(){ // node module として利用する際はこち�
             };
         }
         // console.log(annotationHintDataBase);
-    })();
+    };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     uppdateDataBase = function(callback){
@@ -49,10 +47,11 @@ module.exports = (function(){ // node module として利用する際はこち�
         // ここでバグが発生しても，annotationHint データベース更新が不能になる以外のトラブルを
         // 起こさない(フォールトトレラント設計)．
         try{
+            initAnnotationHintDataBase(); // AnnotationHintDataBase の雛形を生成してからデータベースを構成．
             
             if(callback != undefined) uppdateDataBase_callback = callback;
             
-            // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){ // moduleTest の時
+            // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){  // moduleTest 時のファイルパス
             extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData){
                 // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
                 // (1) まず，ファイルを1つずつ読み込む．
@@ -102,7 +101,7 @@ module.exports = (function(){ // node module として利用する際はこち�
 
                 }
             // console.log(chunkData);           
-            saveDbAsJson();
+            saveDataBaseAsJson();
         });
         }catch(e){
             console.log(e);
@@ -111,6 +110,18 @@ module.exports = (function(){ // node module として利用する際はこち�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // AnnotationHintDataBase の検索用メソッド．
+    // 引数 chunkData 内のチャンク中央の音符列番号 chunkMiddleLine などをキーに関連するアノテーションを検索．
+    // 引数 option はクライアントの ChunkPianoSystem_client.annotationDomRenderer.js で指定された検索オプション．
+    // option の例...
+    // annotationHintSearchOption = { // サーバで annotationHint をサーチする際のオプション
+       // patternChunk:true, // patternChunk をサーチ対象に入れるか否か．
+       // phraseChunk :true,
+       // hardChunk   :true,
+       //summaryChunk:true,
+       // margin      :5,    // chunk の chunkMiddleLine から +- いくつまで検索対象に入れるか．
+       // order       :'normal' // todo: 何を優先して検索するかを指定して検索できるようにする．normal はdbのインデックス順にそのまま返却するモード．
+    // }
     search = function(chunkData, option){
         try{        
             var searchRangeMin = chunkData.chunkMiddleLine - option.margin,
@@ -118,7 +129,8 @@ module.exports = (function(){ // node module として利用する際はこち�
                 searchResult = {},
                 tmp_searchedNoteLine
             ;
-
+            console.log(annotationHintDataBase);
+            
             // searchRangeMin が 0 以下の場合は検索不可なので 0 に修正
             if(searchRangeMin < 0){
                 searchRangeMin = 0;
@@ -167,6 +179,8 @@ module.exports = (function(){ // node module として利用する際はこち�
                     }
                 }
             }
+            
+            // 条件に適合する検索結果が無い場合は {} が return される．
             // console.log(searchResult);
             return searchResult;
         }catch(e){
@@ -176,9 +190,9 @@ module.exports = (function(){ // node module として利用する際はこち�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    saveDbAsJson = function(){
+    saveDataBaseAsJson = function(){
         var strinfiedAnnotationHintDataBase = JSON.stringify(annotationHintDataBase);
-        // extendedFs.writeFile('../AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
+        // extendedFs.writeFile('../AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){ // moduleTest 時のファイルパス
         extendedFs.writeFile('./AnnotationHintDataBase.json', strinfiedAnnotationHintDataBase, function(err){
            if(err){
                console.log(err);
@@ -190,8 +204,24 @@ module.exports = (function(){ // node module として利用する際はこち�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    return {uppdateDataBase:uppdateDataBase, search:search};
-// }; // moduleTest の際はこちらを有効化
+    loadDataBase = function(callback){
+        try{
+            annotationHintDataBase = extendedFs.readFileSync('./AnnotationHintDataBase.json', 'utf-8');
+            // annotationHintDataBase = extendedFs.readFileSync('../UserDataBase.json', 'utf-8'); // moduleTest 時のファイルパス
+            annotationHintDataBase = JSON.parse(annotationHintDataBase);
+            if(callback != null || callback != undefined) callback();
+            sys.puts('AnnotationHintDataBase loaded.'.green);
+        }catch(e){
+            console.log(e);
+            sys.puts('Error occured in loadDataBase.'.red);
+            sys.puts('AnnotationHintDataBase が構成されていない可能性があります.'.red);
+            sys.puts('uppdateDataBase で起動してください．'.red);
+        }
+    };
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
+    return {loadDataBase:loadDataBase, uppdateDataBase:uppdateDataBase, search:search};
+// }; // moduleTest の際はこちらを有効化.
 })();;// node module として利用する際はこちらを有効化
 
 /*
