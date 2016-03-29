@@ -120,7 +120,7 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
                     phraseChunk :true,
                     hardChunk   :true,
                     summaryChunk:true,
-                    margin      :5,    // chunk の chunkMiddleLine から +- いくつまで検索対象に入れるか．
+                    margin      :3,    // chunk の chunkMiddleLine から +- いくつまで検索対象に入れるか．
                     order       :'normal' // todo: 何を優先して検索するかを指定して検索できるようにする．normal はdbのインデックス順にそのまま返却するモード．
                 }
             ;

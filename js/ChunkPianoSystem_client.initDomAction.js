@@ -346,7 +346,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         ///////////////////////////////////////////////
         if(callback) callback();
     };
-    
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////    
     setPlayPosition = function(left, top){
         var playPositionHeight = parseInt(playPosition.css('height'), 10),
             playPositionWidth = parseInt(playPosition.css('width'), 10)
