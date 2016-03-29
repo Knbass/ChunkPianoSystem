@@ -8,6 +8,8 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     //////////////////////////////////////////////
     var initDataBase, saveDbAsJson, uppdateDataBase_callback,
         extendedFs = require('./ExtendedFs.js'), 
+        colors = require('colors'), // 色付きで console.log するモジュール．
+        sys = require('sys'),       // node.js の標準入出力モジュール．
         userDataBase = {}
     ;
     //////////////////////////////////////////////
@@ -15,14 +17,12 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     saveDbAsJson = function(){
         var strinfiedUserDataBase = JSON.stringify(userDataBase);
 
-        extendedFs.writeFile('./UserDataBase.json', strinfiedUserDataBase, function(err){
+        extendedFs.writeFile('../UserDataBase.json', strinfiedUserDataBase, function(err){
            if(err){
                console.log(err);
            }else{
                if(uppdateDataBase_callback != null) uppdateDataBase_callback();
-               console.log('/////////////////////');
-               console.log('UserDataBase updated.');
-               console.log('/////////////////////');
+               sys.puts('UserDataBase updated.' .green);
            }
         });  
     };

@@ -15,6 +15,8 @@ module.exports = (function(){ // node module として利用する際はこち�
         scoreDataParser = require('./ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
         // scoreDataParser = require('./ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
         uppdateDataBase, parseChunkDataJson, initAnnotationHintDataBase, saveDbAsJson, search,
+        colors = require('colors'), // 色付きで console.log するモジュール．
+        sys = require('sys'),       // node.js の標準入出力モジュール．
         annotationHintDataBase = {},
         uppdateDataBase_callback = null,
         noteLineLength = 0
@@ -91,11 +93,11 @@ module.exports = (function(){ // node module として利用する際はこち�
                             }
                         }catch(e){
                             console.log(e);
-                            console.log('chunkData個別処理でエラー．annotationHintDataBase を更新できません．');
+                            sys.puts('chunkData個別処理でエラー．annotationHintDataBase を更新できません．'.red);
                         }
                     }catch(e){
                         console.log(e);
-                        console.log('chunkData全体処理でエラー．annotationHintDataBase を更新できません．');
+                        sys.puts('chunkData全体処理でエラー．annotationHintDataBase を更新できません．'.red);
                     }
 
                 }
@@ -104,7 +106,7 @@ module.exports = (function(){ // node module として利用する際はこち�
         });
         }catch(e){
             console.log(e);
-            console.log('readFilesAsyncでエラー．annotationHintDataBase を更新できません．');
+            sys.puts('readFilesAsyncでエラー．annotationHintDataBase を更新できません．'.red);
         }  
     };
     //////////////////////////////////////////////
@@ -126,10 +128,10 @@ module.exports = (function(){ // node module として利用する際はこち�
                 searchRangeMax = noteLineLength;   
             }
 
-            console.log(chunkData);
-            console.log(option);
-            console.log('searchRangeMin: ' + searchRangeMin);
-            console.log('searchRangeMax: ' + searchRangeMax);      
+            // console.log(chunkData);
+            // console.log(option);
+            // console.log('searchRangeMin: ' + searchRangeMin);
+            // console.log('searchRangeMax: ' + searchRangeMax);      
 
 
             for(var searchRenge = searchRangeMin; searchRenge <= searchRangeMax; searchRenge++){
@@ -168,7 +170,7 @@ module.exports = (function(){ // node module として利用する際はこち�
             // console.log(searchResult);
             return searchResult;
         }catch(e){
-            console.log('Error occured in AnnotationHintDataBaseProcessor.search');
+            sys.puts('Error occured in AnnotationHintDataBaseProcessor.search'.red);
             return 'error'; // 検索操作中に error が発生した際は server に文字列を返却し伝達．
         }
     };
@@ -182,9 +184,7 @@ module.exports = (function(){ // node module として利用する際はこち�
                console.log(err);
            }else{
                if(uppdateDataBase_callback != null) uppdateDataBase_callback();
-               console.log('////////////////////////////////');
-               console.log('AnnotationHintDataBase updated.');
-               console.log('////////////////////////////////');
+               sys.puts('AnnotationHintDataBase updated.'.green);
            }
         });  
     };
