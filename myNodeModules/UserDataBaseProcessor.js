@@ -111,5 +111,5 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     
     udb.addUserData({'userName':'KensukeS', 'userPassword':'12345'});
     udb.addUserData({'userName':'KentaroUeda', 'userPassword':'12345'});
-    //udb.removeUserData('KentaroUeda');
+    // udb.removeUserData('KentaroUeda');
 })();

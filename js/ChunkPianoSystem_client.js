@@ -122,7 +122,7 @@ var ChunkPianoSystem_client = function(){
             ;
             
             isFromLoadChunkButtonProcessing = function(){
-                // loadChunkButton を押し，保存するを選択．正しい練習日数を記入し，保存をクリックした際に呼ばれる処理
+                // loadChunkButton を押し保存するを選択後，正しい練習日数を記入し保存をクリックした際に呼ばれる処理．
                 if(globalMem.isFromLoadChunkButton){ 
                     // todo: 通信エラー時に globalMem.isFromLoadChunkButton を false にできない可能性がある．
                     //       ユーザがブラウザをリロードすれば解決するが...
@@ -134,11 +134,14 @@ var ChunkPianoSystem_client = function(){
             // セーブが完了したら，編集モードを未編集にする． 
             globalMem.turnNotEditedMode();
             
+            // chunkData 保存通知をサーバから受け取った後，モーダルウィンドウは WAIT_TIME msec 表示される．
+            // その後，500 msec 秒後に  ↓ chunkLoad ボタン経由で保存を行った場合の処理 が実行される．500 msec 以下にすると正しく動作しない場合あり．
             setTimeout(isFromLoadChunkButtonProcessing, (WAIT_TIME + 500));
 
-            swal({   
+            swal({
                 title: data.message, 
-                type: data.status, timer: WAIT_TIME, 
+                type : data.status, 
+                timer: WAIT_TIME, 
                 showConfirmButton: false 
             });
         });
@@ -148,12 +151,14 @@ var ChunkPianoSystem_client = function(){
 
             // console.log(data.fileNameList);
             
-            var pullDownMenuTemplate = '<select class="pullDownMenu" id="chunkDataSelectMenu">'
-            
+            var pullDownMenuTemplate = '<select class="pullDownMenu" id="chunkDataSelectMenu">';
             
             // todo: プルダウンメニューに ChunkPianoData や .json を描画する必要は無いので，split して消去
-            for(var i in data.fileNameList){ //  i をインデックスとして data.fileNameList の長さ分 for 文を実行
-                pullDownMenuTemplate += '<option value ="' + data.fileNameList[i] + '">' + data.fileNameList[i] + '</option>';
+            for(var fileNameList_i in data.fileNameList){ //  i をインデックスとして data.fileNameList の長さ分 for 文を実行
+                pullDownMenuTemplate += '<option value ="' 
+                                     + data.fileNameList[fileNameList_i] + '">' 
+                                     + data.fileNameList[fileNameList_i] + '</option>'
+                ;
             }
             
             pullDownMenuTemplate += '</select>';
@@ -166,16 +171,17 @@ var ChunkPianoSystem_client = function(){
                 showCancelButton: true,
                 closeOnConfirm: false,
                 showLoaderOnConfirm: true,
-            }, function(){
-                setTimeout(function () {
-                    // 上記で生成したプルダウンメニューでユーザが選択したファイル名を取得
-                    var chunkDataSelectMenuVal = $('#chunkDataSelectMenu').val();
-                    console.log('chunkDataSelectMenuVal: ' + chunkDataSelectMenuVal);
-                    
-                    globalMem.socketIo.emit('chunkDataReq',{requestChunkDataFileName:chunkDataSelectMenuVal});
-                    // swal.close();
-                }, 1000); // chunkDataSelectMenu DOM の描画を待つ必要があるため，1.5 秒待つ．
-            }); 
+            }
+            , function(){
+                // setTimeout(function () {
+                // 上記で生成したプルダウンメニューでユーザが選択したファイル名を取得
+                var chunkDataSelectMenuVal = $('#chunkDataSelectMenu').val();
+                // console.log('chunkDataSelectMenuVal: ' + chunkDataSelectMenuVal);
+                globalMem.socketIo.emit('chunkDataReq',{requestChunkDataFileName:chunkDataSelectMenuVal});
+                // swal.close();
+                // }, 1000); // chunkDataSelectMenu DOM の描画を待つ必要があるため，1 秒待つ．
+            });
+            
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
@@ -197,7 +203,13 @@ var ChunkPianoSystem_client = function(){
             
             globalMem.turnNotEditedMode();
                         
-            swal(data.message, '', data.status);
+            swal({
+                title: data.message, 
+                type:  data.status,
+                timer: 1500,   
+                showConfirmButton: false 
+            });    
+            
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////

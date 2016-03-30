@@ -102,8 +102,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 cancelButtonText: '保存しない',
                 closeOnConfirm: false,
                 closeOnCancel: false
-            }, function (isConfirm){ // 保存する をクリックした場合
-                if(isConfirm){
+            }, function (isConfirm){
+                if(isConfirm){ // 保存する をクリックした場合
                     // saveChunkButton をクリックすれば．保存モードに移行できる．
                     //
                     globalMemCPSCIDA.isFromLoadChunkButton = true;
@@ -163,6 +163,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             if(Object.keys(globalMemCPSCIDA.chunkDataObj.chunkData).length == 0){ // chunk が一つも描画されていない時は保存処理を行わない．
                 swal('保存するにはチャンクを\n1つ以上記入してください!', '', 'warning');
             }else{
+                
                 var practiceDayChecker, swalPromptOptionForPracDayProp; 
 
                 practiceDayChecker = function(practiceDay){
