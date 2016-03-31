@@ -472,6 +472,11 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                     loadChunkButton.click();
                 });
             }else{
+                // ファイル名リスト取得まで時間がかかる場合があるので，読み込み中を通知するモーダルウィンドウを表示．
+                // ファイル名リストが取得されると自動で閉じられる．
+                swal('ファイルリストを\n取得しています...', '', 'info');
+                // todo: chunkFileName がレスポンスされた際の処理を client.js からここに移す．
+                //       callback を利用して実現．
                 globalMemCPSCIDA.socketIo.emit('chunkFileNameReq',{});
             }
         });
