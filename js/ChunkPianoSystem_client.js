@@ -111,7 +111,8 @@ var ChunkPianoSystem_client = function(){
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
-        globalMem.socketIo.on('disconnect', function(client){            
+        globalMem.socketIo.on('disconnect', function(client){  
+            swal('サーバとのコネクションが\n切断されました．', '' , 'error');
 	    });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
