@@ -84,6 +84,14 @@ var ChunkPianoSystem_server = function(){
                 socket.emit('noteLinePosition', {noteLinePosition:noteLinePosition});
             });
             ///////////////////////////////////////////////
+            /////////////////////////////////////////////// 
+            // data には認証用ユーザ名，パスワード 例: {'userName':'KensukeS', 'userPassword':'12345'}
+            // が格納されている．
+            socket.on('authorizationreq', function(data){
+                console.log(data);
+                // socket.emit('noteLinePosition', {noteLinePosition:noteLinePosition});
+            });
+            ///////////////////////////////////////////////
             ///////////////////////////////////////////////             
             socket.on('chunkSaveReq', function(data){ // data は chunkDataObj
                 

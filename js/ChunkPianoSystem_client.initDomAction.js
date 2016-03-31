@@ -24,11 +24,14 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             isChunkDrawing = false,
             chunkDrawingAreaMouseDowmPosX = 0,
             chunkDrawingAreaMouseDowmPosY = 0,
+            authorizationFrameTemplate,
             swalPromptOptionForUserNameProp,
             defaultUserName = null,
             userNameSetter,
             saveConfirmModalWindow,
-            rejectChunkPracticeMode
+            rejectChunkPracticeMode,
+            createMyFormOnSwal, 
+            reseteMyFormOnSwal
         ;
         globalMemCPSCIDA.nowChunkMode = String() + $('#chunkModeSelector option:selected').val();
         
@@ -45,39 +48,108 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         }catch(e){
             console.log(e);
         }
-        
-        swalPromptOptionForUserNameProp = {
-            title: 'ユーザ名を入力してください...',
-            type: 'input',
-            inputValue: defaultUserName,
-            showCancelButton: false,
-            allowEscapeKey:false,
-            closeOnConfirm: false, // これを true にすると practiceDayChecker が呼び出されなくなる!!!
-            animation: 'slide-from-top',
-            inputPlaceholder: 'ここにユーザ名を入力'                    
-        };
-        
-        userNameSetter = function(userNameUNS){
-
-            if(userNameUNS == '' || userNameUNS == null || userNameUNS == undefined){
-                swal.showInputError('ユーザ名は必須です!');
-            }else{
-                globalMemCPSCIDA.chunkDataObj.userName = userNameUNS;
-                // 何度もユーザ名を入力しなくても済むよう，localStorage にユーザネームを登録．
-                // localStrage はブラウザのバージョンによっては実装されていないので念のため try - catch する. 
-                try{
-                    localStorage.setItem('chunkPianoSystem_userName', userNameUNS);
-                }catch(e){
-                    console.log(e);
-                }
-                swal.close();
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        // ユーザ認証用フォームを生成．
+        (function authorizationFrameTemplateGenerator(){
+            var authorizationFrame = $('<div class="authorizationFrame"></div>'),
+                userNameInput = $('<input type="text" id="userNameInput" maxlength="30" placeholder="ユーザ名"/>'),
+                br = $('<br>'),
+                userPasswprdInput = $('<input type="password" id="userPasswprdInput" maxlength="30" placeholder="パスワード"/>')
+            ;
+            
+            authorizationFrame.append(userNameInput)    
+                              .append(br)
+                              .append(userPasswprdInput)
+            ;
+            
+            authorizationFrameTemplate = authorizationFrame;
+        })();
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        // swal に独自フォームを埋め込むためのメソッド．
+        // 引数 myForm は jQuery で作成した独自フォーム．
+        // myForm が与えられていない際は フォーム表示準備だけを行う．
+        // 独自フォームを埋め込みたい swal を実行した後に呼び出す．
+        // swal では独自 input 要素を表示できないため，.sweet-alert fieldset に 
+        // jQuery で無理やり独自フォーム Myform を埋め込む．
+        // createMyFormOnSwal 実行後は reseteMyFormOnSwal を行い swal を初期状態に戻すこと．
+        // reseteMyFormOnSwal を実行しないと swal の標準 input が正しく表示されなくなる．
+        createMyFormOnSwal = function(myForm){
+            $('.sweet-alert fieldset .sa-input-error, .sweet-alert fieldset input').css({
+                'display':'none'
+            });
+            // myForm が与えられていない際は フォーム表示準備だけを行う．
+            if(myForm){
+                $('.sweet-alert fieldset').append(myForm);           
             }
         };
-        // ↓ comment out for debug
-        swal(swalPromptOptionForUserNameProp, userNameSetter);   
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
+        reseteMyFormOnSwal = function(myFormClassName){
+            $('.sweet-alert fieldset .sa-input-error, .sweet-alert fieldset input').css({
+                'display':'inline'
+            });
+            $(myFormClassName).remove();
+            // swal.close();
+        };
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        // ユーザ認証処理．
+        swal({
+            title: 'auth',
+            text : '',
+            type : 'input',
+            allowEscapeKey   :false,
+            showCancelButton : true,            
+            confirmButtonText: 'ログイン',   
+            cancelButtonText : '新規アカウント作成',
+            closeOnConfirm   : false,   
+            closeOnCancel    : false,
+            showLoaderOnConfirm: true,
+        }
+        , function(isCreateNewAccount){ 
+
+            var userNameInputVal     = String() + $('#userNameInput').val(),
+                userPasswprdInputVal = String() + $('#userPasswprdInput').val()
+            ;            
+            
+            // todo: swal input では isCreateNewAccount を正しく受け取れていない．
+            //       そのため，新規アカウント作成，ログインボタンのどちらをクリックしても認証処理が行われてしまう．
+            //       このバグを修正すること．
+            
+            if(!isCreateNewAccount){ // ユーザがログインボタンをクリックした時の処理．
+                // ユーザ名，パスワードのバリデーション処理．
+                // ユーザ名，パスワードが共に入力されていない場合
+                if(
+                    (userNameInputVal == '' || userNameInputVal == null || userNameInputVal == undefined) &&
+                    (userPasswprdInputVal == '' || userPasswprdInputVal == null || userPasswprdInputVal == undefined)
+                ){
+                    swal.showInputError('ユーザ名とパスワードを入力してください．'); 
+                // ユーザ名が入力されていない場合
+                }else if(userNameInputVal == '' || userNameInputVal == null || userNameInputVal == undefined){
+                   swal.showInputError('ユーザ名を入力してください．'); 
+                // パスワードが入力されていない場合
+                }else if(userPasswprdInputVal == '' || userPasswprdInputVal == null || userPasswprdInputVal == undefined){
+                   swal.showInputError('パスワードを入力してください．'); 
+                // ユーザ名，パスワードが共に入力されている場合
+                }else{
+                    // console.log('userNameInput: ' + userNameInputVal); 
+                    // console.log('userPasswprdInput: ' + userPasswprdInputVal); 
+                    // 認証用ユーザ名，パスワードをサーバに送信．
+                    // サーバの UserDataBaseProcessor で処理するため，{'userName':'KensukeS', 'userPassword':'12345'} といった形式をとる．
+                    globalMemCPSCIDA.reqAuthorization({'userName':userNameInputVal, 'userPassword':userPasswprdInputVal});
+                }
+            }else{ // ユーザが新規アカウント作成ボタンをクリックした時．
+                console.log('新規アカウント作成');
+                swal.close(); // todo: 新規アカウント作成処理の実装．
+            }
+        });        
+        // ユーザ認証 swal には 独自フォームを埋め込みたいので，表示後に createMyFormOnSwal を実行．
+        createMyFormOnSwal(authorizationFrameTemplate);        
         
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         // 演奏位置初期化処理
         // noteLinePosition を受け取ってから処理をしなければならないため，
         // callback を利用し サーバから noteLinePosition を受け取ってから下記の処理を行う．
@@ -88,7 +160,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                             globalMemCPSCIDA.noteLinePosition.noteLine[0].axisY
                            )
             ;    
-        });        
+        });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         saveConfirmModalWindow = function(callback){

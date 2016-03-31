@@ -12,6 +12,7 @@ var ChunkPianoSystem_client = function(){
             annotationTextFlame:$('#annotationTextFlame'), // todo: このメンバは annotationRenderer でしか使わない場合は annotationRenderer に単独で与える．
             socketIo:null,
             reqNoteLinePosition:null,
+            reqAuthorization:null,
             reqAnnotationHint:null,
             turnNotEditedMode:null, // 後方参照ができないので，一旦 null を代入し，クラス内メンバの宣言が終わってからメンバを代入
             chunkDomRenderer:null,
@@ -97,6 +98,15 @@ var ChunkPianoSystem_client = function(){
         });
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
+        // 認証用ユーザ名，パスワード送信用メソッド．
+        // initDomAction モジュールの認証処理用 swal から呼び出される.
+        // authorizationUserData は {'userName':'KensukeS', 'userPassword':'12345'} といった形式となっている．
+        globalMem.reqAuthorization = function(authorizationUserData){ 
+            // chunkData はユーザがクリックしたhintボタンと関連する chunk の chunkData. 
+            globalMem.socketIo.emit('authorizationreq', authorizationUserData);
+        };
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
         globalMem.reqAnnotationHint = function(chunkDataRAH, annotationHintSearchOptionRAH, callback){ 
             // chunkData はユーザがクリックしたhintボタンと関連する chunk の chunkData. 
             globalMem.socketIo.emit('annotationHintReq', {chunkData:chunkDataRAH, annotationHintSearchOption:annotationHintSearchOptionRAH});
@@ -149,9 +159,9 @@ var ChunkPianoSystem_client = function(){
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         globalMem.socketIo.on('chunkFileNameList', function(data){
-
             // console.log(data.fileNameList);
             
+            // サーバからファイル名リストを受け取ったら，ファイル名リスト選択 UI を select タグで作成．
             var pullDownMenuTemplate = '<select class="pullDownMenu" id="chunkDataSelectMenu">';
             
             // todo: プルダウンメニューに ChunkPianoData や .json を描画する必要は無いので，split して消去
