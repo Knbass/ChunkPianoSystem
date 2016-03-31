@@ -472,12 +472,31 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                     loadChunkButton.click();
                 });
             }else{
+                
                 // ファイル名リスト取得まで時間がかかる場合があるので，読み込み中を通知するモーダルウィンドウを表示．
                 // ファイル名リストが取得されると自動で閉じられる．
-                swal('ファイルリストを\n取得しています...', '', 'info');
-                // todo: chunkFileName がレスポンスされた際の処理を client.js からここに移す．
-                //       callback を利用して実現．
-                globalMemCPSCIDA.socketIo.emit('chunkFileNameReq',{});
+                // swal('ファイルリストを\n取得しています...', '', 'info'); // showLoaderOnConfirm を利用しない場合．
+                swal({
+                    title: 'ファイルリストを\n取得しています...',
+                    text : '',
+                    type : 'info',
+                    showCancelButton   : false,
+                    closeOnConfirm     : false,
+                    showLoaderOnConfirm: true,
+                },function(){});
+                
+                // jQuery で swal の ok ボタンをクリックし，showLoaderOnConfirm を初期状態で有効化する．
+                setTimeout(function(){
+                    $('.sa-button-container .confirm').click();
+
+                    // $('.sa-button-container .confirm').click() を実行後，少し setTimeout してから chunkFileNameReq を行い，
+                    // ファイル選択モーダルウィンドウの ok ボタンがクリックされてしまうのを防ぐ．
+                    setTimeout(function(){
+                        // todo: chunkFileName がレスポンスされた際の処理を client.js からここに移す．
+                        //       callback を利用して実現．                        
+                        globalMemCPSCIDA.socketIo.emit('chunkFileNameReq',{});
+                    }, 100);
+                }, 500);
             }
         });
         ///////////////////////////////////////////////
