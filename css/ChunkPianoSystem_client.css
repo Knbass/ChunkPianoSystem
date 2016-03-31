@@ -98,32 +98,43 @@ html {
  }
  }
 
-.cpsWrappers{ 
-    /* . とクラス名で html の要素を取得 */
-    position: relative; /* relative は相対位置で表示．absolute は絶対位置で表示*/
+#upperLabel{
+    position: relative;
+    margin: 0 auto;
+    top: -20px;
+    width: inherit;   
+    height: 50px;
+    background-color: #003e6c;
+}
+
+#cpsTitleFrame{
+    top: 0;
+    left: 0;
+    height: inherit;
+    width:140px;
+    background-color: #640101;
+    text-align: center;
+}
+
+#cpsSystemName{
+    position: relative;
+    color: white;
+    font-style:italic;
+    font-size: 35px;
+    top: 13px;
+}
+
+#cpsMainFrame{ 
+    /* # をつけて id を指定 */
+    position: relative;
+    top:-30px;
     background-color: rgb(52, 52, 52);
+    height: 700px;
     width: inherit;
-    top:-50px;
     margin: 0 auto; /* 中央寄せは position が relative でないといかん */
 }
 
-/*
-.cpsWrappers:hover{ 
-    background-color: #ccc3b9;
-}
-
-.cpsWrappers:active{ 
-    background-color: #605f5e;
-}
-*/
-
-#upperFrame{ 
-    /* # をつけて id を指定 */
-    height: 700px;
-    top:0px;
-}
-
-#lowerFrame{
+#consoleFrame{
     position: relative;
     width:140px;
     top: 0px;

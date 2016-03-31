@@ -9,8 +9,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
     ///////////////////////////////////////////////    
     initDomAction = function(callback){
         
-        var upperFrame = $('#upperFrame'),        
-            saveChunkButton = $('#saveChunkButton'),
+        var saveChunkButton = $('#saveChunkButton'),
             loadChunkButton = $('#loadChunkButton'),
             displayTexitButton = $('#displayTexitButton'),
             alertText = $('.textInput#alertText'),
@@ -83,9 +82,9 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         // ユーザ認証用フォームを生成．
         (function authorizationFrameTemplateGenerator(){
             var authorizationFrame = $('<div class="authorizationFrame"></div>'),
-                userNameInput = $('<input type="text" id="userNameInput" maxlength="30" placeholder="ユーザ名"/>'),
+                userNameInput = $('<input type="text" id="userNameInput" maxlength="30" placeholder="ユーザ名を入力..."/>'),
                 br = $('<br>'),
-                userPasswordInput = $('<input type="password" id="userPasswordInput" maxlength="30" placeholder="パスワード"/>')
+                userPasswordInput = $('<input type="password" id="userPasswordInput" maxlength="30" placeholder="パスワードを入力..."/>')
             ;
             
             // 一度 userName, userPassword を入力している場合, 次回以降は localStorage に保存されている. 
