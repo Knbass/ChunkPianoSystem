@@ -89,11 +89,11 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
             // 保存してから loadDataBase する必要はない．
             saveDataBaseAsJson(); 
             
-            sys.puts(String() + userName + ' removed.'.green);
+            sys.puts(String() + userName + ' is removed.'.green);
             console.log(userDataBase);
             return true;
         }else{
-            sys.puts(String() + userName + ' not exsist.'.red);
+            sys.puts(String() + userName + ' is not exsist.'.red);
             return false;
         }
     };
@@ -103,7 +103,19 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     // userData は {'userName':'userName', 'userPassword':'userPassword'} という形式を取る．
     // userName が既に存在している場合は false を return. 
     authorize = function(userData){
-        
+        if(isUserExist(userData.userName) == true){
+            if(userData.userPassword == userDataBase[userData.userName]){
+                sys.puts(String() + userData.userName + ' is authorized.'.green);                        
+                return 'authorized'; 
+            }else{
+                sys.puts('incorrect user password.'.red);
+                sys.puts(String() + userData.userName + ' is not authorized.'.red);
+                return 'notAuthorized';
+            }
+        }else{
+            sys.puts(String() + userData.userName + ' is not exsist.'.red);
+            return 'userNotExist'; 
+        }
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -122,10 +134,14 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
 (function moduleTest(){
     var udb = UserDataBaseProcessor();
     
-    udb.addUserData({'userName':'KensukeS', 'userPassword':'12345'});
-    udb.addUserData({'userName':'KentaroUeda', 'userPassword':'12345'});
-    udb.addUserData({'userName':'K.Ueda', 'userPassword':'12345'});
+    // console.log(udb.addUserData({'userName':'KensukeS', 'userPassword':'12345'}));
+    // console.log(udb.addUserData({'userName':'KentaroUeda', 'userPassword':'12345'}));
+    // console.log(udb.addUserData({'userName':'K.Ueda', 'userPassword':'12345'}));
     
-    //udb.removeUserData('KentaroUeda');
-    //udb.removeUserData('KensukeS');
+    // console.log(udb.removeUserData('KentaroUeda'));
+    // console.log(udb.removeUserData('KensukeS'));
+    
+    console.log(udb.authorize({'userName':'KensukeS', 'userPassword':'12345'}));
+    // console.log(udb.authorize({'userName':'Ken', 'userPassword':'12345'}));
+    console.log(udb.authorize({'userName':'KensukeS', 'userPassword':'1'}));
 })();
