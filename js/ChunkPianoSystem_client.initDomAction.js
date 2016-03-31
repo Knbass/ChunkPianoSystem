@@ -127,8 +127,8 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             confirmButtonText: 'ログイン',   
             cancelButtonText : '新規アカウント作成',
             closeOnConfirm   : false,   
-            closeOnCancel    : false
-            // showLoaderOnConfirm: true,
+            closeOnCancel    : false,
+            showLoaderOnConfirm: true,
         }
         , function(isCreateNewAccount){ 
 
