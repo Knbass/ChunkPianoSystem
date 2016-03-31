@@ -6,7 +6,8 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     'use strict'
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    var constructor, initDataBase, loadDataBase, saveDataBaseAsJson, addUserData, removeUserData,
+    var constructor, initDataBase, loadDataBase, saveDataBaseAsJson, isUserExist, 
+        addUserData, removeUserData, authorize,
         extendedFs = require('./ExtendedFs.js'), 
         colors = require('colors'), // 色付きで console.log するモジュール．
         sys = require('sys'),       // node.js の標準入出力モジュール．
@@ -53,11 +54,16 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // userName が既に存在している場合は true, そうでない場合は false を return. 
+    isUserExist = function(userName){ 
+        return userDataBase.hasOwnProperty(userName) ? true : false;
+    };
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
     // userData は {'userName':'userName', 'userPassword':'userPassword'} という形式を取る．
     // userName が既に存在している場合は false を return. 
     addUserData = function(userData){
-        // userName が既に存在している場合は false を return. 
-        if(userDataBase.hasOwnProperty(userData.userName) == true){
+        if(isUserExist(userData.userName)){
             sys.puts(String() + userData.userName + ' is already exists.'.red);
             return false;
         }else{
@@ -77,8 +83,7 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     // 削除したいユーザ名を string の userName で引数として与え削除．　
     // 削除対象のキーが存在しない場合は false を return. 
     removeUserData = function(userName){
-        // userName が既に存在している場合は false を return. 
-        if(userDataBase.hasOwnProperty(userName) == true){
+        if(isUserExist(userName) == true){
             delete userDataBase[userName];
             // 最新の userDataBase はメモリ内で構成されているため，最新の database を saveDataBaseAsJson で
             // 保存してから loadDataBase する必要はない．
@@ -94,6 +99,14 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // ユーザ認証メソッド．
+    // userData は {'userName':'userName', 'userPassword':'userPassword'} という形式を取る．
+    // userName が既に存在している場合は false を return. 
+    authorize = function(userData){
+        
+    };
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
     (constructor = function(){
         // 初期化時に UserDataBase.json をメモリに読込．
         loadDataBase();
@@ -102,7 +115,7 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     //////////////////////////////////////////////
     //////////////////////////////////////////////
     // initDataBase は moduleTest での実行が主なため，private とした．
-    return {addUserData:addUserData, removeUserData:removeUserData};
+    return {addUserData:addUserData, removeUserData:removeUserData, authorize:authorize};
 }; // moduleTest の際はこちらを有効化
 // })();;// node module として利用する際はこちらを有効化
 
@@ -111,5 +124,8 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     
     udb.addUserData({'userName':'KensukeS', 'userPassword':'12345'});
     udb.addUserData({'userName':'KentaroUeda', 'userPassword':'12345'});
-    // udb.removeUserData('KentaroUeda');
+    udb.addUserData({'userName':'K.Ueda', 'userPassword':'12345'});
+    
+    //udb.removeUserData('KentaroUeda');
+    //udb.removeUserData('KensukeS');
 })();
