@@ -9,6 +9,7 @@ var ChunkPianoSystem_server = function(){
         splitedIoi = [],
         scoreDataParser = require('./myNodeModules/ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
         annotationHintDataBaseProcessor = require('./myNodeModules/AnnotationHintDataBaseProcessor.js'),
+        userDataBaseProcessor = require('./myNodeModules/UserDataBaseProcessor.js'),
         noteLinePosition = scoreDataParser.getNoteLinePosition(),
         extendedFs = require('./myNodeModules/ExtendedFs'),
         http = require('http'),
@@ -25,6 +26,7 @@ var ChunkPianoSystem_server = function(){
             var data = null, 
                 extension
             ;
+            
             // console.log(req.url);
             // res.writeHead(200, {'Content-type':'text/plain'});
             // res.end('hello http server!\n');
@@ -88,7 +90,26 @@ var ChunkPianoSystem_server = function(){
             // data には認証用ユーザ名，パスワード 例: {'userName':'KensukeS', 'userPassword':'12345'}
             // が格納されている．
             socket.on('authorizationreq', function(data){
-                console.log(data);
+                
+                var authorizationResult = userDataBaseProcessor.authorize(data);
+                
+                if(authorizationResult == 'authorized'){ // 認証成功時
+                    socket.emit('authorizationResult',{
+                        status: 'success',
+                        message: 'ようこそ!'
+                    });
+                }else if(authorizationResult == 'incorrectUserPassword'){ // 不正なパスワードを与えられた時
+                    socket.emit('authorizationResult',{
+                        status: 'error',
+                        message: '不正なパスワードです．'
+                    });
+                }else if(authorizationResult == 'userNotExist'){ // 存在しないユーザ名を与えられた時
+                    socket.emit('authorizationResult',{
+                        status: 'error',
+                        message: '存在しないユーザ名です．'
+                    });
+                }
+                
                 // socket.emit('noteLinePosition', {noteLinePosition:noteLinePosition});
             });
             ///////////////////////////////////////////////

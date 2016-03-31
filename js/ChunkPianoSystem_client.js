@@ -70,7 +70,8 @@ var ChunkPianoSystem_client = function(){
     initSocketIo = function(callback){
         
         var reqNoteLinePositionCallback = null, 
-            reqAnnotationHintCallback   = null
+            reqAnnotationHintCallback   = null,
+            reqAuthorizationCallback    = null
         ;
         // globalMem.socketIo = io.connect('http://127.0.0.1:3001');
         globalMem.socketIo = io.connect();
@@ -101,10 +102,17 @@ var ChunkPianoSystem_client = function(){
         // 認証用ユーザ名，パスワード送信用メソッド．
         // initDomAction モジュールの認証処理用 swal から呼び出される.
         // authorizationUserData は {'userName':'KensukeS', 'userPassword':'12345'} といった形式となっている．
-        globalMem.reqAuthorization = function(authorizationUserData){ 
+        globalMem.reqAuthorization = function(authorizationUserData, callback){ 
             // chunkData はユーザがクリックしたhintボタンと関連する chunk の chunkData. 
             globalMem.socketIo.emit('authorizationreq', authorizationUserData);
-        };
+            if(callback){ reqAuthorizationCallback = callback }
+        };        
+        ///////////////////////////////////////////////
+        ///////////////////////////////////////////////
+        // サーバから認証結果を受け取った際の処理．
+        globalMem.socketIo.on('authorizationResult', function(data){
+            if(reqAuthorizationCallback) reqAuthorizationCallback(data);
+        }); 
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         globalMem.reqAnnotationHint = function(chunkDataRAH, annotationHintSearchOptionRAH, callback){ 

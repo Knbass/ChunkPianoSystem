@@ -1,8 +1,8 @@
 // UserDataBase の初期化，更新を行うモジュール．
 //////////////////////////////////////////////
 //////////////////////////////////////////////
-// module.exports = (function(){ // node module として利用する際はこちらを有効化
-var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有効化
+module.exports = (function(){ // node module として利用する際はこちらを有効化
+// var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有効化
     'use strict'
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -24,7 +24,8 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     saveDataBaseAsJson = function(callback){
         var strinfiedUserDataBase = JSON.stringify(userDataBase);
 
-        extendedFs.writeFile('../UserDataBase.json', strinfiedUserDataBase, function(err){
+        extendedFs.writeFile('./UserDataBase.json', strinfiedUserDataBase, function(err){ // server 実行時のファイルパス
+        // extendedFs.writeFile('../UserDataBase.json', strinfiedUserDataBase, function(err){ // moduleTest 時のファイルパス
            if(err){
                console.log(err);
            }else{
@@ -38,8 +39,8 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     // json 形式の userDataBase を読み込みパースする．
     loadDataBase = function(callback){
         try{
-            // userDataBase = extendedFs.readFileSync('./UserDataBase.json', 'utf-8');
-            userDataBase = extendedFs.readFileSync('../UserDataBase.json', 'utf-8'); // moduleTest 時のファイルパス
+            userDataBase = extendedFs.readFileSync('./UserDataBase.json', 'utf-8'); // server 実行時のファイルパス
+            // userDataBase = extendedFs.readFileSync('../UserDataBase.json', 'utf-8'); // moduleTest 時のファイルパス
             userDataBase = JSON.parse(userDataBase);
             if(callback) callback();
             sys.puts('UserDataBase loaded.'.green);
@@ -110,7 +111,7 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
             }else{
                 sys.puts('incorrect user password.'.red);
                 sys.puts(String() + userData.userName + ' is not authorized.'.red);
-                return 'notAuthorized';
+                return 'incorrectUserPassword';
             }
         }else{
             sys.puts(String() + userData.userName + ' is not exsist.'.red);
@@ -128,9 +129,10 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     //////////////////////////////////////////////
     // initDataBase は moduleTest での実行が主なため，private とした．
     return {addUserData:addUserData, removeUserData:removeUserData, authorize:authorize};
-}; // moduleTest の際はこちらを有効化
-// })();;// node module として利用する際はこちらを有効化
+// }; // moduleTest の際はこちらを有効化
+})();;// node module として利用する際はこちらを有効化
 
+/*
 (function moduleTest(){
     var udb = UserDataBaseProcessor();
     
@@ -145,3 +147,4 @@ var UserDataBaseProcessor = function(){ // moduleTest の際はこちらを有�
     // console.log(udb.authorize({'userName':'Ken', 'userPassword':'12345'}));
     console.log(udb.authorize({'userName':'KensukeS', 'userPassword':'1'}));
 })();
+*/
