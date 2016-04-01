@@ -1,4 +1,11 @@
 // UserDataBase の初期化，更新を行うモジュール．
+// ★ UserDataBase の例  (2016/4/1時点，一部のみ切出)
+/*
+    {   "dummyUserName":"dummyUserPassword",
+        "TanakaTaro"   :"12345",
+        "TanakaMinami" :"54321"
+    }
+*/
 //////////////////////////////////////////////
 //////////////////////////////////////////////
 module.exports = (function(){ // node module として利用する際はこちらを有効化
@@ -24,7 +31,7 @@ module.exports = (function(){ // node module として利用する際はこち�
     saveDataBaseAsJson = function(callback){
         var strinfiedUserDataBase = JSON.stringify(userDataBase);
 
-        extendedFs.writeFile('./UserDataBase.json', strinfiedUserDataBase, function(err){ // server 実行時のファイルパス
+        extendedFs.writeFile('./UserDataBase.json', strinfiedUserDataBase, function(err){     // server 実行時のファイルパス
         // extendedFs.writeFile('../UserDataBase.json', strinfiedUserDataBase, function(err){ // moduleTest 時のファイルパス
            if(err){
                console.log(err);
@@ -39,7 +46,7 @@ module.exports = (function(){ // node module として利用する際はこち�
     // json 形式の userDataBase を読み込みパースする．
     loadDataBase = function(callback){
         try{
-            userDataBase = extendedFs.readFileSync('./UserDataBase.json', 'utf-8'); // server 実行時のファイルパス
+            userDataBase = extendedFs.readFileSync('./UserDataBase.json', 'utf-8');     // server 実行時のファイルパス
             // userDataBase = extendedFs.readFileSync('../UserDataBase.json', 'utf-8'); // moduleTest 時のファイルパス
             userDataBase = JSON.parse(userDataBase);
             if(callback) callback();
@@ -130,19 +137,23 @@ module.exports = (function(){ // node module として利用する際はこち�
     // initDataBase は moduleTest での実行が主なため，private とした．
     return {addUserData:addUserData, removeUserData:removeUserData, authorize:authorize};
 // }; // moduleTest の際はこちらを有効化
-})();;// node module として利用する際はこちらを有効化
-
+})(); // node module として利用する際はこちらを有効化．
+//////////////////////////////////////////////
+//////////////////////////////////////////////
 /*
 (function moduleTest(){
     var udb = UserDataBaseProcessor();
     
+    // ユーザデータ追加テスト
     // console.log(udb.addUserData({'userName':'KensukeS', 'userPassword':'12345'}));
     // console.log(udb.addUserData({'userName':'KentaroUeda', 'userPassword':'12345'}));
     // console.log(udb.addUserData({'userName':'K.Ueda', 'userPassword':'12345'}));
     
+    // ユーザデータ削除テスト
     // console.log(udb.removeUserData('KentaroUeda'));
     // console.log(udb.removeUserData('KensukeS'));
     
+    // ユーザデータ認証テスト
     console.log(udb.authorize({'userName':'KensukeS', 'userPassword':'12345'}));
     // console.log(udb.authorize({'userName':'Ken', 'userPassword':'12345'}));
     console.log(udb.authorize({'userName':'KensukeS', 'userPassword':'1'}));

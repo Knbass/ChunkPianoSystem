@@ -108,7 +108,6 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         hintBtnDom.click(function(e){
-            
             // ヒント ボタンの親要素から，対応するチャンクの id を抽出．
             // todo: この処理は何度も書かれているので関数化すべし．
             var parentAnnotationDom = $(this).parent(),
@@ -134,6 +133,8 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             
             chunkData.userName = globalMemCPSADR.chunkDataObj.userName;
             
+            // ユーザが指定した検索オプションに基づき，サーバに Annotation Hint をリクエストする.
+            // callback は Annotation Hint が受信された際に実行される．
             globalMemCPSADR.reqAnnotationHint(chunkData, annotationHintSearchOption, function(status, hintChunkData){
                 if(status == 'error'){
                     console.error('error occured in reqAnnotationHint');

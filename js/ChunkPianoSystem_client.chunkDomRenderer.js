@@ -1,12 +1,35 @@
-/*
-todo: chunkData に自身が付与された譜面段番号を持たせる．
-todo: annotationDomRenderer の createChunkDom は肥大化していて読みにくい．処理ごとに関数に分離し，
-         処理フローを理解しやすくする．
-         chunkDom 描画モジュールとデータ構造作成モジュールを分離する．
-	 chunkDomDelBtn 描画モジュールも分離．annotationHintDomRenderer でも chunkDomDelBtn 作成処理を行っているので，
-     共通化する．
-*/
 
+// chunk 描画，位置計算モジュール．
+// createChunkDom: マウスによって入力された chunk を描画するだけでなく，保存された chunkDataObj からチャンクを再描画する際にも利用される．
+//                 また，chunkDataObj の生成も本メソッドで行う．
+//                 ★ 生成される chunkDataObj の例 (2016/4/1時点)
+/*
+                        {
+                            "userName": "Iwabuchi",
+                            "chunkData": {
+                                "hardChunk_0": {
+                                    "chunkDomId": "hardChunk_0",
+                                    "left": 81,
+                                    "top": 90,
+                                    "width": 159,
+                                    "height": 37,
+                                    "stringScoreCol": "0",
+                                    "chunkMiddleAxisY": 108,
+                                    "chunkType": "hard",
+                                    "chunkHeadLine": 0,
+                                    "chunkTailLine": 4,
+                                    "chunkMiddleLine": 2,
+                                    "parentChunk": null,
+                                    "good": null,
+                                    "chunkAnnotationText": "和音が出てきた時に左手がついてこない"
+                                }
+                            },
+                            "practiceDay": "1"
+                        }
+*/
+// todo: chunkData に自身が付与された譜面段番号を持たせる．
+// todo: chunkDomDelBtn 描画モジュールを分離．annotationHintDomRenderer でも chunkDomDelBtn 作成処理を行っているので，
+//       共通化する．
 ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){ 
     'use strict'
     ///////////////////////////////////////////////
@@ -16,9 +39,49 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     ;
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
-    // todo: チャンクを複数に分けて描画した際の link を指定する引数 parentChunk を追加
-    // このメソッドは chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
-    // for in 文で回し1つずつ描画する．
+    /*
+        createChunkDom は chunk を 一度に1つしか描画できない．保存データから複数の chunk を描画する際は保存データを
+        for in 文で回し1つずつ描画する．
+        
+        createChunkDom は 2通りの呼び出され方があり，両者で chunkPropCCD の内容が異なる．
+            1. ユーザのマウス操作でチャンクが描画された時.
+                この時は
+                    {
+                        left       : chunkDrawingAreaMouseDowmPosX,
+                        top        : chunkDrawingAreaMouseDowmPosY,
+                        width      : chunkSizeX,
+                        height     : chunkSizeY,
+                        chunkType  : globalMemCPSCIDA.nowChunkMode,
+                        parentChunk: null
+                    }
+                という形式のオブジェクトを受け取る．
+
+            2. ユーザがファイル読込ボタンをクリックしロードされた chunkData json (パース済) 
+                この時は parse 済 json
+                    {
+                        hardChunk_0: {
+                            chunkDomId : "hardChunk_0",
+                            left       : 81,
+                            top        : 90,
+                            width      : 159,
+                            height     : 37,
+                            stringScoreCol   : "0",
+                            chunkMiddleAxisY : 108,
+                            chunkType      : "hard",
+                            chunkHeadLine  : 0,
+                            chunkTailLine  : 4,
+                            chunkMiddleLine: 2,
+                            parentChunk : null,
+                            good        : null,
+                            chunkAnnotationText: "和音が出てきた時に左手がついてこない"
+                        }
+                    }
+                という形式のオブジェクトを受け取る．
+        
+        ★しかし，どちらの場合でも chunkDataObj は createChunkDom の chunk 描画処理に基づいて再構成される 
+          (例えば chunkDomId は再度付与される) 点に留意すること．
+    */
+    // todo: チャンクを複数に分けて描画した際の link を指定する引数 parentChunk を追加．
     createChunkDom = function(chunkPropCCD){ 
         // Chunk のサイズが 0 の時には Chunk を描画しない．
         if((chunkPropCCD.width  != 0 && chunkPropCCD.width  != null && chunkPropCCD.width  != undefined ) ||
@@ -209,6 +272,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+    // 引数として与えられた chunkDomId の chunk を選択状態(色を変化させる) にする．
     selectChunkDom = function(chunkDomIdSCD){
         $('.chunk').each(function(index, element){
             $(element).removeClass('selected');
@@ -217,6 +281,7 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+    // chunk の先頭，中央，末尾の該当音符列を検索する．
     ////////////////////////////////////////    ↓ チャンク先頭の音符番号を取得する際は 'head'，末尾であれば 'tail'
     getChunkHeadTailMidlleLine = function(chunkDataGCL){     // チャンクの左辺の位置情報から最近傍の音符列を取得するメソッド.
         
@@ -282,20 +347,27 @@ ChunkPianoSystem_client.chunkDomRenderer = function(globalMemCPSDDR){
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
+    // chunkData は全ての chunk の描画情報を格納したオブジェクト．
+    // これを
     getSortedChunkHeadLine = function(chunkData){
         
-        var sortedChunkHeadLine = []; 
-        
-        for(var chunk_dom_id in chunkData){
-            // css プロパティは勝手に string に変換されている場合があるので　parseInt を忘れずに行う．
-            sortedChunkHeadLine.push(parseInt(chunkData[chunk_dom_id].chunkHeadLine, 10));
+        try{        
+            var sortedChunkHeadLine = []; 
+
+            for(var chunk_dom_id in chunkData){
+                // css プロパティは勝手に string に変換されている場合があるので　parseInt を忘れずに行う．
+                sortedChunkHeadLine.push(parseInt(chunkData[chunk_dom_id].chunkHeadLine, 10));
+            }
+            // 値を昇順にソート
+            sortedChunkHeadLine.sort(function(a,b){
+                return a - b;
+            });
+            console.info(sortedChunkHeadLine);
+            return sortedChunkHeadLine;
+        }catch(e){
+            console.log(e);
+            console.error('chunkHeadLine が計算されていない可能性があります．getChunkHeadTailMidlleLine を実行してから本メソッドを実行してください．');
         }
-        // 値を昇順にソート
-        sortedChunkHeadLine.sort(function(a,b){
-            return a - b;
-        });
-        console.info(sortedChunkHeadLine);        
-        return sortedChunkHeadLine;
     };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////

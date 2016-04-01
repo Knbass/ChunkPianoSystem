@@ -1,6 +1,38 @@
 // AnnotationHintDataBase の初期化，更新を行うモジュール．
 // このモジュールは json を db として利用しているため，loadDataBase または uppdateDataBase で
 // db をメモリに読み出してから利用すること．
+// ★ UserDataBase の例 (2016/4/1時点，一部のみ切出)
+/*
+        {
+            "0": { // 音符列番号
+                "patternChunk": {}, // chunk の種類毎に chunk を格納
+                "phraseChunk": {},
+                "hardChunk": {},
+                "summaryChunk": {
+                    "Iwabuchi": { // ユーザ名
+                        "1": {    // 練習日
+                            "summaryChunk_0": { // クライアント再度で生成される chunkDataObj.chunkData
+                                "chunkDomId": "summaryChunk_0",
+                                "left": 1103,
+                                "top": 592,
+                                "width": 118,
+                                "height": 21,
+                                "stringScoreCol": "1",
+                                "chunkMiddleAxisY": 575,
+                                "chunkType": "summary",
+                                "chunkHeadLine": 0,
+                                "chunkTailLine": 0,
+                                "chunkMiddleLine": 0,
+                                "parentChunk": null,
+                                "good": null,
+                                "chunkAnnotationText": "今日の目標としてまず少しでも進めるように考えていた。"
+                            }
+                        }
+                    }
+                }
+            }
+         }
+ */
 // todo: 現在はデータベースを利用していないため，AnnotationHintDataBase のサイズが大きくなるにつれて，
 //       メモリを圧迫し処理できなくなる．
 //       最終的には mongoDbに移行すること．
@@ -114,17 +146,19 @@ module.exports = (function(){ // node module として利用する際はこち�
     // 引数 chunkData 内のチャンク中央の音符列番号 chunkMiddleLine などをキーに関連するアノテーションを検索．
     // 引数 option はクライアントの ChunkPianoSystem_client.annotationDomRenderer.js で指定された検索オプション．
     // option の例...
-    // annotationHintSearchOption = { // サーバで annotationHint をサーチする際のオプション
-       // patternChunk:true, // patternChunk をサーチ対象に入れるか否か．
-       // phraseChunk :true,
-       // hardChunk   :true,
-       // summaryChunk:true,
-       // margin      :5,    // chunk の chunkMiddleLine から +- いくつまで検索対象に入れるか．
-       // order       :'normal' // todo: 何を優先して検索するかを指定して検索できるようにする．normal はdbのインデックス順にそのまま返却するモード．
-    // }
+    /*
+        annotationHintSearchOption = { // サーバで annotationHint をサーチする際のオプション
+           patternChunk:true,    // patternChunk をサーチ対象に入れるか否か．
+           phraseChunk :true,
+           hardChunk   :true,
+           summaryChunk:true,
+           margin      :5,       // chunk の chunkMiddleLine から +- いくつまで検索対象に入れるか．
+           order       :'normal' // todo: 何を優先して検索するかを指定して検索できるようにする．normal はdbのインデックス順にそのまま返却するモード．
+        }
+    */
     search = function(chunkData, option){
         try{        
-            var searchRangeMin = chunkData.chunkMiddleLine - option.margin,
+            var searchRangeMin = chunkData.chunkMiddleLine - option.margin, // チャンクの中央音符列位置を基に検索範囲を計算.
                 searchRangeMax = chunkData.chunkMiddleLine + option.margin,
                 searchResult = {},
                 tmp_searchedNoteLine
@@ -144,7 +178,6 @@ module.exports = (function(){ // node module として利用する際はこち�
             // console.log(option);
             // console.log('searchRangeMin: ' + searchRangeMin);
             // console.log('searchRangeMax: ' + searchRangeMax);      
-
 
             for(var searchRenge = searchRangeMin; searchRenge <= searchRangeMax; searchRenge++){
                 // console.log();
@@ -179,7 +212,6 @@ module.exports = (function(){ // node module として利用する際はこち�
                     }
                 }
             }
-            
             // 条件に適合する検索結果が無い場合は {} が return される．
             // console.log(searchResult);
             return searchResult;
@@ -204,6 +236,9 @@ module.exports = (function(){ // node module として利用する際はこち�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // uppdateDataBase をせずに，既に構成されている AnnotationHintDataBase.json をロードする．
+    // AnnotationHintDataBase が肥大化し構成に時間がかかる場合は loadDataBase を利用し，
+    // uppdateDataBase は一定時間毎に行うようにする．
     loadDataBase = function(callback){
         try{
             annotationHintDataBase = extendedFs.readFileSync('./AnnotationHintDataBase.json', 'utf-8');
@@ -222,8 +257,9 @@ module.exports = (function(){ // node module として利用する際はこち�
     //////////////////////////////////////////////
     return {loadDataBase:loadDataBase, uppdateDataBase:uppdateDataBase, search:search};
 // }; // moduleTest の際はこちらを有効化.
-})();;// node module として利用する際はこちらを有効化
-
+})(); // node module として利用する際はこちらを有効化. 
+//////////////////////////////////////////////
+//////////////////////////////////////////////
 /*
 (function moduleTest(){
     var ahdbp = AnnotationHintDataBaseProcessor();
