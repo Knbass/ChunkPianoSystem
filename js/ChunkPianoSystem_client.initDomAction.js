@@ -200,7 +200,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
         // ユーザ認証 swal には 独自フォームを埋め込みたいので，通常の swal (type:input) 表示後に swal の標準 input を無効化し，
         // appendMyFormOnSwal を実行．
         removeSwalInput();
-        appendMyFormOnSwal(authorizationFrameTemplate);        
+        appendMyFormOnSwal(authorizationFrameTemplate);      
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////
         // 演奏位置初期化処理

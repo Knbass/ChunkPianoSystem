@@ -106,7 +106,7 @@ var ChunkPianoSystem_server = function(){
                 }else if(authorizationResult == 'userNotExist'){ // 存在しないユーザ名を与えられた時
                     socket.emit('authorizationResult',{
                         status: 'error',
-                        message: '存在しないユーザ名です．'
+                        message: '登録されていないユーザ名です．'
                     });
                 }
                 

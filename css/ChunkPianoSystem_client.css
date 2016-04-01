@@ -98,19 +98,34 @@ html {
  }
  }
 
+
+
+
+
+
+
+
 #upperLabel{
     position: relative;
     margin: 0 auto;
-    top: -20px;
+    top: 10px;
     width: inherit;   
     height: 50px;
     background-color: #003e6c;
 }
 
-#cpsTitleFrame{
-    top: 0;
-    left: 0;
+.cpsHeader{
+    position: absolute;
+    top: 0;  
     height: inherit;
+}
+
+.cpsHeader p{
+    color: white;
+}
+
+#cpsTitleFrame{
+    left: 0;  
     width:140px;
     background-color: #640101;
     text-align: center;
@@ -118,16 +133,36 @@ html {
 
 #cpsSystemName{
     position: relative;
-    color: white;
     font-style:italic;
     font-size: 35px;
-    top: 13px;
+    top: -20px;
 }
+
+#userNameFrame{
+    position: absolute;
+    width:448px;
+    background-color: #640101;
+    text-align: center;
+    right: 0px;
+}
+
+.cpsHeader#userNameFrame p{
+    width: inherit;
+    /* width 以上の文字を ... として省略*/
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+
+
+
 
 #cpsMainFrame{ 
     /* # をつけて id を指定 */
     position: relative;
-    top:-30px;
+    top:0px;
     background-color: rgb(52, 52, 52);
     height: 700px;
     width: inherit;
@@ -196,7 +231,7 @@ html {
     left: 150px;
     height: 679px;
     width: 1294px;
-    //background-color: rgba(255, 0, 0, 0.56);
+    /*background-color: rgba(255, 0, 0, 0.56);*/
     background-color: transparent;
     margin: 0 auto;
 }
