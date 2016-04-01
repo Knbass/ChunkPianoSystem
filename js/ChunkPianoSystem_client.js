@@ -10,6 +10,7 @@ var ChunkPianoSystem_client = function(){
         globalMem = { // 複数のクラスで利用するメンバ/メソッドはここで定義すること
             chunkDrawingArea:$('#chunkDrawingArea'),
             annotationTextFlame:$('#annotationTextFlame'), // todo: このメンバは annotationRenderer でしか使わない場合は annotationRenderer に単独で与える．
+            isAuthorize:true, // 初期状態で認証を有効化するか/しないか．todo: 実運用時は false を選択できないようにすること．
             socketIo:null,
             reqNoteLinePosition:null,
             reqAuthorization:null,

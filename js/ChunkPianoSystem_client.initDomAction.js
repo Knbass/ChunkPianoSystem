@@ -9,7 +9,9 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
     ///////////////////////////////////////////////    
     initDomAction = function(callback){
         
-        var saveChunkButton = $('#saveChunkButton'),
+        var clientAuthorizer = ChunkPianoSystem_client.authorizeProcessor(globalMemCPSCIDA).clientAuthorizer,
+            // todo: clientAuthorizer は globalObj のごく一部しか利用しないので，必要プロパティのみを渡すだけでも良いかもしれない．
+            saveChunkButton = $('#saveChunkButton'),
             loadChunkButton = $('#loadChunkButton'),
             displayTexitButton = $('#displayTexitButton'),
             alertText = $('.textInput#alertText'),
@@ -19,190 +21,19 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
             practicePointMode = $('#practicePointModeSelector option:selected').val(),
             leftPositionButton = $('#leftPositionButton'),
             rightPositionButton = $('#rightPositionButton'),
-            beforeColor = '',
             isChunkDrawing = false,
             chunkDrawingAreaMouseDowmPosX = 0,
             chunkDrawingAreaMouseDowmPosY = 0,
-            authorizationFrameTemplate,
-            swalPromptOptionForUserNameProp,
-            defaultUserName = null,
-            defaultUserPassword = null,
-            userNameSetter,
             saveConfirmModalWindow,
-            rejectChunkPracticeMode,
-            restoreSwalInput,
-            removeSwalInput,
-            myFormClassNameOnSwal = null,
-            appendMyFormOnSwal, 
-            removeMyFormOnSwal
+            rejectChunkPracticeMode
         ;
         globalMemCPSCIDA.nowChunkMode = String() + $('#chunkModeSelector option:selected').val();        
         ///////////////////////////////////////////////
-        ///////////////////////////////////////////////                
-        // swal の標準 input を無効化する．
-        // 無効化された swal 標準 input は removeSwalInput を実行しないと有効化されないことに注意．
-        // 原因は swal の css で swal モーダルウィンドウ内の input にスタイルが定義されているためと思われる．
-        removeSwalInput = function(){
-            $('.sweet-alert fieldset .sa-input-error, .sweet-alert fieldset input').css({
-                'display':'none'
-            });
-        };
+        ///////////////////////////////////////////////
+        // ユーザ認証モジュール ChunkPianoSystem_client.authorizeProcessorの実行
+        if(globalMemCPSCIDA.isAuthorize) clientAuthorizer();
         ///////////////////////////////////////////////
         ///////////////////////////////////////////////        
-        // swal の標準 input を有効化する．
-        // 有効化された swal 標準 input は removeSwalInput を実行しないと無効化されないことに注意．
-        // 原因は swal の css で swal モーダルウィンドウ内の input にスタイルが定義されているためと思われる．
-        restoreSwalInput = function(){
-            $('.sweet-alert fieldset .sa-input-error,  .sweet-alert fieldset input').css({
-                'display':'block'
-            }); 
-        };
-        // todo: 独自フォーム挿入後でも swal を type:input 以外で実行すると swal 標準 input を表示しないように修正．
-        ///////////////////////////////////////////////
-        ///////////////////////////////////////////////
-        // swal に独自フォームを埋め込むためのメソッド．引数 myForm は jQuery で作成した独自フォーム．
-        // 独自フォームを埋め込みたい swal を実行した直後に呼び出す．
-        // swal では独自 input 要素を表示できないため，.sweet-alert fieldset に jQuery で無理やり独自フォーム Myform を埋め込む．
-        appendMyFormOnSwal = function(myForm){
-            // myForm のクラス名が変更された際に removeMyFormOnSwal できるように，
-            // myForm のクラス名を myFormClassNameOnSwal にキャッシュする．
-            myFormClassNameOnSwal = myForm.prop('class');
-            $('.sweet-alert fieldset').append(myForm);           
-        };
-        ///////////////////////////////////////////////
-        ///////////////////////////////////////////////
-        // appendMyFormOnSwal で swal に挿入された 独自フォームを削除する．
-        removeMyFormOnSwal = function(){
-            if(myFormClassNameOnSwal != null){
-                $('.' + myFormClassNameOnSwal).remove();
-                myFormClassNameOnSwal = null;
-            }
-        };
-        // ユーザ認証処理．
-        // ユーザ認証用フォームを生成．
-        (function authorizationFrameTemplateGenerator(){
-            var authorizationFrame = $('<div class="authorizationFrame"></div>'),
-                userNameInput = $('<input type="text" id="userNameInput" maxlength="30" placeholder="ユーザ名を入力..."/>'),
-                br = $('<br>'),
-                userPasswordInput = $('<input type="password" id="userPasswordInput" maxlength="30" placeholder="パスワードを入力..."/>')
-            ;
-            
-            // 一度 userName, userPassword を入力している場合, 次回以降は localStorage に保存されている. 
-            // userName，userPassword をデフォルトで入力する．
-            try{
-                defaultUserName = localStorage.getItem('chunkPianoSystem_userName');
-                defaultUserPassword = localStorage.getItem('chunkPianoSystem_userPassword');
-                
-                if(defaultUserName == null || defaultUserName == undefined){
-                    defaultUserName = '';
-                }
-                if(defaultUserPassword == null || defaultUserPassword == undefined){
-                    defaultUserPassword = '';
-                }
-                
-                userNameInput.val(defaultUserName);
-                userPasswordInput.val(defaultUserPassword);
-                
-            }catch(e){
-                console.log(e);
-            }
-            
-            authorizationFrame.append(userNameInput)    
-                              .append(br)
-                              .append(userPasswordInput)
-            ;
-            
-            authorizationFrameTemplate = authorizationFrame;
-        })();
-        ///////////////////////////////////////////////
-        ///////////////////////////////////////////////
-        // ユーザ認証処理．
-        swal({
-            title: 'ユーザ認証',
-            text : '',
-            type : 'input',
-            allowEscapeKey   :false,
-            showCancelButton : true,            
-            confirmButtonText: 'ログイン',   
-            cancelButtonText : '新規アカウント作成',
-            closeOnConfirm   : false,   
-            closeOnCancel    : false,
-            showLoaderOnConfirm: true,
-        }
-        , function(isCreateNewAccount){ 
-
-            var userNameInputVal     = String() + $('#userNameInput').val(),
-                userPasswordInputVal = String() + $('#userPasswordInput').val()
-            ;            
-            // todo: swal input では isCreateNewAccount を正しく受け取れていない．
-            //       そのため，新規アカウント作成，ログインボタンのどちらをクリックしても認証処理が行われてしまう．
-            //       このバグを修正すること．
-            if(!isCreateNewAccount){ // ユーザがログインボタンをクリックした時の処理．
-                // ユーザ名，パスワードのバリデーション処理．
-                // ユーザ名，パスワードが共に入力されていない場合
-                if(
-                    (userNameInputVal == '' || userNameInputVal == null || userNameInputVal == undefined) &&
-                    (userPasswordInputVal == '' || userPasswordInputVal == null || userPasswordInputVal == undefined)
-                ){
-                    swal.showInputError('ユーザ名とパスワードを入力してください．'); 
-                // ユーザ名が入力されていない場合
-                }else if(userNameInputVal == '' || userNameInputVal == null || userNameInputVal == undefined){
-                   swal.showInputError('ユーザ名を入力してください．'); 
-                // パスワードが入力されていない場合
-                }else if(userPasswordInputVal == '' || userPasswordInputVal == null || userPasswordInputVal == undefined){
-                   swal.showInputError('パスワードを入力してください．'); 
-                // ユーザ名，パスワードが共に入力されている場合
-                }else{
-                    // console.log('userNameInput: ' + userNameInputVal); 
-                    // console.log('userPasswordInput: ' + userPasswordInputVal); 
-                    // 認証用ユーザ名，パスワードをサーバに送信．
-                    // サーバの UserDataBaseProcessor で処理するため，{'userName':'KensukeS', 'userPassword':'12345'} といった形式をとる．
-                    // callback はサーバから認証結果を受け取った際に実行される．
-                    globalMemCPSCIDA.reqAuthorization({'userName':userNameInputVal, 'userPassword':userPasswordInputVal}, function(authorizationResult){
-                        // console.info(authorizationResult);
-                        
-                        if(authorizationResult.status == 'success'){ // 認証成功時   
-                            
-                            // ユーザネームを設定．
-                            // これを行わないと「いいね!」の処理が正しく行われない．
-                            globalMemCPSCIDA.chunkDataObj.userName = userNameInputVal;
-                            
-                            // 一度 認証に成功した場合, 次回以降は localStorage に保存する．
-                            localStorage.setItem('chunkPianoSystem_userName', userNameInputVal);
-                            localStorage.setItem('chunkPianoSystem_userPassword', userPasswordInputVal);
-                            
-                            // swal から authorizationFrameTemplateGenerator で作成した独自フォームを除去し                            
-                            // appendMyFormOnSwal で無効化された swal 標準 input を有効化する．
-                            // removeMyFormOnSwal は appendMyFormOnSwal 実行時に行っているのでここで行う必要はない．
-                            removeMyFormOnSwal();
-
-                            // 認証成功ウィンドウを表示．
-                            // 新規 swal 実行で 認証モーダルウィンドウは自動で閉じられるので，
-                            // swal.close(); を実行する必要はない．
-                            swal({
-                                title: authorizationResult.message, 
-                                type : authorizationResult.status, 
-                                timer: 1500, 
-                                showConfirmButton: false 
-                            });
-                            
-                        }else if(authorizationResult.status == 'error'){ // 認証成功時
-                            swal.showInputError(authorizationResult.message); // authorizationResult.message 認証失敗メッセージ．
-                        }
-                        
-                    });
-                }
-            }else{ // ユーザが新規アカウント作成ボタンをクリックした時．
-                console.log('新規アカウント作成');
-                swal.close(); // todo: 新規アカウント作成処理の実装．
-            }
-        });        
-        // ユーザ認証 swal には 独自フォームを埋め込みたいので，通常の swal (type:input) 表示後に swal の標準 input を無効化し，
-        // appendMyFormOnSwal を実行．
-        removeSwalInput();
-        appendMyFormOnSwal(authorizationFrameTemplate);      
-        ///////////////////////////////////////////////
-        ///////////////////////////////////////////////
         // 演奏位置初期化処理
         // noteLinePosition を受け取ってから処理をしなければならないため，
         // callback を利用し サーバから noteLinePosition を受け取ってから下記の処理を行う．
@@ -314,7 +145,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                     }
                     
                     // swal 標準 input を無効化．
-                    removeSwalInput();
+                    ChunkPianoSystem_client.swalUtil.removeSwalInput();
                 };
 
                 swalPromptOptionForPracDayProp = {
@@ -328,7 +159,7 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
 
                 // removeSwalInput で無効化された swal 標準 input を有効化した後，
                 // 練習日数入力用 swal を表示．
-                restoreSwalInput();
+                ChunkPianoSystem_client.swalUtil.restoreSwalInput();
                 swal(swalPromptOptionForPracDayProp, practiceDayChecker);                
             }
         });
@@ -474,28 +305,19 @@ ChunkPianoSystem_client.initDomAction = function(globalMemCPSCIDA){
                 
                 // ファイル名リスト取得まで時間がかかる場合があるので，読み込み中を通知するモーダルウィンドウを表示．
                 // ファイル名リストが取得されると自動で閉じられる．
-                // swal('ファイルリストを\n取得しています...', '', 'info'); // showLoaderOnConfirm を利用しない場合．
-                swal({
+                ChunkPianoSystem_client.swalUtil.createAutoLoaderSwalWindow({
                     title: 'ファイルリストを\n取得しています...',
                     text : '',
                     type : 'info',
                     showCancelButton   : false,
                     closeOnConfirm     : false,
                     showLoaderOnConfirm: true,
-                },function(){});
-                
-                // jQuery で swal の ok ボタンをクリックし，showLoaderOnConfirm を初期状態で有効化する．
-                setTimeout(function(){
-                    $('.sa-button-container .confirm').click();
-
-                    // $('.sa-button-container .confirm').click() を実行後，少し setTimeout してから chunkFileNameReq を行い，
-                    // ファイル選択モーダルウィンドウの ok ボタンがクリックされてしまうのを防ぐ．
-                    setTimeout(function(){
-                        // todo: chunkFileName がレスポンスされた際の処理を client.js からここに移す．
-                        //       callback を利用して実現．                        
-                        globalMemCPSCIDA.socketIo.emit('chunkFileNameReq',{});
-                    }, 100);
-                }, 500);
+                }, function(){
+                    // この callback は loader の表示が完了した際に実行される．
+                    // todo: chunkFileName がレスポンスされた際の処理を client.js からここに移す．
+                    //       callback を利用して実現．                        
+                    globalMemCPSCIDA.socketIo.emit('chunkFileNameReq',{});
+                });
             }
         });
         ///////////////////////////////////////////////

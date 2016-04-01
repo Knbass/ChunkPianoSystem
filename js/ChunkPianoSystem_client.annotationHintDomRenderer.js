@@ -29,16 +29,6 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         
         annotationHintListWrapperDom = $('<div class="annotationHintListWrapper"></div>');                
         
-        // ↓ for dev & demo
-        // todo: サーバから annotation hint をダウンロードし表示するように変更．
-        //       サーバで annotation hint db を作成するモジュールを作成．
-        //       annotation hint の chunktype を表示するようにする．
-        // アノテーションヒントの dom は creadAndAppendAnnotationHintTxtDom で生成する．
-        //creadAndAppendAnnotationHintTxtDom('上田', 'コードがずっとA minor なので同じ運指を繰り返すだけで良い．', 
-        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        //creadAndAppendAnnotationHintTxtDom('岩淵', 'スタッカートを意識しながら跳ねるように演奏すると上手くいく．', 
-        //                                   annotationHintListWrapperDom, parentAnnotationDomCAHD);
-        
         // hdb とは annotationHintDataBase を意味する．
         // annotationHintDataBase のキーの従い annotationHintDataBase を探索し annotationHintDom を描画
         for(var hDbLine in hintChunkDataCAHD){ 
@@ -65,7 +55,7 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         
         // todo: annotationWrapper の clientTop が正しく取得されていないことが原因の, annotationHintWrapperDom 表示位置バグを修正．
         annotationHintWrapperDom.css({
-            top: parentAnnotationDomCAHD[0].clientTop + parentAnnotationDomCAHD[0].clientHeight + MARGIN_Y,
+            top : parentAnnotationDomCAHD[0].clientTop + parentAnnotationDomCAHD[0].clientHeight + MARGIN_Y,
             left: parentAnnotationDomCAHD[0].clientLeft
         });
         
@@ -76,11 +66,10 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
         autosize($('textarea')); // chunk annotation 入力用 textarea を自動可変に変更．
     };
     ///////////////////////////////////////////////
-    ///////////////////////////////////////////////    
+    ///////////////////////////////////////////////
     creadAndAppendAnnotationHintTxtDom = function(annotationUserName, innerText, parentDom, parentAnnotationDom){
 
-        var 
-            annotationHintListDom = $('<div class="annotationHintList fade"></div>'),
+        var annotationHintListDom = $('<div class="annotationHintList fade"></div>'),
             hintAnnotationUserNameDom = $('<p class="hintAnnotationUserName">' + annotationUserName + '</p>'),
             annotationHintTxtDom = $('<textarea class="annotationHintTxt" cols="50" rows="2" readonly>' + String() + innerText + '</textarea>'),
             refBtnDom = $('<div class="button refBtn">引用する</div>')
