@@ -20,8 +20,6 @@ module.exports = (function(){
         
         ExtendedFs.readdir(directryPath, function(err, files){
             if (err){
-                // ファイル名を取得できない際は callback の第2引数を与える．
-                // 
                 console.log(err);
                 sys.puts('ファイル名を取得できませんでした．'.red);
                 callback(null, true); // 第2引数は error 通知変数 isError．error 発生時は true. 
@@ -52,13 +50,14 @@ module.exports = (function(){
     //////////////////////////////////////////////
     // [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
     // directry path を指定する際，末尾に '/' を付けずに実行しなければならない. 
-    // callback にファイルデータが格納された配列が渡される．
+    // callback にファイルデータが格納された配列が渡される．第2引数は error が発生したかを示す bool 値 isError.
     ExtendedFs.readFilesAsync = function(directryPathRFA, extentionRFA, callback){
         // fileNameList には指定された拡張子を持つファイル名のみが格納されている．
         ExtendedFs.getFileNameListAsync(directryPathRFA, extentionRFA, function(fNameList, isError){
             
             if(isError){
                 sys.puts('ファイル名を取得できず，readFilesAsync を正常に実行できませんでした．'.red);
+                callback(null, true); // error 発生時は第2引数は true.
             }else{
                 var fileDataList = [];
 
@@ -74,7 +73,7 @@ module.exports = (function(){
                         console.log('dhirectry path の末尾に / が付いている可能性があります．除去してください．');
                     }
                 }
-                callback(fileDataList);
+                callback(fileDataList, false);
             }
             
         });

@@ -73,17 +73,29 @@ module.exports = (function(){ // node module として利用する際はこち�
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
+    // annotationHintDataBase を更新しメモリ上に展開する．
+    // 更新に失敗した際は loadDataBase で annotationHintDataBase をメモリ上に展開する．
     uppdateDataBase = function(callback){
-        // server モジュールから呼び出すメソッドのため，念入りに try-catch する．
+        
+        var loadDataBaseBootUp;
+        // uppdateDataBase でerror が発生した際は loadDataBase で annotationHintDataBase をメモリ上に展開．
         // ここでバグが発生しても，annotationHint データベース更新が不能になる以外のトラブルを
-        // 起こさない(フォールトトレラント設計)．
-        try{
-            initAnnotationHintDataBase(); // AnnotationHintDataBase の雛形を生成してからデータベースを構成．
-            
-            // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){  // moduleTest 時のファイルパス
-            extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData){
-                // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
-                // (1) まず，ファイルを1つずつ読み込む. 
+        // 起こさない(フォールトトレラント)．
+        loadDataBaseBootUp = function(){
+            loadDataBase(callback);
+            sys.puts('ChunkData フォルダの json ファイルの取得に失敗しました．'.red);
+            sys.puts('代わりに loadDataBase で起動します...'.red);
+        };
+        
+        initAnnotationHintDataBase(); // AnnotationHintDataBase の雛形を生成してからデータベースを構成．
+
+        // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){  // moduleTest 時のファイルパス
+        extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData, isError){
+            // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
+            // (1) まず，ファイルを1つずつ読み込む. 
+            if(isError){
+                if(callback) loadDataBaseBootUp(callback);                    
+            }else{
                 for(var file_i in chunkData){
 
                     try{
@@ -120,26 +132,26 @@ module.exports = (function(){ // node module として利用する際はこち�
 
                             }
                         }catch(e){
+                            if(callback) loadDataBaseBootUp(callback);    
                             console.log(e);
                             sys.puts('chunkData個別処理でエラー．annotationHintDataBase を更新できません．'.red);
+                            break;
                         }
                     }catch(e){
+                        if(callback) loadDataBaseBootUp(callback);
                         console.log(e);
                         sys.puts('chunkData全体処理でエラー．annotationHintDataBase を更新できません．'.red);
+                        break;
                     }
 
                 }
                 // console.log(chunkData);           
-                
+
                 // 最新の annotationHintDataBase はメモリ内で構成されているため，最新の database を saveDataBaseAsJson で
                 // 保存してから loadDataBase する必要はない．
-                saveDataBaseAsJson(callback);
-            });
-        }catch(e){
-            console.log(e);
-            sys.puts('readFilesAsyncでエラー．annotationHintDataBase を更新できません．'.red);
-            callback();
-        }  
+                if(callback) saveDataBaseAsJson(callback);
+            }
+        });
     };
     //////////////////////////////////////////////
     //////////////////////////////////////////////
@@ -164,7 +176,7 @@ module.exports = (function(){ // node module として利用する際はこち�
                 searchResult = {},
                 tmp_searchedNoteLine
             ;
-            console.log(annotationHintDataBase);
+            // console.log(annotationHintDataBase);
             
             // searchRangeMin が 0 以下の場合は検索不可なので 0 に修正
             if(searchRangeMin < 0){
@@ -248,10 +260,15 @@ module.exports = (function(){ // node module として利用する際はこち�
             if(callback) callback();
             sys.puts('AnnotationHintDataBase loaded.'.green);
         }catch(e){
+            if(callback) callback();
             console.log(e);
             sys.puts('Error occured in loadDataBase.'.red);
             sys.puts('AnnotationHintDataBase が構成されていない可能性があります.'.red);
             sys.puts('uppdateDataBase で起動してください．'.red);
+            // ここで updateDataBase で起動するようにすると，updateDataBase で error が発生した際に
+            // loadDataBase が起動するようになっているので，無限ループに陥る可能性がある．
+            // そのため，loadDataBase が失敗した際は AnnotationHintDataBase のメモリ展開を行わず
+            // 機能を低下させ server を実行する．
         }
     };
     //////////////////////////////////////////////
