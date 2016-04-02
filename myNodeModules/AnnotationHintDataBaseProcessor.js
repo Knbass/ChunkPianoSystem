@@ -83,7 +83,7 @@ module.exports = (function(){ // node module として利用する際はこち�
             // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){  // moduleTest 時のファイルパス
             extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData){
                 // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
-                // (1) まず，ファイルを1つずつ読み込む．
+                // (1) まず，ファイルを1つずつ読み込む. 
                 for(var file_i in chunkData){
 
                     try{

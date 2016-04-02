@@ -4,7 +4,6 @@ var ChunkPianoSystem_server = function(){
     ///////////////////////////////////////////////
     var constructor,
         getStrTimeOrYear = require('./myNodeModules/GetStrTimeOrYear'), // node_modules を指定せずに require する方法はないのか? 
-        getChunkDataJsonList,
         initHttpAndSocketIo,
         splitedIoi = [],
         scoreDataParser = require('./myNodeModules/ScoreDataParser.js')('./ScoreData/TurcoScore.json'),
@@ -152,19 +151,14 @@ var ChunkPianoSystem_server = function(){
             });
             ///////////////////////////////////////////////
             /////////////////////////////////////////////// 
-            socket.on('chunkFileNameReq', function(data){
-                
-                getChunkDataJsonList('./ChunkData/', function(fileNameList, e){
-                    if(e){
-                        console.log(e);
-                    }else{
-                        // todo: 保存しているファイルがない場合の処理を追加
-                        socket.emit('chunkFileNameList',{
-                            status : 'success', // status は success, error, sameFileExist
-                            message: 'チャンクデータの保存を\n完了しました',
-                            fileNameList:fileNameList
-                        });
-                    }
+            socket.on('chunkFileNameReq', function(data){                
+                extendedFs.getFileNameListAsync('./ChunkData/', 'json', function(fileNameList){
+                    // todo: 保存しているファイルがない場合の処理を追加
+                    socket.emit('chunkFileNameList',{
+                        status : 'success', // status は success, error, sameFileExist
+                        message: 'チャンクデータの保存を\n完了しました',
+                        fileNameList:fileNameList
+                    });
                 });
             });
             ///////////////////////////////////////////////
@@ -226,45 +220,9 @@ var ChunkPianoSystem_server = function(){
             // socket.emit　      → 自分のみにデータを送信する. socket.emit であることに注意!
         });
     };
-    
-    // todo: ExtendFs に同機能が実装されているので，利用すること．
-    // 指定フォルダのファイル一覧を取得... http://blog.panicblanket.com/archives/2465
-    // readdir は非同期実行なので次処理は callback で渡す．
-    getChunkDataJsonList = function(directryPathGCDJL, callback){        
-        extendedFs.readdir(directryPathGCDJL, function(err, files){    
-            try{
-            
-                if (err) throw err;
-
-                var chunkDataJsonList = [];
-
-                files.forEach(function (file){
-                    chunkDataJsonList.push(file);
-                });
-
-                // json 拡張子以外のファイルをファイル名リストから削除
-                for (var i in chunkDataJsonList){
-
-                    var substrString;
-
-                    // 文字列を末尾から指定分切り抜く... https://syncer.jp/javascript-reverse-reference/how-to-use-substr
-                    substrString = chunkDataJsonList[i].substr( (chunkDataJsonList[i].length - 4) , (chunkDataJsonList[i].length - 1) );
-
-                    // 指定位置の要素を削除... https://syncer.jp/javascript-reverse-reference/array-remove
-                    if(substrString != 'json'){
-                        chunkDataJsonList.splice( i , 1 ) ; // i 番目の要素のみを配列から削除
-                    }
-                }
-                callback(chunkDataJsonList);
-            }catch(e){
-                callback(chunkDataJsonList, e);
-            }
-        });
-    };
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
     constructor = function(){
-        
         /*
         // サーバ起動時に AnnotationHintDataBase を更新せずに起動する場合はこちらを有効化．
         // この場合，サーバ起動時に AnnotationHintDataBase が構成されている必要がある．

@@ -41,18 +41,18 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
                             "1": {    // 練習日
                                 "summaryChunk_0": { // クライアント再度で生成される chunkDataObj.chunkData
                                     "chunkDomId": "summaryChunk_0",
-                                    "left": 1103,
-                                    "top": 592,
-                                    "width": 118,
+                                    "left"  : 1103,
+                                    "top"   : 592,
+                                    "width" : 118,
                                     "height": 21,
-                                    "stringScoreCol": "1",
+                                    "stringScoreCol"  : "1",
                                     "chunkMiddleAxisY": 575,
-                                    "chunkType": "summary",
-                                    "chunkHeadLine": 0,
-                                    "chunkTailLine": 0,
-                                    "chunkMiddleLine": 0,
+                                    "chunkType"       : "summary",
+                                    "chunkHeadLine"   : 0,
+                                    "chunkTailLine"   : 0,
+                                    "chunkMiddleLine" : 0,
                                     "parentChunk": null,
-                                    "good": null,
+                                    "good"       : null,
                                     "chunkAnnotationText": "今日の目標としてまず少しでも進めるように考えていた。"
                                 }
                             }
@@ -63,7 +63,7 @@ ChunkPianoSystem_client.annotationHintDomRenderer = function(globalMemCPSAHDR){
          */
         // hdb とは annotationHintDataBase を意味する．
         // annotationHintDataBase から出力された検索結果オブジェクト hintChunkDataCAHD を全探索し annotationHintDom を描画．
-        for(var hDbLine in hintChunkDataCAHD){ 
+        for(var hDbLine in hintChunkDataCAHD){ // 音符列番号
             for(var hDbChunkType in hintChunkDataCAHD[hDbLine]){
                 for(var hDbUserName in hintChunkDataCAHD[hDbLine][hDbChunkType]){
                     for(var hDbPracticeDay in hintChunkDataCAHD[hDbLine][hDbChunkType][hDbUserName]){

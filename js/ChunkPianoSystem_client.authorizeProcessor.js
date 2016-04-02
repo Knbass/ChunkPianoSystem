@@ -86,10 +86,11 @@ ChunkPianoSystem_client.authorizeProcessor = function(globalMemCPSCP){
                 // パスワードが入力されていない場合
                 }else if(userPasswordInputVal == '' || userPasswordInputVal == null || userPasswordInputVal == undefined){
                    swal.showInputError('パスワードを入力してください．'); 
-                // ユーザ名，パスワードが共に入力されている場合
+                // ユーザ名，パスワードが共に入力されている場合.
                 }else{
                     // console.log('userNameInput: ' + userNameInputVal); 
-                    // console.log('userPasswordInput: ' + userPasswordInputVal); 
+                    // console.log('userPasswordInput: ' + userPasswordInputVal);
+                    
                     // 認証用ユーザ名，パスワードをサーバに送信．
                     // サーバの UserDataBaseProcessor で処理するため，{'userName':'KensukeS', 'userPassword':'12345'} といった形式をとる．
                     // callback はサーバから認証結果を受け取った際に実行される．
