@@ -79,7 +79,7 @@ module.exports = (function(){ // node module として利用する際はこち�
         // 起こさない(フォールトトレラント設計)．
         try{
             initAnnotationHintDataBase(); // AnnotationHintDataBase の雛形を生成してからデータベースを構成．
-                        
+            
             // extendedFs.readFilesAsync('../ChunkData', 'json', function(chunkData){  // moduleTest 時のファイルパス
             extendedFs.readFilesAsync('./ChunkData', 'json', function(chunkData){
                 // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
@@ -134,10 +134,11 @@ module.exports = (function(){ // node module として利用する際はこち�
                 // 最新の annotationHintDataBase はメモリ内で構成されているため，最新の database を saveDataBaseAsJson で
                 // 保存してから loadDataBase する必要はない．
                 saveDataBaseAsJson(callback);
-        });
+            });
         }catch(e){
             console.log(e);
             sys.puts('readFilesAsyncでエラー．annotationHintDataBase を更新できません．'.red);
+            callback();
         }  
     };
     //////////////////////////////////////////////

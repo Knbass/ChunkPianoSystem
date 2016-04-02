@@ -152,13 +152,20 @@ var ChunkPianoSystem_server = function(){
             ///////////////////////////////////////////////
             /////////////////////////////////////////////// 
             socket.on('chunkFileNameReq', function(data){                
-                extendedFs.getFileNameListAsync('./ChunkData/', 'json', function(fileNameList){
-                    // todo: 保存しているファイルがない場合の処理を追加
-                    socket.emit('chunkFileNameList',{
-                        status : 'success', // status は success, error, sameFileExist
-                        message: 'チャンクデータの保存を\n完了しました',
-                        fileNameList:fileNameList
-                    });
+                extendedFs.getFileNameListAsync('./ChunkData/', 'json', function(fileNameList, isError){                    
+                    if(isError){
+                        socket.emit('chunkFileNameList',{
+                            status : 'error',
+                            message: 'チャンクデータの読み込みに失敗しました...',
+                            fileNameList:fileNameList
+                        });
+                    }else{
+                        // todo: 保存しているファイルがない場合の処理を追加
+                        socket.emit('chunkFileNameList',{
+                            status : 'success', // status は success, error, sameFileExist
+                            fileNameList:fileNameList
+                        });
+                    }
                 });
             });
             ///////////////////////////////////////////////
