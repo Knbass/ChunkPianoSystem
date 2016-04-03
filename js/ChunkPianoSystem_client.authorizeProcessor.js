@@ -123,7 +123,7 @@ ChunkPianoSystem_client.authorizeProcessor = function(globalMemCPSCP){
                                 showConfirmButton: false 
                             });
 
-                        }else if(authorizationResult.status == 'error'){ // 認証成功時
+                        }else if(authorizationResult.status == 'error'){ // 認証失敗時
                             swal.showInputError(authorizationResult.message); // authorizationResult.message 認証失敗メッセージ．
                         }
 

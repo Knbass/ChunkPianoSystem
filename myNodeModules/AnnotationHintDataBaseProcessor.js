@@ -170,64 +170,70 @@ module.exports = (function(){ // node module として利用する際はこち�
         }
     */
     search = function(chunkData, option){
-        try{        
-            var searchRangeMin = chunkData.chunkMiddleLine - option.margin, // チャンクの中央音符列位置を基に検索範囲を計算.
-                searchRangeMax = chunkData.chunkMiddleLine + option.margin,
-                searchResult = {},
-                tmp_searchedNoteLine
-            ;
-            // console.log(annotationHintDataBase);
-            
-            // searchRangeMin が 0 以下の場合は検索不可なので 0 に修正
-            if(searchRangeMin < 0){
-                searchRangeMin = 0;
-            }
-            // TurcoScore の場合は searchRangeMax が 82 以上の場合は検索不可なので 82 に修正．        
-            if(searchRangeMax > noteLineLength){
-                searchRangeMax = noteLineLength;   
-            }
+        try{
+            // chunkData がない時，もしくは loadDataBase で error が発生した時は annotationHintDataBase が空になる．
+            // その際に search された際は error を返す．
+            if(Object.keys(annotationHintDataBase).length == 0){
+                return 'error';
+            }else{
+                var searchRangeMin = chunkData.chunkMiddleLine - option.margin, // チャンクの中央音符列位置を基に検索範囲を計算.
+                    searchRangeMax = chunkData.chunkMiddleLine + option.margin,
+                    searchResult = {},
+                    tmp_searchedNoteLine
+                ;
+                // console.log(annotationHintDataBase);
 
-            // console.log(chunkData);
-            // console.log(option);
-            // console.log('searchRangeMin: ' + searchRangeMin);
-            // console.log('searchRangeMax: ' + searchRangeMax);      
+                // searchRangeMin が 0 以下の場合は検索不可なので 0 に修正
+                if(searchRangeMin < 0){
+                    searchRangeMin = 0;
+                }
+                // TurcoScore の場合は searchRangeMax が 82 以上の場合は検索不可なので 82 に修正．        
+                if(searchRangeMax > noteLineLength){
+                    searchRangeMax = noteLineLength;   
+                }
 
-            for(var searchRenge = searchRangeMin; searchRenge <= searchRangeMax; searchRenge++){
-                // console.log();
-                tmp_searchedNoteLine = annotationHintDataBase[String() + searchRenge];
+                // console.log(chunkData);
+                // console.log(option);
+                // console.log('searchRangeMin: ' + searchRangeMin);
+                // console.log('searchRangeMax: ' + searchRangeMax);      
 
-                if(option.patternChunk){
-                    if(Object.keys(tmp_searchedNoteLine.patternChunk).length != 0){
-                        // 検索オプションで patternChunk が有効化され，該当音列 の annotationHintDataBase の patternChunk が空でない時は
-                        // 検索結果に当該データを格納する．
-                        // phraseChunk, hardChunk, summaryChunk についても同様の処理を行っている．
-                        // todo: 類似処理が反復されているので関数化する． 
-                        searchResult[String() + searchRenge] = {};
-                        searchResult[String() + searchRenge]['patternChunk'] = tmp_searchedNoteLine.patternChunk;
+                for(var searchRenge = searchRangeMin; searchRenge <= searchRangeMax; searchRenge++){
+                    // console.log();
+                    tmp_searchedNoteLine = annotationHintDataBase[String() + searchRenge];
+
+                    if(option.patternChunk){
+                        if(Object.keys(tmp_searchedNoteLine.patternChunk).length != 0){
+                            // 検索オプションで patternChunk が有効化され，該当音列 の annotationHintDataBase の patternChunk が空でない時は
+                            // 検索結果に当該データを格納する．
+                            // phraseChunk, hardChunk, summaryChunk についても同様の処理を行っている．
+                            // todo: 類似処理が反復されているので関数化する． 
+                            searchResult[String() + searchRenge] = {};
+                            searchResult[String() + searchRenge]['patternChunk'] = tmp_searchedNoteLine.patternChunk;
+                        }
+                    }
+                    if(option.phraseChunk){
+                        if(Object.keys(tmp_searchedNoteLine.phraseChunk).length != 0){
+                            searchResult[String() + searchRenge] = {};
+                            searchResult[String() + searchRenge]['phraseChunk'] = tmp_searchedNoteLine.phraseChunk;
+                        }
+                    }           
+                    if(option.hardChunk){
+                        if(Object.keys(tmp_searchedNoteLine.hardChunk).length != 0){
+                            searchResult[String() + searchRenge] = {};
+                            searchResult[String() + searchRenge]['hardChunk'] = tmp_searchedNoteLine.hardChunk;
+                        }
+                    }
+                    if(option.summaryChunk){
+                        if(Object.keys(tmp_searchedNoteLine.summaryChunk).length != 0){
+                            searchResult[String() + searchRenge] = {};
+                            searchResult[String() + searchRenge]['summaryChunk'] = tmp_searchedNoteLine.summaryChunk;
+                        }
                     }
                 }
-                if(option.phraseChunk){
-                    if(Object.keys(tmp_searchedNoteLine.phraseChunk).length != 0){
-                        searchResult[String() + searchRenge] = {};
-                        searchResult[String() + searchRenge]['phraseChunk'] = tmp_searchedNoteLine.phraseChunk;
-                    }
-                }           
-                if(option.hardChunk){
-                    if(Object.keys(tmp_searchedNoteLine.hardChunk).length != 0){
-                        searchResult[String() + searchRenge] = {};
-                        searchResult[String() + searchRenge]['hardChunk'] = tmp_searchedNoteLine.hardChunk;
-                    }
-                }
-                if(option.summaryChunk){
-                    if(Object.keys(tmp_searchedNoteLine.summaryChunk).length != 0){
-                        searchResult[String() + searchRenge] = {};
-                        searchResult[String() + searchRenge]['summaryChunk'] = tmp_searchedNoteLine.summaryChunk;
-                    }
-                }
+                // 条件に適合する検索結果が無い場合は {} が return される．
+                // console.log(searchResult);
+                return searchResult;
             }
-            // 条件に適合する検索結果が無い場合は {} が return される．
-            // console.log(searchResult);
-            return searchResult;
         }catch(e){
             sys.puts('Error occured in AnnotationHintDataBaseProcessor.search'.red);
             return 'error'; // 検索操作中に error が発生した際は server に文字列を返却し伝達．

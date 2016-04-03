@@ -215,8 +215,8 @@ var ChunkPianoSystem_server = function(){
                 }else{
                     socket.emit('annotationHint',{
                         status : 'error',
-                        message: 'ヒントアノテーションの受信に失敗しました',
-                        searchResult:searchResult
+                        message: 'ヒントアノテーションが\nありません．',
+                        searchResult:null
                     });
                 }
             });
@@ -241,7 +241,7 @@ var ChunkPianoSystem_server = function(){
         // サーバ起動時に AnnotationHintDataBase を更新してから起動する場合はこちらを有効化．
         // この場合，AnnotationHintDataBase が構成されていなくても実行可能．
         // サーバ負荷を気にしなくて良い場合はこちらで起動すること．
-        annotationHintDataBaseProcessor.uppdateDataBase(function(){
+        annotationHintDataBaseProcessor.loadDataBase(function(){
             initHttpAndSocketIo();
         });
     };

@@ -135,12 +135,25 @@ ChunkPianoSystem_client.annotationDomRenderer = function(globalMemCPSADR){
             
             // ユーザが指定した検索オプションに基づき，サーバに Annotation Hint をリクエストする.
             // callback は Annotation Hint が受信された際に実行される．
-            globalMemCPSADR.reqAnnotationHint(chunkData, annotationHintSearchOption, function(status, hintChunkData){
-                if(status == 'error'){
-                    console.error('error occured in reqAnnotationHint');
+            // annotationHintData は サーバから返却される swal 形式のオブジェクト．実例は以下の通り．
+            /*
+                {
+                    status : 'success',
+                    message: 'ヒントアノテーションの受信に失敗しました',
+                    searchResult:searchResult
+                }
+            */
+            globalMemCPSADR.reqAnnotationHint(chunkData, annotationHintSearchOption, function(annotationHintData){
+                if(annotationHintData.status == 'error'){
+                    swal({
+                        title: annotationHintData.message, 
+                        type : annotationHintData.status, 
+                        timer: 1500, 
+                        showConfirmButton: false
+                    });
                 }else{
                     // console.log(hintChunkData);
-                    globalMemCPSADR.annotationHintDomRenderer.createAnnotationHintDom(parentAnnotationDom, hintChunkData);
+                    globalMemCPSADR.annotationHintDomRenderer.createAnnotationHintDom(parentAnnotationDom, annotationHintData.searchResult);
                 }
             });
         });

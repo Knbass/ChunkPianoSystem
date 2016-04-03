@@ -125,7 +125,7 @@ var ChunkPianoSystem_client = function(){
         ///////////////////////////////////////////////
         globalMem.socketIo.on('annotationHint', function(data){ // ユーザが hint ボタンを押下し要求した annotation hint が返却された際の動作．
             if(reqAnnotationHintCallback){
-                reqAnnotationHintCallback(data.status, data.searchResult);
+                reqAnnotationHintCallback(data);
             }
         });
         ///////////////////////////////////////////////
