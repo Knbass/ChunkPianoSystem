@@ -77,11 +77,11 @@ module.exports = (function(){ // node module として利用する際はこち�
     // 更新に失敗した際は loadDataBase で annotationHintDataBase をメモリ上に展開する．
     uppdateDataBase = function(callback){
         
-        var loadDataBaseBootUp;
+        var bootUpWithLoadDataBase;
         // uppdateDataBase でerror が発生した際は loadDataBase で annotationHintDataBase をメモリ上に展開．
         // ここでバグが発生しても，annotationHint データベース更新が不能になる以外のトラブルを
         // 起こさない(フォールトトレラント)．
-        loadDataBaseBootUp = function(){
+        bootUpWithLoadDataBase = function(){
             loadDataBase(callback);
             sys.puts('ChunkData フォルダの json ファイルの取得に失敗しました．'.red);
             sys.puts('代わりに loadDataBase で起動します...'.red);
@@ -94,7 +94,7 @@ module.exports = (function(){ // node module として利用する際はこち�
             // readFilesAsync は [{'ファイル名':ファイルデータ}, {'ファイル名':ファイルデータ}...] を返却する．
             // (1) まず，ファイルを1つずつ読み込む. 
             if(isError){
-                if(callback) loadDataBaseBootUp(callback);                    
+                if(callback) bootUpWithLoadDataBase(callback);                    
             }else{
                 for(var file_i in chunkData){
 
@@ -132,13 +132,13 @@ module.exports = (function(){ // node module として利用する際はこち�
 
                             }
                         }catch(e){
-                            if(callback) loadDataBaseBootUp(callback);    
+                            if(callback) bootUpWithLoadDataBase(callback);    
                             console.log(e);
                             sys.puts('chunkData個別処理でエラー．annotationHintDataBase を更新できません．'.red);
                             break;
                         }
                     }catch(e){
-                        if(callback) loadDataBaseBootUp(callback);
+                        if(callback) bootUpWithLoadDataBase(callback);
                         console.log(e);
                         sys.puts('chunkData全体処理でエラー．annotationHintDataBase を更新できません．'.red);
                         break;
